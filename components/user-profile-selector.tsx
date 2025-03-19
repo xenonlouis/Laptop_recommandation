@@ -1,12 +1,14 @@
 "use client"
 
+import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import type { UserProfile } from "@/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export function UserProfileSelector() {
+function UserProfileSelectorContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -25,41 +27,51 @@ export function UserProfileSelector() {
         <CardDescription>Select your user profile to get tailored recommendations</CardDescription>
       </CardHeader>
       <CardContent>
-        <RadioGroup value={currentProfile || undefined} onValueChange={handleProfileChange} className="space-y-4">
-          <div className="flex items-start space-x-3 space-y-0">
+        <RadioGroup value={currentProfile || ""} onValueChange={handleProfileChange}>
+          <div className="flex items-center space-x-2">
             <RadioGroupItem value="consultant" id="consultant" />
-            <div className="grid gap-1.5">
-              <Label htmlFor="consultant" className="font-medium">
-                Consultant
-              </Label>
-              <p className="text-sm text-muted-foreground">Business-focused laptops with Windows or macOS support</p>
-            </div>
+            <Label htmlFor="consultant">Consultant</Label>
           </div>
-
-          <div className="flex items-start space-x-3 space-y-0">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem value="webDeveloper" id="webDeveloper" />
-            <div className="grid gap-1.5">
-              <Label htmlFor="webDeveloper" className="font-medium">
-                Web Developer
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Development-optimized laptops with Windows, macOS, or Linux support
-              </p>
-            </div>
+            <Label htmlFor="webDeveloper">Web Developer</Label>
           </div>
-
-          <div className="flex items-start space-x-3 space-y-0">
+          <div className="flex items-center space-x-2">
             <RadioGroupItem value="intensiveDeployment" id="intensiveDeployment" />
-            <div className="grid gap-1.5">
-              <Label htmlFor="intensiveDeployment" className="font-medium">
-                Intensive Deployment
-              </Label>
-              <p className="text-sm text-muted-foreground">High-performance laptops with Windows or Linux support</p>
-            </div>
+            <Label htmlFor="intensiveDeployment">Intensive Deployment</Label>
           </div>
         </RadioGroup>
       </CardContent>
     </Card>
+  )
+}
+
+function UserProfileSelectorSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-64" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-center space-x-2">
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export function UserProfileSelector() {
+  return (
+    <Suspense fallback={<UserProfileSelectorSkeleton />}>
+      <UserProfileSelectorContent />
+    </Suspense>
   )
 }
 

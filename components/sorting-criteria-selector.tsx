@@ -1,13 +1,15 @@
 "use client"
 
+import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { SortingCriteria, OperatingSystem } from "@/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export function SortingCriteriaSelector() {
+function SortingCriteriaSelectorContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -62,62 +64,79 @@ export function SortingCriteriaSelector() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sorting & Filtering</CardTitle>
-        <CardDescription>Choose how you want to sort and filter laptop recommendations</CardDescription>
+        <CardTitle>Sorting Criteria</CardTitle>
+        <CardDescription>Choose how to sort and filter the laptop recommendations</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-sm font-medium mb-3">Sort By:</h3>
-          <RadioGroup value={currentCriteria || undefined} onValueChange={handleCriteriaChange} className="space-y-4">
-            <div className="flex items-start space-x-3 space-y-0">
+        <div className="space-y-4">
+          <Label>Sort By</Label>
+          <RadioGroup value={currentCriteria || ""} onValueChange={handleCriteriaChange}>
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="price" id="price" />
-              <div className="grid gap-1.5">
-                <Label htmlFor="price" className="font-medium">
-                  Price
-                </Label>
-                <p className="text-sm text-muted-foreground">Budget-friendly options first</p>
-              </div>
+              <Label htmlFor="price">Price</Label>
             </div>
-
-            <div className="flex items-start space-x-3 space-y-0">
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="performance" id="performance" />
-              <div className="grid gap-1.5">
-                <Label htmlFor="performance" className="font-medium">
-                  Performance
-                </Label>
-                <p className="text-sm text-muted-foreground">High-end specs and capabilities first</p>
-              </div>
+              <Label htmlFor="performance">Performance</Label>
             </div>
-
-            <div className="flex items-start space-x-3 space-y-0">
-              <RadioGroupItem value="batteryLife" id="batteryLife" />
-              <div className="grid gap-1.5">
-                <Label htmlFor="batteryLife" className="font-medium">
-                  Battery Life
-                </Label>
-                <p className="text-sm text-muted-foreground">Long-lasting battery options first</p>
-              </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="battery" id="battery" />
+              <Label htmlFor="battery">Battery Life</Label>
             </div>
           </RadioGroup>
         </div>
 
-        {currentProfile && (
-          <div>
-            <h3 className="text-sm font-medium mb-3">Operating System:</h3>
-            <Tabs value={currentOS || "all"} onValueChange={handleOSChange} className="w-full">
-              <TabsList className="grid grid-cols-4">
-                <TabsTrigger value="all">All</TabsTrigger>
-                {getOSOptions().map((option) => (
-                  <TabsTrigger key={option.value} value={option.value}>
-                    {option.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
-        )}
+        <div className="space-y-4">
+          <Label>Operating System</Label>
+          <Tabs value={currentOS || "all"} onValueChange={handleOSChange}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="all">All</TabsTrigger>
+              {getOSOptions().map((os) => (
+                <TabsTrigger key={os.value} value={os.value}>
+                  {os.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
       </CardContent>
     </Card>
+  )
+}
+
+function SortingCriteriaSelectorSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-4 w-64" />
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-16" />
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center space-x-2">
+                <Skeleton className="h-4 w-4" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export function SortingCriteriaSelector() {
+  return (
+    <Suspense fallback={<SortingCriteriaSelectorSkeleton />}>
+      <SortingCriteriaSelectorContent />
+    </Suspense>
   )
 }
 
