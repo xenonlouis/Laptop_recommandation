@@ -53,7 +53,7 @@
     "ram": "16",
     "storage": "512",
     "batteryLife": 7,
-    "performanceScore": 8.7,
+    "performanceScore": 8.9,
     "notes": "Freedos included , besoin d'une license Windows",
     "images": [
       "https://joutech.ma/7073-large_default/ordinateur-portable-lenovo-thinkpad-e14-gen-5-21m7000hfe.jpg"
@@ -86,7 +86,8 @@
       "webDeveloper"
     ],
     "supportedOS": [
-      "windows"
+      "windows",
+      "linux"
     ],
     "id": "z9axtzs"
   },
@@ -98,7 +99,7 @@
     "ram": "16",
     "storage": "256",
     "batteryLife": 16,
-    "performanceScore": 8,
+    "performanceScore": 8.8,
     "notes": "",
     "images": [
       "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005959615.jpeg"
