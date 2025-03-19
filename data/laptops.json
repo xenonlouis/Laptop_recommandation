@@ -1,0 +1,115 @@
+[
+  {
+    "brand": "Hp",
+    "model": "Probook 450 G8 11Th",
+    "price": 8390,
+    "processor": "i7-1165G7",
+    "ram": "16",
+    "storage": "512",
+    "batteryLife": 4,
+    "performanceScore": 8,
+    "notes": "",
+    "images": [
+      "https://www.techpro.ma/2883-large_default/ordinateur-portable-hp-probook-450-g8-i7-32m80ea.jpg",
+      "https://media.tera.ma/wp-content/uploads/2025/03/HP-PROBOOK-450-G8-1.jpg",
+      "https://bunny-wp-pullzone-cbh8ghlmbr.b-cdn.net/wp-content/uploads/2024/12/91002984_5944689220-600x600.jpg"
+    ],
+    "supportedProfiles": [
+      "consultant"
+    ],
+    "supportedOS": [
+      "windows",
+      "linux"
+    ],
+    "id": "vlkhl1j"
+  },
+  {
+    "brand": "Apple",
+    "model": "MacBook Air 13",
+    "price": 10690,
+    "processor": "Puce M1",
+    "ram": "8",
+    "storage": "256",
+    "batteryLife": 15,
+    "performanceScore": 7.5,
+    "notes": "",
+    "images": [
+      "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005819956_1.jpeg",
+      "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005819961_1.jpeg"
+    ],
+    "supportedProfiles": [
+      "consultant"
+    ],
+    "supportedOS": [
+      "macos"
+    ],
+    "id": "8bxapel"
+  },
+  {
+    "brand": "Lenovo",
+    "model": "ThinkPad E14 Gen 5 (Intel)",
+    "price": 999,
+    "processor": " Intel® Core™ Ultra 7 155H ",
+    "ram": "16",
+    "storage": "512",
+    "batteryLife": 7,
+    "performanceScore": 8.7,
+    "notes": "Freedos included , besoin d'une license Windows",
+    "images": [
+      "https://joutech.ma/7073-large_default/ordinateur-portable-lenovo-thinkpad-e14-gen-5-21m7000hfe.jpg"
+    ],
+    "supportedProfiles": [
+      "webDeveloper",
+      "intensiveDeployment"
+    ],
+    "supportedOS": [
+      "windows",
+      "linux"
+    ],
+    "id": "m626lh4"
+  },
+  {
+    "brand": "Hp",
+    "model": "Probook 440 G11",
+    "price": 8850,
+    "processor": "Intel Core Ultra 7 155U",
+    "ram": "8",
+    "storage": "512",
+    "batteryLife": 6,
+    "performanceScore": 8.5,
+    "notes": "needs to upgrade ram with another 8gb ram stick",
+    "images": [
+      "https://joutech.ma/7169-large_default/ordinateur-portable-hp-hp-probook-440-14-pouces-g11-a38e8et.jpg"
+    ],
+    "supportedProfiles": [
+      "consultant",
+      "webDeveloper"
+    ],
+    "supportedOS": [
+      "windows"
+    ],
+    "id": "z9axtzs"
+  },
+  {
+    "brand": "Apple",
+    "model": "MacBook Air 13 M2",
+    "price": 14490,
+    "processor": "Puce M2",
+    "ram": "16",
+    "storage": "256",
+    "batteryLife": 16,
+    "performanceScore": 8,
+    "notes": "",
+    "images": [
+      "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005959615.jpeg"
+    ],
+    "supportedProfiles": [
+      "consultant",
+      "webDeveloper"
+    ],
+    "supportedOS": [
+      "macos"
+    ],
+    "id": "zgpc0wq"
+  }
+]
