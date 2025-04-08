@@ -112,5 +112,29 @@
       "macos"
     ],
     "id": "zgpc0wq"
+  },
+  {
+    "brand": "Lenovo",
+    "model": "ThinkPad P14s Gen 5",
+    "price": 14500,
+    "processor": "AMD Ryzen 7 Pro - 8840HS",
+    "ram": "32",
+    "storage": "1024",
+    "batteryLife": 7,
+    "performanceScore": 7,
+    "notes": "",
+    "images": [
+      "https://static.fnac-static.com/multimedia/Images/AE/EA/1D/1A/27385518-1505-3756-1.jpg#3f2c069c-f213-4152-bd0c-1c51c3c0647f",
+      "https://static.fnac-static.com/multimedia/Images/AE/EA/1D/1A/27385518-3-1520-2.jpg"
+    ],
+    "supportedProfiles": [
+      "webDeveloper",
+      "intensiveDeployment"
+    ],
+    "supportedOS": [
+      "windows",
+      "linux"
+    ],
+    "id": "fb8bwvr"
   }
 ]
