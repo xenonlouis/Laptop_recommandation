@@ -16,6 +16,201 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
 import { useToast } from "@/hooks/use-toast"
 import type { Package, Accessory, Laptop, PackageStatus } from "@/types"
+// Import dnd-kit components
+import { 
+  DndContext, 
+  DragOverlay, 
+  closestCorners, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  useDroppable,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent 
+} from "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+
+// Define a type for our droppable areas (status columns)
+type StatusColumn = "proposed" | "approved" | "rejected" | "delivered";
+
+// Sortable Package Card component
+function SortablePackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge, onClick }: { 
+  pkg: Package, 
+  formatPrice: (price: number, priceType: "HT" | "TTC") => string,
+  getTotalPrice: (pkg: Package) => number,
+  getAccessoryIcon: (type: string) => React.ReactElement,
+  getStatusBadge: (status: string) => React.ReactElement,
+  onClick: () => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({
+    id: pkg.id,
+    data: {
+      type: 'package',
+      package: pkg
+    }
+  });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 999 : 1,
+  };
+
+  const statusColors = {
+    proposed: 'hover:border-blue-200',
+    approved: 'hover:border-green-200',
+    rejected: 'hover:border-red-200 opacity-80',
+    delivered: 'hover:border-purple-200'
+  };
+  
+  return (
+    <Card 
+      ref={setNodeRef}
+      style={style}
+      className={`cursor-pointer hover:shadow-md transition-shadow border-2 border-transparent ${statusColors[pkg.status]}`}
+      onClick={onClick}
+      {...attributes} 
+      {...listeners}
+    >
+      <CardHeader className="p-4 pb-2">
+        <CardTitle className="text-sm">{pkg.name}</CardTitle>
+        <CardDescription className="text-xs truncate">
+          For: {pkg.assignedTo}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4 pt-0 pb-0">
+        <div className="flex items-center mt-1 mb-2">
+          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
+            <Image
+              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
+              alt={pkg.laptop.model}
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="text-xs">
+            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
+            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1 mb-2">
+          {pkg.accessories.map((acc: Accessory) => (
+            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
+              {getAccessoryIcon(acc.type)}
+              {acc.name.split(' ')[0]}
+            </Badge>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between p-4 pt-2">
+        <div className="text-xs font-medium">
+          {formatPrice(getTotalPrice(pkg), "TTC")}
+        </div>
+        {getStatusBadge(pkg.status)}
+      </CardFooter>
+    </Card>
+  );
+}
+
+// Package Card for the drag overlay
+function PackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge }: { 
+  pkg: Package, 
+  formatPrice: (price: number, priceType: "HT" | "TTC") => string,
+  getTotalPrice: (pkg: Package) => number,
+  getAccessoryIcon: (type: string) => React.ReactElement,
+  getStatusBadge: (status: string) => React.ReactElement,
+}) {
+  return (
+    <Card className="cursor-grabbing shadow-md border-2 border-primary w-[280px]">
+      <CardHeader className="p-4 pb-2">
+        <CardTitle className="text-sm">{pkg.name}</CardTitle>
+        <CardDescription className="text-xs truncate">
+          For: {pkg.assignedTo}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4 pt-0 pb-0">
+        <div className="flex items-center mt-1 mb-2">
+          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
+            <Image
+              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
+              alt={pkg.laptop.model}
+              fill
+              className="object-contain"
+            />
+          </div>
+          <div className="text-xs">
+            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
+            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between p-4 pt-2">
+        <div className="text-xs font-medium">
+          {formatPrice(getTotalPrice(pkg), "TTC")}
+        </div>
+        {getStatusBadge(pkg.status)}
+      </CardFooter>
+    </Card>
+  );
+}
+
+// Droppable container for each status column
+function StatusColumn({ 
+  children, 
+  title, 
+  icon, 
+  count, 
+  status, 
+  color 
+}: { 
+  children: React.ReactNode, 
+  title: string, 
+  icon: React.ReactElement, 
+  count: number, 
+  status: StatusColumn,
+  color: string
+}) {
+  // Set up droppable area
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+  });
+
+  // Add highlighting when dragging over
+  const dropStyles = isOver 
+    ? { backgroundColor: 'rgba(0, 0, 0, 0.05)', borderRadius: '8px' }
+    : {};
+  
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center mb-4">
+        {icon}
+        <h2 className="font-semibold text-lg">{title}</h2>
+        <Badge className={`ml-2 ${color}`}>{count}</Badge>
+      </div>
+      <ScrollArea className="h-[calc(100vh-200px)]">
+        <div 
+          ref={setNodeRef} 
+          className="pr-3 space-y-3 p-2" 
+          style={dropStyles}
+        >
+          {children}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
 
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Package[]>([])
@@ -27,6 +222,7 @@ export default function PackagesPage() {
   const [laptops, setLaptops] = useState<Laptop[]>([])
   const [accessories, setAccessories] = useState<Accessory[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [activePackage, setActivePackage] = useState<Package | null>(null)
 
   const [newPackage, setNewPackage] = useState<Partial<Package>>({
     name: "",
@@ -47,6 +243,51 @@ export default function PackagesPage() {
   const [editSelectedAccessoryIds, setEditSelectedAccessoryIds] = useState<string[]>([])
 
   const { toast } = useToast()
+
+  // Configure dnd-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Minimum drag distance for activation (prevents accidental drags)
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Define columns configuration
+  const columns: { id: StatusColumn; title: string; icon: React.ReactElement; color: string }[] = [
+    { 
+      id: 'proposed', 
+      title: 'Proposed', 
+      icon: <MoveHorizontal className="h-5 w-5 mr-2 text-blue-500" />,
+      color: 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+    },
+    { 
+      id: 'approved', 
+      title: 'Approved', 
+      icon: <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />,
+      color: 'bg-green-100 text-green-800 hover:bg-green-200'
+    },
+    { 
+      id: 'rejected', 
+      title: 'Rejected', 
+      icon: <XCircle className="h-5 w-5 mr-2 text-red-500" />,
+      color: 'bg-red-100 text-red-800 hover:bg-red-200'
+    },
+    { 
+      id: 'delivered', 
+      title: 'Delivered', 
+      icon: <PackageIcon className="h-5 w-5 mr-2 text-purple-500" />,
+      color: 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+    }
+  ];
+
+  // Get packages for a specific status
+  const getPackagesByStatus = (status: StatusColumn) => {
+    return packages.filter(pkg => pkg.status === status);
+  };
 
   // Fetch packages data
   useEffect(() => {
@@ -164,6 +405,73 @@ export default function PackagesPage() {
   const handlePackageClick = (pkg: Package) => {
     setSelectedPackage(pkg)
     setIsDetailDialogOpen(true)
+  }
+
+  // Handle drag start event
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const pkg = packages.find(p => p.id === active.id);
+    if (pkg) {
+      setActivePackage(pkg);
+    }
+  }
+
+  // Handle drag over event (not needed for our basic implementation)
+  const handleDragOver = (event: DragOverEvent) => {
+    // Optional: implement logic for sorting within a container
+    return;
+  }
+
+  // Handle drag end event
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    // Reset active package
+    setActivePackage(null);
+    
+    // If no over target, do nothing
+    if (!over) {
+      return;
+    }
+    
+    const packageId = active.id.toString();
+    const newStatus = over.id.toString() as PackageStatus;
+    
+    // Find the package being dragged
+    const pkg = packages.find(p => p.id === packageId);
+    
+    // If package not found or status didn't change, do nothing
+    if (!pkg || pkg.status === newStatus) {
+      return;
+    }
+    
+    try {
+      // Create an updated package with the new status
+      const updatedPackage: Package = {
+        ...pkg,
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Update the package in the backend
+      await updatePackage(updatedPackage);
+      
+      // Update the local state
+      setPackages(prev => prev.map(p => 
+        p.id === updatedPackage.id ? updatedPackage : p
+      ));
+      
+      toast({
+        title: "Status Updated",
+        description: `${updatedPackage.name} moved to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
+      });
+    } catch (err) {
+      console.error("Error updating package status:", err);
+      toast({
+        title: "Error",
+        description: "Failed to update package status. Please try again.",
+      });
+    }
   }
 
   const handleAddPackage = async () => {
@@ -422,219 +730,59 @@ export default function PackagesPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-4 mt-6">
-            {/* Proposed Column */}
-            <div className="flex flex-col">
-              <div className="flex items-center mb-4">
-                <MoveHorizontal className="h-5 w-5 mr-2 text-blue-500" />
-                <h2 className="font-semibold text-lg">Proposed</h2>
-                <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200">{proposedPackages.length}</Badge>
-              </div>
-              <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="pr-3 space-y-3">
-                  {proposedPackages.map((pkg) => (
-                    <Card key={pkg.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handlePackageClick(pkg)}>
-                      <CardHeader className="p-4 pb-2">
-                        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-                        <CardDescription className="text-xs truncate">
-                          For: {pkg.assignedTo}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 pb-0">
-                        <div className="flex items-center mt-1 mb-2">
-                          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-                            <Image
-                              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-                              alt={pkg.laptop.model}
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                          <div className="text-xs">
-                            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-                            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {pkg.accessories.map((acc: Accessory) => (
-                            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
-                              {getAccessoryIcon(acc.type)}
-                              {acc.name.split(' ')[0]}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between p-4 pt-2">
-                        <div className="text-xs font-medium">
-                          {formatPrice(getTotalPrice(pkg), "TTC")}
-                        </div>
-                        {getStatusBadge(pkg.status)}
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="grid grid-cols-4 gap-4 mt-6">
+              {columns.map(column => {
+                const pkgsInColumn = getPackagesByStatus(column.id);
+                return (
+                  <StatusColumn
+                    key={column.id}
+                    title={column.title}
+                    icon={column.icon}
+                    count={pkgsInColumn.length}
+                    status={column.id}
+                    color={column.color}
+                  >
+                    <SortableContext 
+                      items={pkgsInColumn.map(pkg => pkg.id)} 
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {pkgsInColumn.map((pkg) => (
+                        <SortablePackageCard
+                          key={pkg.id}
+                          pkg={pkg}
+                          formatPrice={formatPrice}
+                          getTotalPrice={getTotalPrice}
+                          getAccessoryIcon={getAccessoryIcon}
+                          getStatusBadge={getStatusBadge}
+                          onClick={() => handlePackageClick(pkg)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </StatusColumn>
+                );
+              })}
             </div>
-
-            {/* Approved Column */}
-            <div className="flex flex-col">
-              <div className="flex items-center mb-4">
-                <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />
-                <h2 className="font-semibold text-lg">Approved</h2>
-                <Badge className="ml-2 bg-green-100 text-green-800 hover:bg-green-200">{approvedPackages.length}</Badge>
-              </div>
-              <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="pr-3 space-y-3">
-                  {approvedPackages.map((pkg) => (
-                    <Card key={pkg.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handlePackageClick(pkg)}>
-                      <CardHeader className="p-4 pb-2">
-                        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-                        <CardDescription className="text-xs truncate">
-                          For: {pkg.assignedTo}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 pb-0">
-                        <div className="flex items-center mt-1 mb-2">
-                          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-                            <Image
-                              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-                              alt={pkg.laptop.model}
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                          <div className="text-xs">
-                            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-                            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {pkg.accessories.map((acc: Accessory) => (
-                            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
-                              {getAccessoryIcon(acc.type)}
-                              {acc.name.split(' ')[0]}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between p-4 pt-2">
-                        <div className="text-xs font-medium">
-                          {formatPrice(getTotalPrice(pkg), "TTC")}
-                        </div>
-                        {getStatusBadge(pkg.status)}
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-
-            {/* Rejected Column */}
-            <div className="flex flex-col">
-              <div className="flex items-center mb-4">
-                <XCircle className="h-5 w-5 mr-2 text-red-500" />
-                <h2 className="font-semibold text-lg">Rejected</h2>
-                <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-200">{rejectedPackages.length}</Badge>
-              </div>
-              <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="pr-3 space-y-3">
-                  {rejectedPackages.map((pkg) => (
-                    <Card key={pkg.id} className="cursor-pointer hover:shadow-md transition-shadow opacity-80" onClick={() => handlePackageClick(pkg)}>
-                      <CardHeader className="p-4 pb-2">
-                        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-                        <CardDescription className="text-xs truncate">
-                          For: {pkg.assignedTo}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 pb-0">
-                        <div className="flex items-center mt-1 mb-2">
-                          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-                            <Image
-                              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-                              alt={pkg.laptop.model}
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                          <div className="text-xs">
-                            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-                            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {pkg.accessories.map((acc: Accessory) => (
-                            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
-                              {getAccessoryIcon(acc.type)}
-                              {acc.name.split(' ')[0]}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between p-4 pt-2">
-                        <div className="text-xs font-medium">
-                          {formatPrice(getTotalPrice(pkg), "TTC")}
-                        </div>
-                        {getStatusBadge(pkg.status)}
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-
-            {/* Delivered Column */}
-            <div className="flex flex-col">
-              <div className="flex items-center mb-4">
-                <PackageIcon className="h-5 w-5 mr-2 text-purple-500" />
-                <h2 className="font-semibold text-lg">Delivered</h2>
-                <Badge className="ml-2 bg-purple-100 text-purple-800 hover:bg-purple-200">{deliveredPackages.length}</Badge>
-              </div>
-              <ScrollArea className="h-[calc(100vh-200px)]">
-                <div className="pr-3 space-y-3">
-                  {deliveredPackages.map((pkg) => (
-                    <Card key={pkg.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handlePackageClick(pkg)}>
-                      <CardHeader className="p-4 pb-2">
-                        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-                        <CardDescription className="text-xs truncate">
-                          For: {pkg.assignedTo}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 pb-0">
-                        <div className="flex items-center mt-1 mb-2">
-                          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-                            <Image
-                              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-                              alt={pkg.laptop.model}
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                          <div className="text-xs">
-                            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-                            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {pkg.accessories.map((acc: Accessory) => (
-                            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
-                              {getAccessoryIcon(acc.type)}
-                              {acc.name.split(' ')[0]}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between p-4 pt-2">
-                        <div className="text-xs font-medium">
-                          {formatPrice(getTotalPrice(pkg), "TTC")}
-                        </div>
-                        {getStatusBadge(pkg.status)}
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          </div>
+            
+            {/* Drag overlay for visualization */}
+            <DragOverlay>
+              {activePackage ? (
+                <PackageCard
+                  pkg={activePackage}
+                  formatPrice={formatPrice}
+                  getTotalPrice={getTotalPrice}
+                  getAccessoryIcon={getAccessoryIcon}
+                  getStatusBadge={getStatusBadge}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         )}
       </main>
 

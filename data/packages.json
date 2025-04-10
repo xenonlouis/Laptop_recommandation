@@ -17,8 +17,13 @@
       "images": [
         "https://joutech.ma/7073-large_default/ordinateur-portable-lenovo-thinkpad-e14-gen-5-21m7000hfe.jpg"
       ],
-      "supportedProfiles": ["developer"],
-      "supportedOS": ["windows", "linux"]
+      "supportedProfiles": [
+        "developer"
+      ],
+      "supportedOS": [
+        "windows",
+        "linux"
+      ]
     },
     "accessories": [
       {
@@ -66,8 +71,12 @@
       "images": [
         "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005959615.jpeg"
       ],
-      "supportedProfiles": ["developer"],
-      "supportedOS": ["macos"]
+      "supportedProfiles": [
+        "developer"
+      ],
+      "supportedOS": [
+        "macos"
+      ]
     },
     "accessories": [
       {
@@ -115,8 +124,13 @@
       "images": [
         "https://static.fnac-static.com/multimedia/Images/AE/EA/1D/1A/27385518-1505-3756-1.jpg#3f2c069c-f213-4152-bd0c-1c51c3c0647f"
       ],
-      "supportedProfiles": ["developer"],
-      "supportedOS": ["windows", "linux"]
+      "supportedProfiles": [
+        "developer"
+      ],
+      "supportedOS": [
+        "windows",
+        "linux"
+      ]
     },
     "accessories": [
       {
@@ -164,8 +178,13 @@
       "images": [
         "https://www.techpro.ma/2883-large_default/ordinateur-portable-hp-probook-450-g8-i7-32m80ea.jpg"
       ],
-      "supportedProfiles": ["consultant"],
-      "supportedOS": ["windows", "linux"]
+      "supportedProfiles": [
+        "consultant"
+      ],
+      "supportedOS": [
+        "windows",
+        "linux"
+      ]
     },
     "accessories": [
       {
@@ -184,5 +203,61 @@
     "createdAt": "2023-09-05T11:00:00Z",
     "updatedAt": "2023-09-07T14:20:00Z",
     "notes": "Budget option rejected due to insufficient battery life"
+  },
+  {
+    "name": "Current Package",
+    "laptop": {
+      "brand": "Hp",
+      "model": "Probook 450 G8 11Th",
+      "price": 8390,
+      "priceType": "HT",
+      "processor": "i7-1165G7",
+      "ram": "16",
+      "storage": "512",
+      "batteryLife": 4,
+      "performanceScore": 8,
+      "notes": "",
+      "images": [
+        "https://www.techpro.ma/2883-large_default/ordinateur-portable-hp-probook-450-g8-i7-32m80ea.jpg",
+        "https://media.tera.ma/wp-content/uploads/2025/03/HP-PROBOOK-450-G8-1.jpg",
+        "https://bunny-wp-pullzone-cbh8ghlmbr.b-cdn.net/wp-content/uploads/2024/12/91002984_5944689220-600x600.jpg"
+      ],
+      "supportedProfiles": [
+        "consultant"
+      ],
+      "supportedOS": [
+        "windows",
+        "linux"
+      ],
+      "id": "vlkhl1j"
+    },
+    "accessories": [
+      {
+        "id": "acc4",
+        "name": "Bose QuietComfort",
+        "type": "headphone",
+        "brand": "Bose",
+        "price": 2500,
+        "priceType": "TTC",
+        "image": "https://assets.bose.com/content/dam/cloudassets/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/product_silo_images/QC45_PDP_Global_Static_1200x1022_Black_hero.png/jcr:content/renditions/cq5dam.web.320.320.png",
+        "notes": "Noise cancelling headphones"
+      },
+      {
+        "id": "acc7",
+        "name": "HP Wireless Mouse",
+        "type": "mouse",
+        "brand": "HP",
+        "price": 350,
+        "priceType": "HT",
+        "image": "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06588544.png",
+        "notes": "Basic wireless mouse"
+      }
+    ],
+    "status": "delivered",
+    "assignedTo": "All",
+    "createdAt": "2025-04-10T17:14:38.940Z",
+    "updatedAt": "2025-04-10T17:14:38.940Z",
+    "notes": "Current Package that all consultants have",
+    "id": "j5tksun"
   }
-] 
+]
