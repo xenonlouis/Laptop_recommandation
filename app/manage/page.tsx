@@ -313,10 +313,17 @@ export default function ManageLaptops() {
             </Link>
             <h1 className="text-2xl font-bold tracking-tight">Manage Laptops</h1>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Laptop
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link href="/manage/accessories">
+              <Button variant="outline">
+                Manage Accessories
+              </Button>
+            </Link>
+            <Button onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Laptop
+            </Button>
+          </div>
         </div>
       </header>
 

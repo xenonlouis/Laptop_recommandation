@@ -17,6 +17,12 @@ export default function Home() {
           <div className="container flex h-16 items-center justify-between py-4">
             <h1 className="text-2xl font-bold tracking-tight">Laptop Finder</h1>
             <div className="flex items-center gap-4">
+              <Link href="/packages">
+                <Button variant="outline">Packages</Button>
+              </Link>
+              <Link href="/people">
+                <Button variant="outline">People</Button>
+              </Link>
               <Link href="/manage">
                 <Button variant="outline">Manage Laptops</Button>
               </Link>

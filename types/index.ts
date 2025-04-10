@@ -8,6 +8,30 @@ export type SortingDirection = "asc" | "desc"
 
 export type PriceType = "HT" | "TTC"
 
+export type PackageStatus = "proposed" | "approved" | "rejected" | "delivered"
+
+export interface Person {
+  id: string
+  name: string
+  email: string
+  department: string
+  position: string
+  pcReference?: string  // Reference/serial number of the person's PC
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Accessory {
+  id: string
+  name: string
+  type: "mouse" | "keyboard" | "headphone" | "dock" | "other"
+  brand: string
+  price: number
+  priceType: PriceType
+  image?: string
+  notes?: string
+}
+
 export interface Laptop {
   id: string
   brand: string
@@ -23,6 +47,18 @@ export interface Laptop {
   images?: string[]
   supportedProfiles: UserProfile[]
   supportedOS: OperatingSystem[]
+}
+
+export interface Package {
+  id: string
+  name: string
+  laptop: Laptop
+  accessories: Accessory[]
+  status: PackageStatus
+  assignedTo?: string
+  createdAt: string
+  updatedAt: string
+  notes?: string
 }
 
 export interface RecommendationNode {

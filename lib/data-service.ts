@@ -1,9 +1,10 @@
 import fs from "fs"
 import path from "path"
-import type { Laptop } from "@/types"
+import type { Laptop, Package } from "@/types"
 
-// Path to the JSON file
-const dataFilePath = path.join(process.cwd(), "data", "laptops.json")
+// Path to the JSON files
+const laptopsDataFilePath = path.join(process.cwd(), "data", "laptops.json")
+const packagesDataFilePath = path.join(process.cwd(), "data", "packages.json")
 
 // Ensure the data directory exists
 const ensureDataDirectoryExists = () => {
@@ -14,18 +15,18 @@ const ensureDataDirectoryExists = () => {
 }
 
 // Create an empty JSON file if it doesn't exist
-const ensureDataFileExists = () => {
+const ensureDataFileExists = (filePath: string, initialData: any[] = []) => {
   ensureDataDirectoryExists()
-  if (!fs.existsSync(dataFilePath)) {
-    fs.writeFileSync(dataFilePath, JSON.stringify([], null, 2), "utf8")
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2), "utf8")
   }
 }
 
 // Read laptops from the JSON file
 export const getLaptops = async (): Promise<Laptop[]> => {
   try {
-    ensureDataFileExists()
-    const data = await fs.promises.readFile(dataFilePath, "utf8")
+    ensureDataFileExists(laptopsDataFilePath)
+    const data = await fs.promises.readFile(laptopsDataFilePath, "utf8")
     return JSON.parse(data) as Laptop[]
   } catch (error) {
     console.error("Error reading laptops data:", error)
@@ -44,11 +45,83 @@ export const getLaptopById = async (id: string): Promise<Laptop | null> => {
   }
 }
 
+// Read packages from the JSON file
+export const getPackages = async (): Promise<Package[]> => {
+  try {
+    ensureDataFileExists(packagesDataFilePath)
+    const data = await fs.promises.readFile(packagesDataFilePath, "utf8")
+    return JSON.parse(data) as Package[]
+  } catch (error) {
+    console.error("Error reading packages data:", error)
+    return []
+  }
+}
+
+// Get a single package by ID
+export const getPackageById = async (id: string): Promise<Package | null> => {
+  try {
+    const packages = await getPackages()
+    return packages.find((pkg) => pkg.id === id) || null
+  } catch (error) {
+    console.error(`Error getting package with ID ${id}:`, error)
+    return null
+  }
+}
+
+// Update a package
+export const updatePackage = async (updatedPackage: Package): Promise<boolean> => {
+  try {
+    const packages = await getPackages()
+    const index = packages.findIndex((pkg) => pkg.id === updatedPackage.id)
+
+    if (index === -1) {
+      return false // Package not found
+    }
+
+    packages[index] = updatedPackage
+    return await savePackages(packages)
+  } catch (error) {
+    console.error(`Error updating package with ID ${updatedPackage.id}:`, error)
+    return false
+  }
+}
+
+// Add a new package
+export const addPackage = async (newPackage: Omit<Package, "id">): Promise<boolean> => {
+  try {
+    const packages = await getPackages()
+    
+    // Generate a random ID
+    const packageWithId = {
+      ...newPackage,
+      id: Math.random().toString(36).substring(2, 9)
+    } as Package
+    
+    packages.push(packageWithId)
+    return await savePackages(packages)
+  } catch (error) {
+    console.error("Error adding package:", error)
+    return false
+  }
+}
+
+// Save packages to JSON file
+export const savePackages = async (packages: Package[]): Promise<boolean> => {
+  try {
+    ensureDataDirectoryExists()
+    await fs.promises.writeFile(packagesDataFilePath, JSON.stringify(packages, null, 2), "utf8")
+    return true
+  } catch (error) {
+    console.error("Error saving packages data:", error)
+    return false
+  }
+}
+
 // Save laptops to the JSON file
 export const saveLaptops = async (laptops: Laptop[]): Promise<boolean> => {
   try {
     ensureDataDirectoryExists()
-    await fs.promises.writeFile(dataFilePath, JSON.stringify(laptops, null, 2), "utf8")
+    await fs.promises.writeFile(laptopsDataFilePath, JSON.stringify(laptops, null, 2), "utf8")
     return true
   } catch (error) {
     console.error("Error saving laptops data:", error)
