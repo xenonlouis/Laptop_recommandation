@@ -3,6 +3,7 @@
     "brand": "Hp",
     "model": "Probook 450 G8 11Th",
     "price": 8390,
+    "priceType": "HT",
     "processor": "i7-1165G7",
     "ram": "16",
     "storage": "512",
@@ -27,6 +28,7 @@
     "brand": "Apple",
     "model": "MacBook Air 13",
     "price": 10690,
+    "priceType": "TTC",
     "processor": "Puce M1",
     "ram": "8",
     "storage": "256",
@@ -49,6 +51,7 @@
     "brand": "Lenovo",
     "model": "ThinkPad E14 Gen 5 (Intel)",
     "price": 9490,
+    "priceType": "HT",
     "processor": " Intel® Core™ Ultra 7 155H ",
     "ram": "16",
     "storage": "512",
@@ -59,8 +62,7 @@
       "https://joutech.ma/7073-large_default/ordinateur-portable-lenovo-thinkpad-e14-gen-5-21m7000hfe.jpg"
     ],
     "supportedProfiles": [
-      "webDeveloper",
-      "intensiveDeployment"
+      "developer"
     ],
     "supportedOS": [
       "windows",
@@ -72,6 +74,7 @@
     "brand": "Hp",
     "model": "Probook 440 G11",
     "price": 8850,
+    "priceType": "HT",
     "processor": "Intel Core Ultra 7 155U",
     "ram": "8",
     "storage": "512",
@@ -83,7 +86,7 @@
     ],
     "supportedProfiles": [
       "consultant",
-      "webDeveloper"
+      "developer"
     ],
     "supportedOS": [
       "windows",
@@ -95,6 +98,7 @@
     "brand": "Apple",
     "model": "MacBook Air 13 M2",
     "price": 14490,
+    "priceType": "TTC",
     "processor": "Puce M2",
     "ram": "16",
     "storage": "256",
@@ -105,8 +109,7 @@
       "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005959615.jpeg"
     ],
     "supportedProfiles": [
-      "consultant",
-      "webDeveloper"
+      "developer"
     ],
     "supportedOS": [
       "macos"
@@ -117,19 +120,19 @@
     "brand": "Lenovo",
     "model": "ThinkPad P14s Gen 5",
     "price": 14500,
+    "priceType": "HT",
     "processor": "AMD Ryzen 7 Pro - 8840HS",
     "ram": "32",
     "storage": "1024",
     "batteryLife": 7,
     "performanceScore": 9.5,
-    "notes": "",
+    "notes": "Importé de france\n",
     "images": [
       "https://static.fnac-static.com/multimedia/Images/AE/EA/1D/1A/27385518-1505-3756-1.jpg#3f2c069c-f213-4152-bd0c-1c51c3c0647f",
       "https://static.fnac-static.com/multimedia/Images/AE/EA/1D/1A/27385518-3-1520-2.jpg"
     ],
     "supportedProfiles": [
-      "webDeveloper",
-      "intensiveDeployment"
+      "developer"
     ],
     "supportedOS": [
       "windows",

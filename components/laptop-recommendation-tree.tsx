@@ -15,6 +15,7 @@ function LaptopRecommendationTreeContent() {
   const searchParams = useSearchParams()
   const profile = searchParams.get("profile") as UserProfile | null
   const criteria = searchParams.get("criteria") as SortingCriteria | null
+  const direction = searchParams.get("direction") as "asc" | "desc" || "asc"
   const os = searchParams.get("os") as OperatingSystem | null
 
   // State for laptops data
@@ -94,19 +95,26 @@ function LaptopRecommendationTreeContent() {
     return true
   })
 
-  // Sort laptops based on selected criteria
+  // Sort laptops based on selected criteria and direction
   const sortedLaptops = [...filteredLaptops].sort((a, b) => {
+    let result = 0;
     switch (criteria) {
       case "price":
-        return a.price - b.price
+        result = a.price - b.price;
+        break;
       case "performance":
-        return b.performanceScore - a.performanceScore
-      case "battery":
-        return b.batteryLife - a.batteryLife
+        result = b.performanceScore - a.performanceScore;
+        break;
+      case "batteryLife":
+        result = b.batteryLife - a.batteryLife;
+        break;
       default:
-        return 0
+        return 0;
     }
-  })
+    
+    // Invert result if direction is descending
+    return direction === "desc" ? -result : result;
+  });
 
   return (
     <div className="space-y-8">

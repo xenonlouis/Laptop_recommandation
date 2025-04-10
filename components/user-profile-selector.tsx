@@ -33,12 +33,8 @@ function UserProfileSelectorContent() {
             <Label htmlFor="consultant">Consultant</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <RadioGroupItem value="webDeveloper" id="webDeveloper" />
-            <Label htmlFor="webDeveloper">Web Developer</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="intensiveDeployment" id="intensiveDeployment" />
-            <Label htmlFor="intensiveDeployment">Intensive Deployment</Label>
+            <RadioGroupItem value="developer" id="developer" />
+            <Label htmlFor="developer">Developer</Label>
           </div>
         </RadioGroup>
       </CardContent>

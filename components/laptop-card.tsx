@@ -29,8 +29,8 @@ export function LaptopCard({ laptop }: LaptopCardProps) {
   const isSelected = isInCompare(laptop.id)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
-  const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} Dh`
+  const formatPrice = (price: number, priceType: "HT" | "TTC") => {
+    return `${price.toLocaleString()} MAD (${priceType})`
   }
 
   const getOSBadges = (os: string[]) => {
@@ -105,7 +105,7 @@ export function LaptopCard({ laptop }: LaptopCardProps) {
               </Button>
 
               <div className="absolute bottom-1 left-0 right-0 flex justify-center space-x-1">
-                {laptop.images.map((_, index) => (
+                {laptop.images?.map((_, index) => (
                   <div
                     key={index}
                     className={`w-1.5 h-1.5 rounded-full ${
@@ -136,7 +136,7 @@ export function LaptopCard({ laptop }: LaptopCardProps) {
               </div>
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <span className="font-medium">{formatPrice(laptop.price)}</span>
+              <span className="font-medium">{formatPrice(laptop.price, laptop.priceType)}</span>
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Cpu className="h-4 w-4" />
@@ -169,7 +169,7 @@ export function LaptopCard({ laptop }: LaptopCardProps) {
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="font-medium">Price:</div>
-                  <div>{formatPrice(laptop.price)}</div>
+                  <div>{formatPrice(laptop.price, laptop.priceType)}</div>
 
                   <div className="font-medium">Processor:</div>
                   <div>{laptop.processor}</div>

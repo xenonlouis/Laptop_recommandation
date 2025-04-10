@@ -6,20 +6,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { SortingCriteria, OperatingSystem } from "@/types"
+import { Button } from "@/components/ui/button"
+import type { SortingCriteria, SortingDirection, OperatingSystem } from "@/types"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ArrowDownAZ, ArrowUpAZ } from "lucide-react"
 
 function SortingCriteriaSelectorContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const currentCriteria = searchParams.get("criteria") as SortingCriteria | null
+  const currentDirection = searchParams.get("direction") as SortingDirection || "asc"
   const currentOS = searchParams.get("os") as OperatingSystem | null
   const currentProfile = searchParams.get("profile")
 
   const handleCriteriaChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set("criteria", value)
+    router.push(`?${params.toString()}`)
+  }
+
+  const handleDirectionChange = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("direction", currentDirection === "asc" ? "desc" : "asc")
     router.push(`?${params.toString()}`)
   }
 
@@ -41,15 +50,10 @@ function SortingCriteriaSelectorContent() {
           { value: "windows", label: "Windows" },
           { value: "macos", label: "macOS" },
         ]
-      case "webDeveloper":
+      case "developer":
         return [
           { value: "windows", label: "Windows" },
           { value: "macos", label: "macOS" },
-          { value: "linux", label: "Linux" },
-        ]
-      case "intensiveDeployment":
-        return [
-          { value: "windows", label: "Windows" },
           { value: "linux", label: "Linux" },
         ]
       default:
@@ -69,7 +73,29 @@ function SortingCriteriaSelectorContent() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <Label>Sort By</Label>
+          <div className="flex items-center justify-between">
+            <Label>Sort By</Label>
+            {currentCriteria && (
+              <Button
+                variant="outline" 
+                size="sm" 
+                onClick={handleDirectionChange}
+                className="flex items-center gap-1"
+              >
+                {currentDirection === "asc" ? (
+                  <>
+                    <ArrowUpAZ className="h-4 w-4" />
+                    <span className="text-xs">Ascending</span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDownAZ className="h-4 w-4" />
+                    <span className="text-xs">Descending</span>
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
           <RadioGroup value={currentCriteria || ""} onValueChange={handleCriteriaChange}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="price" id="price" />
@@ -80,7 +106,7 @@ function SortingCriteriaSelectorContent() {
               <Label htmlFor="performance">Performance</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="battery" id="battery" />
+              <RadioGroupItem value="batteryLife" id="battery" />
               <Label htmlFor="battery">Battery Life</Label>
             </div>
           </RadioGroup>

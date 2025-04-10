@@ -16,8 +16,8 @@ export function LaptopComparison() {
     return null
   }
 
-  const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} Dh`
+  const formatPrice = (price: number, priceType: "HT" | "TTC") => {
+    return `${price.toLocaleString()} MAD (${priceType})`
   }
 
   const getOSLabel = (os: string) => {
@@ -204,7 +204,7 @@ export function LaptopComparison() {
                               dominantBaseline="middle"
                               className="text-sm font-bold fill-foreground"
                             >
-                              ${Math.round(laptop.price / 100)}
+                              {laptop.price.toLocaleString()}
                             </text>
                           </svg>
                         </div>
@@ -268,6 +268,11 @@ export function LaptopComparison() {
                             </Badge>
                           ))}
                         </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1">
+                        <span className="text-muted-foreground">Price:</span>
+                        <span className="font-medium">{formatPrice(laptop.price, laptop.priceType)}</span>
                       </div>
                     </div>
                   </div>

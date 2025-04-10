@@ -39,6 +39,7 @@ export default function ManageLaptops() {
     brand: "",
     model: "",
     price: 999,
+    priceType: "HT",
     processor: "",
     ram: "",
     storage: "",
@@ -104,6 +105,7 @@ export default function ManageLaptops() {
         brand: newLaptop.brand || "",
         model: newLaptop.model || "",
         price: newLaptop.price || 0,
+        priceType: newLaptop.priceType || "HT",
         processor: newLaptop.processor || "",
         ram: newLaptop.ram || "",
         storage: newLaptop.storage || "",
@@ -125,6 +127,7 @@ export default function ManageLaptops() {
         brand: "",
         model: "",
         price: 999,
+        priceType: "HT",
         processor: "",
         ram: "",
         storage: "",
@@ -332,11 +335,10 @@ export default function ManageLaptops() {
 
           <div className="flex items-center gap-2">
             <Tabs defaultValue="all" className="w-[400px]">
-              <TabsList className="grid grid-cols-4">
+              <TabsList className="grid grid-cols-3">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="consultant">Consultant</TabsTrigger>
-                <TabsTrigger value="webDeveloper">Developer</TabsTrigger>
-                <TabsTrigger value="intensiveDeployment">Intensive</TabsTrigger>
+                <TabsTrigger value="developer">Developer</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -385,18 +387,13 @@ export default function ManageLaptops() {
                         <TableCell className="font-medium">
                           {laptop.brand} {laptop.model}
                         </TableCell>
-                        <TableCell>${laptop.price.toLocaleString()}</TableCell>
+                        <TableCell>{laptop.price.toLocaleString()} MAD ({laptop.priceType})</TableCell>
                         <TableCell className="max-w-[200px] truncate">
                           {laptop.processor}, {laptop.ram}, {laptop.storage}
                         </TableCell>
                         <TableCell>
                           {laptop.supportedProfiles.map((profile) => {
-                            const label =
-                              profile === "webDeveloper"
-                                ? "Developer"
-                                : profile === "intensiveDeployment"
-                                  ? "Intensive"
-                                  : "Consultant"
+                            const label = profile === "developer" ? "Developer" : "Consultant"
 
                             return (
                               <span
@@ -498,9 +495,34 @@ export default function ManageLaptops() {
                 <Input
                   id="price"
                   type="number"
-                  value={newLaptop.price}
+                  min="0"
+                  value={newLaptop.price || ""}
                   onChange={(e) => setNewLaptop({ ...newLaptop, price: Number(e.target.value) })}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Price Type</Label>
+                <div className="flex space-x-4 pt-2">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="priceTypeHT-add"
+                      checked={newLaptop.priceType === "HT"}
+                      onChange={() => setNewLaptop({ ...newLaptop, priceType: "HT" })}
+                    />
+                    <Label htmlFor="priceTypeHT-add">HT</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="priceTypeTTC-add"
+                      checked={newLaptop.priceType === "TTC"}
+                      onChange={() => setNewLaptop({ ...newLaptop, priceType: "TTC" })}
+                    />
+                    <Label htmlFor="priceTypeTTC-add">TTC</Label>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -583,22 +605,12 @@ export default function ManageLaptops() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="webDeveloper"
-                      checked={newLaptop.supportedProfiles?.includes("webDeveloper")}
-                      onCheckedChange={() => handleProfileToggle("webDeveloper")}
+                      id="developer"
+                      checked={newLaptop.supportedProfiles?.includes("developer")}
+                      onCheckedChange={() => handleProfileToggle("developer")}
                     />
-                    <Label htmlFor="webDeveloper" className="font-normal">
-                      Web Developer
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="intensiveDeployment"
-                      checked={newLaptop.supportedProfiles?.includes("intensiveDeployment")}
-                      onCheckedChange={() => handleProfileToggle("intensiveDeployment")}
-                    />
-                    <Label htmlFor="intensiveDeployment" className="font-normal">
-                      Intensive Deployment
+                    <Label htmlFor="developer" className="font-normal">
+                      Developer
                     </Label>
                   </div>
                 </div>
@@ -732,9 +744,42 @@ export default function ManageLaptops() {
                   <Input
                     id="edit-price"
                     type="number"
-                    value={currentLaptop.price}
-                    onChange={(e) => setCurrentLaptop({ ...currentLaptop, price: Number(e.target.value) })}
+                    min="0"
+                    value={currentLaptop?.price || ""}
+                    onChange={(e) =>
+                      setCurrentLaptop(
+                        currentLaptop ? { ...currentLaptop, price: Number(e.target.value) } : null
+                      )
+                    }
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Price Type</Label>
+                  <div className="flex space-x-4 pt-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="priceTypeHT-edit"
+                        checked={currentLaptop?.priceType === "HT"}
+                        onChange={() =>
+                          setCurrentLaptop(currentLaptop ? { ...currentLaptop, priceType: "HT" } : null)
+                        }
+                      />
+                      <Label htmlFor="priceTypeHT-edit">HT</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="priceTypeTTC-edit"
+                        checked={currentLaptop?.priceType === "TTC"}
+                        onChange={() =>
+                          setCurrentLaptop(currentLaptop ? { ...currentLaptop, priceType: "TTC" } : null)
+                        }
+                      />
+                      <Label htmlFor="priceTypeTTC-edit">TTC</Label>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -810,7 +855,7 @@ export default function ManageLaptops() {
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="edit-consultant"
-                        checked={currentLaptop.supportedProfiles.includes("consultant")}
+                        checked={currentLaptop.supportedProfiles?.includes("consultant")}
                         onCheckedChange={() => handleProfileToggle("consultant", false)}
                       />
                       <Label htmlFor="edit-consultant" className="font-normal">
@@ -819,22 +864,12 @@ export default function ManageLaptops() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="edit-webDeveloper"
-                        checked={currentLaptop.supportedProfiles.includes("webDeveloper")}
-                        onCheckedChange={() => handleProfileToggle("webDeveloper", false)}
+                        id="edit-developer"
+                        checked={currentLaptop.supportedProfiles?.includes("developer")}
+                        onCheckedChange={() => handleProfileToggle("developer", false)}
                       />
-                      <Label htmlFor="edit-webDeveloper" className="font-normal">
-                        Web Developer
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="edit-intensiveDeployment"
-                        checked={currentLaptop.supportedProfiles.includes("intensiveDeployment")}
-                        onCheckedChange={() => handleProfileToggle("intensiveDeployment", false)}
-                      />
-                      <Label htmlFor="edit-intensiveDeployment" className="font-normal">
-                        Intensive Deployment
+                      <Label htmlFor="edit-developer" className="font-normal">
+                        Developer
                       </Label>
                     </div>
                   </div>
