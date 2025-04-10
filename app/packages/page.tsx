@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Plus, Loader2, MoveHorizontal, CheckCircle2, XCircle, Package as PackageIcon, MousePointer2, Keyboard, Headphones, Plug, Info, Pencil, Trash2 } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, MoveHorizontal, CheckCircle2, XCircle, Package as PackageIcon, MousePointer2, Keyboard, Headphones, Plug, Info, Pencil, Trash2, PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -33,6 +34,7 @@ import {
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // Define a type for our droppable areas (status columns)
 type StatusColumn = "proposed" | "approved" | "rejected" | "delivered";
@@ -182,32 +184,30 @@ function StatusColumn({
   status: StatusColumn,
   color: string
 }) {
-  // Set up droppable area
-  const { setNodeRef, isOver } = useDroppable({
-    id: status,
-  });
-
-  // Add highlighting when dragging over
-  const dropStyles = isOver 
-    ? { backgroundColor: 'rgba(0, 0, 0, 0.05)', borderRadius: '8px' }
-    : {};
+  const { setNodeRef, isOver } = useDroppable({ id: status });
+  
+  const dropStyles = {
+    backgroundColor: isOver ? `${color}50` : '',
+    borderColor: isOver ? color : '',
+    transition: 'background-color 0.2s, border-color 0.2s',
+  };
   
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center mb-4">
-        {icon}
-        <h2 className="font-semibold text-lg">{title}</h2>
-        <Badge className={`ml-2 ${color}`}>{count}</Badge>
+    <div className="flex flex-col h-full min-h-[500px]">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-muted-foreground">{icon}</span>
+        <span className="font-medium">{title}</span>
+        <Badge variant="secondary" className="ml-auto">
+          {count}
+        </Badge>
       </div>
-      <ScrollArea className="h-[calc(100vh-200px)]">
-        <div 
-          ref={setNodeRef} 
-          className="pr-3 space-y-3 p-2" 
-          style={dropStyles}
-        >
-          {children}
-        </div>
-      </ScrollArea>
+      <div 
+        ref={setNodeRef}
+        className="flex-1 p-2 bg-muted/30 rounded-lg border-2 border-dashed overflow-y-auto" 
+        style={dropStyles}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -446,20 +446,20 @@ export default function PackagesPage() {
     }
     
     try {
-      // Create an updated package with the new status
+      // Optimistically update the local state first
       const updatedPackage: Package = {
         ...pkg,
         status: newStatus,
         updatedAt: new Date().toISOString()
       };
       
-      // Update the package in the backend
-      await updatePackage(updatedPackage);
-      
-      // Update the local state
+      // Update local state immediately to prevent UI flicker
       setPackages(prev => prev.map(p => 
         p.id === updatedPackage.id ? updatedPackage : p
       ));
+      
+      // Then update the backend
+      await updatePackage(updatedPackage);
       
       toast({
         title: "Status Updated",
@@ -467,9 +467,14 @@ export default function PackagesPage() {
       });
     } catch (err) {
       console.error("Error updating package status:", err);
+      
+      // Revert to previous state if update fails
+      setPackages(prev => [...prev]);
+      
       toast({
         title: "Error",
         description: "Failed to update package status. Please try again.",
+        variant: "destructive"
       });
     }
   }
@@ -703,31 +708,27 @@ export default function PackagesPage() {
       </header>
 
       <main className="container py-6">
-        <div className="mb-8">
-          <Tabs defaultValue="kanban">
-            <TabsList>
-              <TabsTrigger value="kanban">Kanban View</TabsTrigger>
-              <TabsTrigger value="list">List View</TabsTrigger>
-            </TabsList>
-          </Tabs>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight mb-2">Package Management</h1>
+            <p className="text-muted-foreground">
+              Manage laptop packages and track their status. Drag packages between columns to change their status.
+            </p>
+          </div>
+          <Button onClick={handleAddPackage}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            Add Package
+          </Button>
         </div>
 
-        {error ? (
-          <div className="rounded-md bg-red-50 p-4 my-6">
-            <div className="flex">
-              <XCircle className="h-5 w-5 text-red-400" />
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">Error</h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{error}</p>
-                </div>
-                <div className="mt-4">
-                  <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
-                    Try Again
-                  </Button>
-                </div>
+        {loading ? (
+          <div className="grid grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-[500px] w-full rounded-xl" />
               </div>
-            </div>
+            ))}
           </div>
         ) : (
           <DndContext
@@ -737,23 +738,22 @@ export default function PackagesPage() {
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            <div className="grid grid-cols-4 gap-4 mt-6">
-              {columns.map(column => {
-                const pkgsInColumn = getPackagesByStatus(column.id);
-                return (
-                  <StatusColumn
-                    key={column.id}
-                    title={column.title}
-                    icon={column.icon}
-                    count={pkgsInColumn.length}
-                    status={column.id}
-                    color={column.color}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {columns.map((column) => (
+                <StatusColumn
+                  key={column.id}
+                  title={column.title}
+                  icon={column.icon}
+                  count={getPackagesByStatus(column.id).length}
+                  status={column.id}
+                  color={column.color}
+                >
+                  <SortableContext
+                    items={getPackagesByStatus(column.id).map(pkg => pkg.id)}
+                    strategy={verticalListSortingStrategy}
                   >
-                    <SortableContext 
-                      items={pkgsInColumn.map(pkg => pkg.id)} 
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {pkgsInColumn.map((pkg) => (
+                    <div className="space-y-3">
+                      {getPackagesByStatus(column.id).map((pkg) => (
                         <SortablePackageCard
                           key={pkg.id}
                           pkg={pkg}
@@ -764,22 +764,23 @@ export default function PackagesPage() {
                           onClick={() => handlePackageClick(pkg)}
                         />
                       ))}
-                    </SortableContext>
-                  </StatusColumn>
-                );
-              })}
+                    </div>
+                  </SortableContext>
+                </StatusColumn>
+              ))}
             </div>
-            
-            {/* Drag overlay for visualization */}
+
             <DragOverlay>
               {activePackage ? (
-                <PackageCard
-                  pkg={activePackage}
-                  formatPrice={formatPrice}
-                  getTotalPrice={getTotalPrice}
-                  getAccessoryIcon={getAccessoryIcon}
-                  getStatusBadge={getStatusBadge}
-                />
+                <div className="w-full opacity-80">
+                  <PackageCard
+                    pkg={activePackage}
+                    formatPrice={formatPrice}
+                    getTotalPrice={getTotalPrice}
+                    getAccessoryIcon={getAccessoryIcon}
+                    getStatusBadge={getStatusBadge}
+                  />
+                </div>
               ) : null}
             </DragOverlay>
           </DndContext>
