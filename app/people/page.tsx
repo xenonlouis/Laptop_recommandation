@@ -314,14 +314,37 @@ export default function PeoplePage() {
   const getStatusBadge = (status: PackageStatus) => {
     const statusConfig = {
       proposed: { variant: "outline", label: "Proposed" },
-      approved: { variant: "success", label: "Approved" },
-      rejected: { variant: "destructive", label: "Rejected" },
-      delivered: { variant: "default", label: "Delivered" },
+      approved: { variant: "outline", label: "Approved" },
+      rejected: { variant: "outline", label: "Rejected" },
+      delivered: { variant: "outline", label: "Delivered" },
     }
 
     const config = statusConfig[status]
+    
+    // Handle undefined status gracefully
+    if (!config) {
+      return <Badge variant="outline">Unknown</Badge>;
+    }
+    
+    // Map to valid badge variants
+    let badgeClass = "";
+    switch(status) {
+      case "proposed":
+        badgeClass = "bg-blue-50 text-blue-700 border-blue-300";
+        break;
+      case "approved":
+        badgeClass = "bg-green-50 text-green-700 border-green-300";
+        break;
+      case "rejected":
+        badgeClass = "bg-red-50 text-red-700 border-red-300";
+        break;
+      case "delivered":
+        badgeClass = "bg-purple-50 text-purple-700 border-purple-300";
+        break;
+    }
+    
     return (
-      <Badge variant={config.variant as any}>{config.label}</Badge>
+      <Badge variant="outline" className={badgeClass}>{config.label}</Badge>
     )
   }
 

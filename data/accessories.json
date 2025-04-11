@@ -68,5 +68,14 @@
     "priceType": "HT",
     "image": "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06588544.png",
     "notes": "Basic wireless mouse"
+  },
+  {
+    "name": "M240 Graphite ",
+    "type": "mouse",
+    "brand": "Logitech ",
+    "price": 200,
+    "priceType": "TTC",
+    "image": "https://joutech.ma/6828-large_default/souris-silencieuse-logitech-m240-graphite-910-007119.jpg",
+    "id": "z71z14p"
   }
-] 
+]

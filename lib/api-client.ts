@@ -394,3 +394,25 @@ export async function deletePerson(id: string): Promise<{ success: boolean; mess
   }
 }
 
+export async function assignPackage(packageId: string, assignedTo: string): Promise<{ message: string }> {
+  try {
+    const response = await fetch(`/api/packages/${packageId}/assign`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ assignedTo }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Failed to assign package: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error assigning package:", error);
+    throw error;
+  }
+}
+

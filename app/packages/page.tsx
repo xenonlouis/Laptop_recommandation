@@ -323,10 +323,10 @@ export default function PackagesPage() {
       }
     }
 
-    if (isAddDialogOpen) {
+    if (isAddDialogOpen || isEditDialogOpen) {
       fetchOptions()
     }
-  }, [isAddDialogOpen])
+  }, [isAddDialogOpen, isEditDialogOpen])
 
   // Initialize edit form when a package is selected for editing
   useEffect(() => {
@@ -473,8 +473,7 @@ export default function PackagesPage() {
       
       toast({
         title: "Error",
-        description: "Failed to update package status. Please try again.",
-        variant: "destructive"
+        description: "Failed to update package status. Please try again."
       });
     }
   }
@@ -561,8 +560,25 @@ export default function PackagesPage() {
     )
   }
 
-  const handleEditClick = (pkg: Package) => {
+  const handleEditClick = async (pkg: Package) => {
     setEditPackage(pkg)
+    setEditSelectedLaptopId(pkg.laptop.id)
+    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
+    
+    // Make sure we have both laptops and accessories data
+    if (laptops.length === 0 || accessories.length === 0) {
+      try {
+        const [laptopsData, accessoriesData] = await Promise.all([
+          fetchLaptops(),
+          fetchAccessories()
+        ])
+        setLaptops(laptopsData)
+        setAccessories(accessoriesData)
+      } catch (err) {
+        console.error("Error fetching options for edit:", err)
+      }
+    }
+    
     setIsEditDialogOpen(true)
     setIsDetailDialogOpen(false)
   }
@@ -700,10 +716,6 @@ export default function PackagesPage() {
             </Link>
             <h1 className="text-2xl font-bold tracking-tight">Laptop Packages</h1>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Package
-          </Button>
         </div>
       </header>
 
@@ -715,7 +727,7 @@ export default function PackagesPage() {
               Manage laptop packages and track their status. Drag packages between columns to change their status.
             </p>
           </div>
-          <Button onClick={handleAddPackage}>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />
             Add Package
           </Button>
