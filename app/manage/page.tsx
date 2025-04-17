@@ -465,6 +465,65 @@ export default function ManageLaptops() {
             )}
           </CardContent>
         </Card>
+
+        {/* Management Cards */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Link href="/manage/laptops">
+            <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardHeader>
+                <CardTitle>Laptop Database</CardTitle>
+                <CardDescription>Manage the laptops inventory</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Add, edit, or remove laptop models from the system.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/accessories">
+            <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardHeader>
+                <CardTitle>Accessories</CardTitle>
+                <CardDescription>Manage the accessories inventory</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Add, edit, or remove accessories such as mice, keyboards, and headphones.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/packages">
+            <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardHeader>
+                <CardTitle>Packages</CardTitle>
+                <CardDescription>Manage laptop packages</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Create and manage packages containing laptops and accessories.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/tools">
+            <Card className="h-full cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardHeader>
+                <CardTitle>Tools</CardTitle>
+                <CardDescription>Manage the software tools</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Add, edit, or remove software tools that can be included in toolkits.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </main>
 
       {/* Add Laptop Dialog */}

@@ -1,11 +1,13 @@
 import fs from "fs"
 import path from "path"
-import type { Laptop, Package, Toolkit } from "@/types"
+import type { Laptop, Package, Toolkit, ToolkitItem } from "@/types"
+import { Tool } from "./api-client-tools"
 
 // Path to the JSON files
 const laptopsDataFilePath = path.join(process.cwd(), "data", "laptops.json")
 const packagesDataFilePath = path.join(process.cwd(), "data", "packages.json")
 const toolkitsDataFilePath = path.join(process.cwd(), "data", "toolkits.json")
+const toolsDataFilePath = path.join(process.cwd(), "data", "tools.json")
 
 // Ensure the data directory exists
 const ensureDataDirectoryExists = () => {
@@ -290,6 +292,158 @@ export const saveToolkits = async (toolkits: Toolkit[]): Promise<boolean> => {
     return true
   } catch (error) {
     console.error("Error saving toolkits:", error)
+    return false
+  }
+}
+
+// Get all tools
+export const getTools = async (): Promise<Tool[]> => {
+  try {
+    ensureDataFileExists(toolsDataFilePath)
+    const data = await fs.promises.readFile(toolsDataFilePath, "utf8")
+    return JSON.parse(data) as Tool[]
+  } catch (error) {
+    console.error("Error reading tools data:", error)
+    return []
+  }
+}
+
+// Get a single tool by ID
+export const getToolById = async (id: string): Promise<Tool | null> => {
+  try {
+    const tools = await getTools()
+    return tools.find((tool) => tool.id === id) || null
+  } catch (error) {
+    console.error(`Error getting tool with ID ${id}:`, error)
+    return null
+  }
+}
+
+// Get tools by category
+export const getToolsByCategory = async (category: string): Promise<Tool[]> => {
+  try {
+    const tools = await getTools()
+    return tools.filter((tool) => tool.category === category)
+  } catch (error) {
+    console.error(`Error getting tools for category ${category}:`, error)
+    return []
+  }
+}
+
+// Get popular tools
+export const getPopularTools = async (limit: number = 10): Promise<Tool[]> => {
+  try {
+    const tools = await getTools()
+    return [...tools]
+      .sort((a, b) => b.popularity - a.popularity)
+      .slice(0, limit)
+  } catch (error) {
+    console.error("Error getting popular tools:", error)
+    return []
+  }
+}
+
+// Save tools to JSON file
+export const saveTools = async (tools: Tool[]): Promise<boolean> => {
+  try {
+    ensureDataDirectoryExists()
+    await fs.promises.writeFile(toolsDataFilePath, JSON.stringify(tools, null, 2), "utf8")
+    return true
+  } catch (error) {
+    console.error("Error saving tools data:", error)
+    return false
+  }
+}
+
+// Add a new tool
+export const addTool = async (tool: Omit<Tool, "id" | "createdAt" | "updatedAt" | "usageCount" | "popularity">): Promise<Tool> => {
+  try {
+    const tools = await getTools()
+    
+    // Create a new tool with required fields
+    const newTool: Tool = {
+      ...tool,
+      id: `tool-${Date.now().toString(36)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      usageCount: 0,
+      popularity: 0
+    }
+    
+    tools.push(newTool)
+    await saveTools(tools)
+    
+    return newTool
+  } catch (error) {
+    console.error("Error adding tool:", error)
+    throw error
+  }
+}
+
+// Update a tool
+export const updateTool = async (updatedTool: Tool): Promise<boolean> => {
+  try {
+    const tools = await getTools()
+    const index = tools.findIndex((tool) => tool.id === updatedTool.id)
+    
+    if (index === -1) {
+      return false
+    }
+    
+    // Preserve usage data but update timestamp
+    tools[index] = {
+      ...updatedTool,
+      updatedAt: new Date().toISOString()
+    }
+    
+    return await saveTools(tools)
+  } catch (error) {
+    console.error(`Error updating tool with ID ${updatedTool.id}:`, error)
+    return false
+  }
+}
+
+// Delete a tool
+export const deleteTool = async (id: string): Promise<boolean> => {
+  try {
+    const tools = await getTools()
+    const filteredTools = tools.filter((tool) => tool.id !== id)
+    
+    if (filteredTools.length === tools.length) {
+      return false
+    }
+    
+    return await saveTools(filteredTools)
+  } catch (error) {
+    console.error(`Error deleting tool with ID ${id}:`, error)
+    return false
+  }
+}
+
+// Track tool usage
+export const trackToolUsage = async (id: string): Promise<boolean> => {
+  try {
+    const tools = await getTools()
+    const index = tools.findIndex((tool) => tool.id === id)
+    
+    if (index === -1) {
+      return false
+    }
+    
+    // Increment usage count and recalculate popularity (0-10 scale)
+    tools[index].usageCount += 1
+    
+    // Find max usage count to scale popularity
+    const maxUsage = Math.max(...tools.map(t => t.usageCount))
+    
+    // Update popularity if we have usage data
+    if (maxUsage > 0) {
+      tools[index].popularity = Math.min(10, Math.round((tools[index].usageCount / maxUsage) * 10))
+    }
+    
+    return await saveTools(tools)
+  } catch (error) {
+    console.error(`Error tracking usage for tool ${id}:`, error)
     return false
   }
 }

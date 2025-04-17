@@ -567,7 +567,15 @@ export default function PackagesPage() {
   const handleEditClick = async (pkg: Package) => {
     setEditPackage(pkg)
     
-    // First make sure we have the laptops and accessories data
+    // Set the laptop ID directly from the package
+    const laptopId = pkg.laptop.id
+    console.log("Setting laptop ID:", laptopId)
+    setEditSelectedLaptopId(laptopId)
+    
+    // Set the accessory IDs
+    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
+    
+    // Make sure we have both laptops and accessories data
     if (laptops.length === 0 || accessories.length === 0) {
       try {
         const [laptopsData, accessoriesData] = await Promise.all([
@@ -580,25 +588,6 @@ export default function PackagesPage() {
         console.error("Error fetching options for edit:", err)
       }
     }
-    
-    // Find the correct laptop ID by matching the brand and model
-    let laptopId = ""
-    // Try to get ID directly if available
-    if (pkg.laptop?.id) {
-      laptopId = pkg.laptop.id
-    } else {
-      // Otherwise match by brand and model
-      const matchingLaptop = laptops.find(l => 
-        l.brand === pkg.laptop.brand && l.model === pkg.laptop.model
-      )
-      if (matchingLaptop) {
-        laptopId = matchingLaptop.id
-      }
-    }
-    
-    console.log("Found laptop ID for edit:", laptopId)
-    setEditSelectedLaptopId(laptopId)
-    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
     
     setIsEditDialogOpen(true)
     setIsDetailDialogOpen(false)
@@ -713,14 +702,15 @@ export default function PackagesPage() {
     }
   }
 
-  // Debug useEffect for laptop selection
+  // Debug selected laptop
   useEffect(() => {
-    if (isEditDialogOpen && editPackage) {
-      console.log("Debug - Current package laptop:", editPackage.laptop)
-      console.log("Debug - editSelectedLaptopId:", editSelectedLaptopId)
-      console.log("Debug - Available laptops:", laptops)
+    if (isEditDialogOpen && editPackage && editPackage.laptop) {
+      // Always force set the laptop ID when the dialog opens
+      const laptopId = editPackage.laptop.id;
+      console.log("Setting laptop ID from edit useEffect:", laptopId);
+      setEditSelectedLaptopId(laptopId);
     }
-  }, [isEditDialogOpen, editPackage, editSelectedLaptopId, laptops])
+  }, [isEditDialogOpen, editPackage]);
 
   if (loading) {
     return (
@@ -1120,8 +1110,13 @@ export default function PackagesPage() {
                 >
                   <SelectTrigger id="edit-laptop">
                     <SelectValue placeholder="Select a laptop">
-                      {editSelectedLaptopId ? laptops.find(l => l.id === editSelectedLaptopId)?.brand + " " + 
-                      laptops.find(l => l.id === editSelectedLaptopId)?.model : "Select a laptop"}
+                      {editSelectedLaptopId && laptops.length > 0 ? 
+                        (() => {
+                          const laptop = laptops.find(l => l.id === editSelectedLaptopId);
+                          return laptop ? `${laptop.brand} ${laptop.model}` : "Select a laptop";
+                        })() : 
+                        "Select a laptop"
+                      }
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>

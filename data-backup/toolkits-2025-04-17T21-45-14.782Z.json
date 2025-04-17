@@ -1,0 +1,477 @@
+[
+  {
+    "id": "sfmc-windows",
+    "profileName": "SFMC Consultant",
+    "description": "Standard toolkit for Salesforce Marketing Cloud consultants using Windows",
+    "operatingSystem": "windows",
+    "tools": [
+      {
+        "id": "vscode-sfmc",
+        "name": "Visual Studio Code",
+        "description": "Code editor with SFMC extensions for AMPscript and SSJS",
+        "category": "development",
+        "downloadUrl": "https://code.visualstudio.com/download",
+        "installationNotes": "Install with SFMC Code Tools extension and Salesforce Extensions",
+        "isRequired": true,
+        "alternatives": ["Sublime Text", "Notepad++"]
+      },
+      {
+        "id": "chrome",
+        "name": "Google Chrome",
+        "description": "Primary browser with developer tools",
+        "category": "development",
+        "downloadUrl": "https://www.google.com/chrome/",
+        "installationNotes": "Add SFMC Inspector Chrome extension",
+        "isRequired": true,
+        "alternatives": ["Firefox Developer Edition"]
+      },
+      {
+        "id": "postman",
+        "name": "Postman",
+        "description": "API testing tool for SFMC API exploration",
+        "category": "testing",
+        "downloadUrl": "https://www.postman.com/downloads/",
+        "installationNotes": "Import SFMC API Collection",
+        "isRequired": true,
+        "alternatives": ["Insomnia"]
+      },
+      {
+        "id": "git",
+        "name": "Git",
+        "description": "Version control system",
+        "category": "development",
+        "downloadUrl": "https://git-scm.com/download/win",
+        "isRequired": true
+      },
+      {
+        "id": "nodejs",
+        "name": "Node.js",
+        "description": "JavaScript runtime for SSJS development and testing",
+        "category": "development",
+        "downloadUrl": "https://nodejs.org/en/download/",
+        "isRequired": true
+      },
+      {
+        "id": "ms-office",
+        "name": "Microsoft Office Suite",
+        "description": "For documentation and client communications",
+        "category": "productivity",
+        "isRequired": true
+      },
+      {
+        "id": "teams",
+        "name": "Microsoft Teams",
+        "description": "Communication and collaboration platform",
+        "category": "communication",
+        "downloadUrl": "https://www.microsoft.com/en-us/microsoft-teams/download-app",
+        "isRequired": true,
+        "alternatives": ["Slack"]
+      },
+      {
+        "id": "sfmc-trailhead",
+        "name": "Salesforce Trailhead",
+        "description": "Learning platform for Salesforce",
+        "category": "specialized",
+        "downloadUrl": "https://trailhead.salesforce.com/",
+        "isRequired": false
+      }
+    ]
+  },
+  {
+    "id": "sfmc-macos",
+    "profileName": "SFMC Consultant",
+    "description": "Standard toolkit for Salesforce Marketing Cloud consultants using macOS",
+    "operatingSystem": "macos",
+    "tools": [
+      {
+        "id": "vscode-sfmc-mac",
+        "name": "Visual Studio Code",
+        "description": "Code editor with SFMC extensions for AMPscript and SSJS",
+        "category": "development",
+        "downloadUrl": "https://code.visualstudio.com/download",
+        "installationNotes": "Install with SFMC Code Tools extension and Salesforce Extensions",
+        "isRequired": true,
+        "alternatives": ["Sublime Text", "BBEdit"]
+      },
+      {
+        "id": "chrome-mac",
+        "name": "Google Chrome",
+        "description": "Primary browser with developer tools",
+        "category": "development",
+        "downloadUrl": "https://www.google.com/chrome/",
+        "installationNotes": "Add SFMC Inspector Chrome extension",
+        "isRequired": true,
+        "alternatives": ["Firefox Developer Edition", "Safari"]
+      },
+      {
+        "id": "postman-mac",
+        "name": "Postman",
+        "description": "API testing tool for SFMC API exploration",
+        "category": "testing",
+        "downloadUrl": "https://www.postman.com/downloads/",
+        "installationNotes": "Import SFMC API Collection",
+        "isRequired": true,
+        "alternatives": ["Insomnia"]
+      },
+      {
+        "id": "git-mac",
+        "name": "Git",
+        "description": "Version control system (via Homebrew)",
+        "category": "development",
+        "downloadUrl": "https://brew.sh/",
+        "installationNotes": "Install via Homebrew: brew install git",
+        "isRequired": true
+      },
+      {
+        "id": "homebrew",
+        "name": "Homebrew",
+        "description": "Package manager for macOS",
+        "category": "development",
+        "downloadUrl": "https://brew.sh/",
+        "isRequired": true
+      },
+      {
+        "id": "nodejs-mac",
+        "name": "Node.js",
+        "description": "JavaScript runtime for SSJS development and testing",
+        "category": "development",
+        "downloadUrl": "https://nodejs.org/en/download/",
+        "installationNotes": "Or install via Homebrew: brew install node",
+        "isRequired": true
+      },
+      {
+        "id": "ms-office-mac",
+        "name": "Microsoft Office Suite",
+        "description": "For documentation and client communications",
+        "category": "productivity",
+        "isRequired": true
+      },
+      {
+        "id": "teams-mac",
+        "name": "Microsoft Teams",
+        "description": "Communication and collaboration platform",
+        "category": "communication",
+        "downloadUrl": "https://www.microsoft.com/en-us/microsoft-teams/download-app",
+        "isRequired": true,
+        "alternatives": ["Slack"]
+      }
+    ]
+  },
+  {
+    "id": "mulesoft-windows",
+    "profileName": "MuleSoft Developer",
+    "description": "Standard toolkit for MuleSoft integration developers using Windows",
+    "operatingSystem": "windows",
+    "tools": [
+      {
+        "id": "anypoint-studio",
+        "name": "Anypoint Studio",
+        "description": "MuleSoft's Eclipse-based IDE for Mule applications",
+        "category": "development",
+        "downloadUrl": "https://www.mulesoft.com/platform/studio",
+        "isRequired": true
+      },
+      {
+        "id": "jdk",
+        "name": "Java Development Kit",
+        "description": "JDK for Mule application development",
+        "category": "development",
+        "downloadUrl": "https://adoptopenjdk.net/",
+        "installationNotes": "Install JDK 8 or 11 as recommended by MuleSoft",
+        "isRequired": true
+      },
+      {
+        "id": "maven",
+        "name": "Apache Maven",
+        "description": "Build and dependency management tool",
+        "category": "development",
+        "downloadUrl": "https://maven.apache.org/download.cgi",
+        "isRequired": true
+      },
+      {
+        "id": "postman-mule",
+        "name": "Postman",
+        "description": "API testing tool",
+        "category": "testing",
+        "downloadUrl": "https://www.postman.com/downloads/",
+        "isRequired": true,
+        "alternatives": ["Insomnia"]
+      },
+      {
+        "id": "mysql-workbench",
+        "name": "MySQL Workbench",
+        "description": "SQL development and database management tool",
+        "category": "database",
+        "downloadUrl": "https://dev.mysql.com/downloads/workbench/",
+        "isRequired": false,
+        "alternatives": ["DBeaver", "PostgreSQL"]
+      },
+      {
+        "id": "git-mule",
+        "name": "Git",
+        "description": "Version control system",
+        "category": "development",
+        "downloadUrl": "https://git-scm.com/download/win",
+        "isRequired": true
+      },
+      {
+        "id": "soapui",
+        "name": "SoapUI",
+        "description": "Web service testing application",
+        "category": "testing",
+        "downloadUrl": "https://www.soapui.org/downloads/soapui/",
+        "isRequired": false
+      },
+      {
+        "id": "teams-mule",
+        "name": "Microsoft Teams",
+        "description": "Communication and collaboration platform",
+        "category": "communication",
+        "downloadUrl": "https://www.microsoft.com/en-us/microsoft-teams/download-app",
+        "isRequired": true,
+        "alternatives": ["Slack"]
+      }
+    ]
+  },
+  {
+    "id": "fullstack-windows",
+    "profileName": "Full-Stack Developer",
+    "description": "Standard toolkit for full-stack developers using Windows",
+    "operatingSystem": "windows",
+    "tools": [
+      {
+        "id": "vscode-fullstack",
+        "name": "Visual Studio Code",
+        "description": "Code editor with extensions for various languages",
+        "category": "development",
+        "downloadUrl": "https://code.visualstudio.com/download",
+        "isRequired": true,
+        "alternatives": ["IntelliJ IDEA", "WebStorm"]
+      },
+      {
+        "id": "node-fullstack",
+        "name": "Node.js",
+        "description": "JavaScript runtime",
+        "category": "development",
+        "downloadUrl": "https://nodejs.org/en/download/",
+        "isRequired": true
+      },
+      {
+        "id": "docker-desktop",
+        "name": "Docker Desktop",
+        "description": "Containerization platform",
+        "category": "development",
+        "downloadUrl": "https://www.docker.com/products/docker-desktop",
+        "isRequired": true
+      },
+      {
+        "id": "git-fullstack",
+        "name": "Git",
+        "description": "Version control system",
+        "category": "development",
+        "downloadUrl": "https://git-scm.com/download/win",
+        "isRequired": true
+      },
+      {
+        "id": "mongodb-compass",
+        "name": "MongoDB Compass",
+        "description": "GUI for MongoDB",
+        "category": "database",
+        "downloadUrl": "https://www.mongodb.com/products/compass",
+        "isRequired": false,
+        "alternatives": ["Studio 3T"]
+      },
+      {
+        "id": "pgadmin",
+        "name": "pgAdmin",
+        "description": "PostgreSQL Tools",
+        "category": "database",
+        "downloadUrl": "https://www.pgadmin.org/download/",
+        "isRequired": false
+      },
+      {
+        "id": "figma",
+        "name": "Figma",
+        "description": "Interface design tool",
+        "category": "design",
+        "downloadUrl": "https://www.figma.com/downloads/",
+        "isRequired": false,
+        "alternatives": ["Adobe XD", "Sketch"]
+      },
+      {
+        "id": "jira",
+        "name": "Jira",
+        "description": "Project management software",
+        "category": "project_management",
+        "downloadUrl": "https://www.atlassian.com/software/jira",
+        "isRequired": true,
+        "alternatives": ["Asana", "Trello"]
+      }
+    ]
+  },
+  {
+    "id": "mulesoft-macos",
+    "profileName": "MuleSoft Developer",
+    "description": "Standard toolkit for MuleSoft integration developers using macOS",
+    "operatingSystem": "macos",
+    "tools": [
+      {
+        "id": "anypoint-studio-mac",
+        "name": "Anypoint Studio",
+        "description": "MuleSoft's Eclipse-based IDE for Mule applications",
+        "category": "development",
+        "downloadUrl": "https://www.mulesoft.com/platform/studio",
+        "isRequired": true
+      },
+      {
+        "id": "jdk-mac",
+        "name": "Java Development Kit",
+        "description": "JDK for Mule application development",
+        "category": "development",
+        "downloadUrl": "https://adoptopenjdk.net/",
+        "installationNotes": "Install JDK 8 or 11 as recommended by MuleSoft, or use: brew install --cask adoptopenjdk11",
+        "isRequired": true
+      },
+      {
+        "id": "homebrew-mule",
+        "name": "Homebrew",
+        "description": "Package manager for macOS",
+        "category": "development",
+        "downloadUrl": "https://brew.sh/",
+        "isRequired": true
+      },
+      {
+        "id": "maven-mac",
+        "name": "Apache Maven",
+        "description": "Build and dependency management tool",
+        "category": "development",
+        "downloadUrl": "https://maven.apache.org/download.cgi",
+        "installationNotes": "Install via Homebrew: brew install maven",
+        "isRequired": true
+      },
+      {
+        "id": "postman-mule-mac",
+        "name": "Postman",
+        "description": "API testing tool",
+        "category": "testing",
+        "downloadUrl": "https://www.postman.com/downloads/",
+        "isRequired": true,
+        "alternatives": ["Insomnia"]
+      },
+      {
+        "id": "iterm2",
+        "name": "iTerm2",
+        "description": "Terminal replacement for macOS",
+        "category": "development",
+        "downloadUrl": "https://iterm2.com/",
+        "isRequired": false,
+        "alternatives": ["Terminal"]
+      },
+      {
+        "id": "git-mule-mac",
+        "name": "Git",
+        "description": "Version control system",
+        "category": "development",
+        "downloadUrl": "https://git-scm.com/download/mac",
+        "installationNotes": "Install via Homebrew: brew install git",
+        "isRequired": true
+      },
+      {
+        "id": "teams-mule-mac",
+        "name": "Microsoft Teams",
+        "description": "Communication and collaboration platform",
+        "category": "communication",
+        "downloadUrl": "https://www.microsoft.com/en-us/microsoft-teams/download-app",
+        "isRequired": true,
+        "alternatives": ["Slack"]
+      }
+    ]
+  },
+  {
+    "id": "fullstack-macos",
+    "profileName": "Full-Stack Developer",
+    "description": "Standard toolkit for full-stack developers using macOS",
+    "operatingSystem": "macos",
+    "tools": [
+      {
+        "id": "vscode-fullstack-mac",
+        "name": "Visual Studio Code",
+        "description": "Code editor with extensions for various languages",
+        "category": "development",
+        "downloadUrl": "https://code.visualstudio.com/download",
+        "isRequired": true,
+        "alternatives": ["IntelliJ IDEA", "WebStorm"]
+      },
+      {
+        "id": "homebrew-fullstack",
+        "name": "Homebrew",
+        "description": "Package manager for macOS",
+        "category": "development",
+        "downloadUrl": "https://brew.sh/",
+        "isRequired": true
+      },
+      {
+        "id": "node-fullstack-mac",
+        "name": "Node.js",
+        "description": "JavaScript runtime",
+        "category": "development",
+        "downloadUrl": "https://nodejs.org/en/download/",
+        "installationNotes": "Install via Homebrew: brew install node",
+        "isRequired": true
+      },
+      {
+        "id": "docker-desktop-mac",
+        "name": "Docker Desktop",
+        "description": "Containerization platform",
+        "category": "development",
+        "downloadUrl": "https://www.docker.com/products/docker-desktop",
+        "isRequired": true
+      },
+      {
+        "id": "git-fullstack-mac",
+        "name": "Git",
+        "description": "Version control system",
+        "category": "development",
+        "downloadUrl": "https://git-scm.com/download/mac",
+        "installationNotes": "Install via Homebrew: brew install git",
+        "isRequired": true
+      },
+      {
+        "id": "iterm2-fullstack",
+        "name": "iTerm2",
+        "description": "Terminal replacement for macOS",
+        "category": "development",
+        "downloadUrl": "https://iterm2.com/",
+        "isRequired": false,
+        "alternatives": ["Terminal"]
+      },
+      {
+        "id": "mongodb-compass-mac",
+        "name": "MongoDB Compass",
+        "description": "GUI for MongoDB",
+        "category": "database",
+        "downloadUrl": "https://www.mongodb.com/products/compass",
+        "isRequired": false,
+        "alternatives": ["Studio 3T"]
+      },
+      {
+        "id": "figma-mac",
+        "name": "Figma",
+        "description": "Interface design tool",
+        "category": "design",
+        "downloadUrl": "https://www.figma.com/downloads/",
+        "isRequired": false,
+        "alternatives": ["Sketch", "Adobe XD"]
+      },
+      {
+        "id": "jira-mac",
+        "name": "Jira",
+        "description": "Project management software",
+        "category": "project_management",
+        "downloadUrl": "https://www.atlassian.com/software/jira",
+        "isRequired": true,
+        "alternatives": ["Asana", "Trello"]
+      }
+    ]
+  }
+] 

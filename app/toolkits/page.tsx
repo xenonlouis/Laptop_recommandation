@@ -29,12 +29,19 @@ export default function ToolkitsPage() {
               Manage software toolkits for different profiles and operating systems.
             </p>
           </div>
-          <Link href="/toolkits/add">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Toolkit
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/toolkits/add">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Toolkit
+              </Button>
+            </Link>
+            <Link href="/manage/tools">
+              <Button variant="outline">
+                Manage Tools
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Suspense fallback={<div>Loading toolkits...</div>}>

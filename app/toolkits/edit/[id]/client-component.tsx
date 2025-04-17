@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Toolkit, OperatingSystem } from "@/types"
-import { createToolkit } from "@/lib/api-client"
+import { fetchToolkitById, updateToolkit } from "@/lib/api-client"
 import { fetchTools } from "@/lib/api-client-tools"
 import { Tool } from "@/lib/api-client-tools"
 import { Button } from "@/components/ui/button"
@@ -34,17 +34,20 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table"
-import { ArrowLeft, Plus, Loader2, Search } from "lucide-react"
+import { ArrowLeft, Plus, Trash, Loader2, Search } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
-export default function AddToolkitPage() {
+// Client component that handles the actual editing
+export function EditToolkitContent({ id }: { id: string }) {
   const router = useRouter()
   const { toast } = useToast()
   
-  const [loading, setLoading] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [loadingTools, setLoadingTools] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   
+  const [toolkit, setToolkit] = useState<Toolkit | null>(null)
   const [profileName, setProfileName] = useState("")
   const [description, setDescription] = useState("")
   const [operatingSystem, setOperatingSystem] = useState<OperatingSystem>("windows")
@@ -52,26 +55,41 @@ export default function AddToolkitPage() {
   const [availableTools, setAvailableTools] = useState<Tool[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   
-  // Fetch available tools on component mount
+  // Fetch the toolkit data and available tools on component mount
   useEffect(() => {
-    const loadTools = async () => {
+    const loadData = async () => {
       try {
+        setLoading(true)
         setLoadingTools(true)
-        const tools = await fetchTools()
-        setAvailableTools(tools)
+        
+        // Fetch toolkit and available tools in parallel
+        const [toolkit, tools] = await Promise.all([
+          fetchToolkitById(id),
+          fetchTools()
+        ])
+        
+        if (toolkit) {
+          setToolkit(toolkit)
+          setProfileName(toolkit.profileName)
+          setDescription(toolkit.description || "")
+          setOperatingSystem(toolkit.operatingSystem || "windows")
+          // Use toolIds if available, otherwise derive them from embedded tools
+          setToolIds(toolkit.toolIds || (toolkit.tools?.map(tool => tool.id) || []))
+          setAvailableTools(tools)
+        } else {
+          setError("Toolkit not found")
+        }
       } catch (err) {
         console.error(err)
-        toast({
-          title: "Error",
-          description: "Failed to load available tools",
-        })
+        setError("Failed to load toolkit data")
       } finally {
+        setLoading(false)
         setLoadingTools(false)
       }
     }
     
-    loadTools()
-  }, [toast])
+    loadData()
+  }, [id])
   
   // Filter tools based on search term
   const filteredTools = availableTools.filter(tool => 
@@ -118,7 +136,8 @@ export default function AddToolkitPage() {
       return
     }
     
-    const newToolkit: Omit<Toolkit, 'id'> = {
+    const updatedToolkit: Toolkit = {
+      id,
       profileName,
       description,
       operatingSystem,
@@ -128,11 +147,11 @@ export default function AddToolkitPage() {
     setSubmitting(true)
     
     try {
-      await createToolkit(newToolkit)
+      await updateToolkit(updatedToolkit)
       
       toast({
         title: "Success",
-        description: "Toolkit created successfully",
+        description: "Toolkit updated successfully",
       })
       
       router.push("/toolkits")
@@ -140,11 +159,36 @@ export default function AddToolkitPage() {
       console.error(err)
       toast({
         title: "Error",
-        description: "Failed to create toolkit",
+        description: "Failed to update toolkit",
       })
     } finally {
       setSubmitting(false)
     }
+  }
+  
+  if (loading) {
+    return (
+      <div className="container flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    )
+  }
+  
+  if (error) {
+    return (
+      <div className="container py-8">
+        <Alert variant="destructive" className="mb-4">
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+        <Button asChild>
+          <Link href="/toolkits">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Toolkits
+          </Link>
+        </Button>
+      </div>
+    )
   }
   
   return (
@@ -158,7 +202,7 @@ export default function AddToolkitPage() {
                 <span className="sr-only">Back to toolkits</span>
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight">Create New Toolkit</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Edit Toolkit</h1>
           </div>
         </div>
       </header>
@@ -322,10 +366,10 @@ export default function AddToolkitPage() {
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  Saving...
                 </>
               ) : (
-                "Create Toolkit"
+                "Update Toolkit"
               )}
             </Button>
           </div>

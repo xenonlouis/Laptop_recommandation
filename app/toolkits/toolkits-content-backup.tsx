@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { fetchToolkits } from "@/lib/api-client"
-import { fetchTools } from "@/lib/api-client-tools"
 import { Toolkit, ToolkitItem, OperatingSystem } from "@/types"
-import { Tool } from "@/lib/api-client-tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -28,41 +26,19 @@ export function ToolkitsContent() {
   const [error, setError] = useState<string | null>(null)
   const [selectedOperatingSystem, setSelectedOperatingSystem] = useState<OperatingSystem>("windows")
   const [uniqueProfiles, setUniqueProfiles] = useState<string[]>([])
-  const [allTools, setAllTools] = useState<Tool[]>([])
 
   const searchParams = useSearchParams()
   const profileParam = searchParams.get('profile')
 
   useEffect(() => {
-    const getToolkitsAndTools = async () => {
+    const getToolkits = async () => {
       try {
         setLoading(true)
-        
-        // Fetch toolkits and tools in parallel
-        const [toolkitsData, toolsData] = await Promise.all([
-          fetchToolkits(),
-          fetchTools()
-        ])
-        
-        setAllTools(toolsData)
-        
-        // Populate each toolkit with its tools based on toolIds
-        const populatedToolkits = toolkitsData.map(toolkit => {
-          // Map toolIds to actual tool objects
-          const toolObjects = toolkit.toolIds.map(toolId => 
-            toolsData.find(tool => tool.id === toolId)
-          ).filter(Boolean) as ToolkitItem[];
-          
-          return {
-            ...toolkit,
-            tools: toolObjects
-          };
-        })
-        
-        setToolkits(populatedToolkits)
+        const data = await fetchToolkits()
+        setToolkits(data)
         
         // Extract unique profile names
-        const profiles = Array.from(new Set(populatedToolkits.map(toolkit => toolkit.profileName)))
+        const profiles = Array.from(new Set(data.map(toolkit => toolkit.profileName)))
         setUniqueProfiles(profiles)
         
         setError(null)
@@ -74,7 +50,7 @@ export function ToolkitsContent() {
       }
     }
 
-    getToolkitsAndTools()
+    getToolkits()
   }, [])
 
   // Filter toolkits based on OS and profile
@@ -99,8 +75,6 @@ export function ToolkitsContent() {
   // Group tools by category for a better display
   const groupToolsByCategory = (tools: ToolkitItem[]) => {
     const grouped: Record<string, ToolkitItem[]> = {}
-    
-    if (!tools) return grouped;
     
     tools.forEach(tool => {
       if (!grouped[tool.category]) {
@@ -188,10 +162,18 @@ export function ToolkitsContent() {
       ) : (
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {filteredToolkits.map(toolkit => {
-            // Ensure tools array exists
-            const tools = toolkit.tools || [];
-            const toolsByCategory = groupToolsByCategory(tools);
+            const toolsByCategory = groupToolsByCategory(toolkit.tools)
             
+            // Find the dominant category for this toolkit
+            const categoryCounts: Record<string, number> = {};
+            toolkit.tools.forEach(tool => {
+              categoryCounts[tool.category] = (categoryCounts[tool.category] || 0) + 1;
+            });
+            
+            const dominantCategory = Object.entries(categoryCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(entry => entry[0])[0] || 'development';
+              
             return (
               <Card 
                 key={toolkit.id} 
@@ -214,7 +196,7 @@ export function ToolkitsContent() {
                 <CardContent className="pt-6">
                   <div className="mb-4 flex gap-2 flex-wrap">
                     <Badge variant="outline">{toolkit.operatingSystem}</Badge>
-                    <Badge variant="outline">{tools.length} tools</Badge>
+                    <Badge variant="outline">{toolkit.tools.length} tools</Badge>
                   </div>
                   
                   {/* Statistics Dialog button */}
@@ -238,80 +220,59 @@ export function ToolkitsContent() {
                     </Dialog>
                   </div>
 
-                  {/* Tools by category with accordion */}
-                  <Accordion type="multiple" className="w-full space-y-2">
-                    {Object.entries(toolsByCategory).map(([category, tools]) => (
-                      <AccordionItem 
-                        key={category} 
-                        value={category}
-                        className="rounded-md border overflow-hidden bg-card shadow-sm"
-                      >
-                        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50 data-[state=open]:bg-muted/50">
-                          <div className="flex items-center gap-2">
-                            {getCategoryIcon(category)}
-                            <span className="font-medium">{formatCategory(category)}</span>
-                            <Badge variant="secondary">{tools.length}</Badge>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pt-2 pb-4">
-                          <div className="grid grid-cols-1 gap-3">
-                            {tools.map(tool => (
-                              <div 
-                                key={tool.id} 
-                                className="border rounded-lg bg-card/50 p-4 hover:bg-muted/30 transition-colors"
-                              >
-                                <div className="flex items-center justify-between mb-3">
-                                  <h4 className="font-medium flex items-center">
-                                    {tool.icon ? (
-                                      <img 
-                                        src={tool.icon} 
-                                        alt={`${tool.name} icon`} 
-                                        className="w-6 h-6 object-contain mr-2"
-                                      />
-                                    ) : (
-                                      <div className="w-6 h-6 bg-muted rounded-sm flex items-center justify-center text-xs mr-2">
-                                        {tool.name.charAt(0)}
-                                      </div>
-                                    )}
-                                    {tool.name}
-                                    {tool.isRequired && (
-                                      <Badge className="ml-2" variant="outline">Required</Badge>
-                                    )}
-                                  </h4>
-                                  {tool.downloadUrl && (
-                                    <a href={tool.downloadUrl} target="_blank" rel="noopener noreferrer">
-                                      <Button variant="outline" size="sm">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Download
-                                      </Button>
-                                    </a>
-                                  )}
+                  {/* Categories with tool cards */}
+                  {Object.entries(toolsByCategory).map(([category, tools]) => (
+                    <div key={category} className="mb-6">
+                      {/* Category heading */}
+                      <div className="flex items-center gap-2 mb-3">
+                        {getCategoryIcon(category)}
+                        <h3 className="font-medium">{formatCategory(category)}</h3>
+                        <Badge variant="secondary">{tools.length}</Badge>
+                      </div>
+                      
+                      {/* Tool cards grid */}
+                      <div className="grid grid-cols-1 gap-3">
+                        {tools.map(tool => (
+                          <div key={tool.id} className="border rounded-lg bg-card/50 p-4 hover:bg-muted/30 transition-colors">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-medium flex items-center">
+                                {tool.name}
+                                {tool.isRequired && (
+                                  <Badge className="ml-2" variant="outline">Required</Badge>
+                                )}
+                              </h4>
+                              {tool.downloadUrl && (
+                                <a href={tool.downloadUrl} target="_blank" rel="noopener noreferrer">
+                                  <Button variant="outline" size="sm">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download
+                                  </Button>
+                                </a>
+                              )}
+                            </div>
+                            
+                            <p className="text-sm text-muted-foreground mb-3">{tool.description}</p>
+                            
+                            <div className="space-y-2 text-sm">
+                              {tool.installationNotes && (
+                                <div className="pt-2 border-t border-border">
+                                  <p className="font-medium">Installation:</p>
+                                  <p className="text-muted-foreground">{tool.installationNotes}</p>
                                 </div>
-                                
-                                <p className="text-sm text-muted-foreground mb-3">{tool.description}</p>
-                                
-                                <div className="space-y-2 text-sm">
-                                  {tool.installationNotes && (
-                                    <div className="pt-2 border-t border-border">
-                                      <p className="font-medium">Installation:</p>
-                                      <p className="text-muted-foreground">{tool.installationNotes}</p>
-                                    </div>
-                                  )}
-                                  
-                                  {tool.alternatives && tool.alternatives.length > 0 && (
-                                    <div className="pt-2 border-t border-border">
-                                      <p className="font-medium">Alternatives:</p>
-                                      <p className="text-muted-foreground">{Array.isArray(tool.alternatives) ? tool.alternatives.join(', ') : tool.alternatives}</p>
-                                    </div>
-                                  )}
+                              )}
+                              
+                              {tool.alternatives && tool.alternatives.length > 0 && (
+                                <div className="pt-2 border-t border-border">
+                                  <p className="font-medium">Alternatives:</p>
+                                  <p className="text-muted-foreground">{tool.alternatives.join(', ')}</p>
                                 </div>
-                              </div>
-                            ))}
+                              )}
+                            </div>
                           </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
             )

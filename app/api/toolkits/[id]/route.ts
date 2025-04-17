@@ -9,7 +9,8 @@ interface Params {
 // GET /api/toolkits/:id - Get a single toolkit
 export async function GET(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
     const toolkit = await getToolkitById(id)
 
     if (toolkit) {
@@ -26,7 +27,8 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
 // PUT /api/toolkits/:id - Update a toolkit
 export async function PUT(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
     const toolkitData = (await request.json()) as Toolkit
 
     if (id !== toolkitData.id) {
@@ -54,7 +56,8 @@ export async function PUT(request: NextRequest, { params }: { params: Params }) 
 // DELETE /api/toolkits/:id - Delete a toolkit
 export async function DELETE(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
     
     const success = await deleteToolkit(id)
 

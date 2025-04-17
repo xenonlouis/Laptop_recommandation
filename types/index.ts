@@ -21,6 +21,18 @@ export type ToolkitCategory =
   | "design"
   | "productivity";
 
+export interface Tool {
+  id: string;
+  name: string;
+  description: string;
+  category: ToolkitCategory;
+  downloadUrl?: string;
+  installationNotes?: string;
+  isRequired: boolean;
+  alternatives?: string[];
+  icon?: string; // URL to the tool's logo/icon
+}
+
 export interface ToolkitItem {
   id: string;
   name: string;
@@ -30,6 +42,7 @@ export interface ToolkitItem {
   installationNotes?: string;
   isRequired: boolean;
   alternatives?: string[];
+  icon?: string; // URL to the tool's logo/icon
 }
 
 export interface Toolkit {
@@ -37,7 +50,8 @@ export interface Toolkit {
   profileName: string;
   description: string;
   operatingSystem: OperatingSystem;
-  tools: ToolkitItem[];
+  tools?: ToolkitItem[];
+  toolIds: string[];
 }
 
 export interface Person {
