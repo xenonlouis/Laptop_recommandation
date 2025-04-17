@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-04-15T10-56-25.057Z",
+  "createdAt": "2025-04-15T10:56:25.063Z",
+  "files": [
+    "packages.json",
+    "laptops.json",
+    "accessories.json",
+    "people.json"
+  ]
+}

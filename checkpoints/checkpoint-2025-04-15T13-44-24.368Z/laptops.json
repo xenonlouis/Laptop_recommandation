@@ -139,29 +139,5 @@
       "linux"
     ],
     "id": "fb8bwvr"
-  },
-  {
-    "brand": "Lenovo ",
-    "model": "ThinkPad T14s Gen4",
-    "price": 179.976,
-    "priceType": "TTC",
-    "processor": "i7-1370P",
-    "ram": "32",
-    "storage": "512",
-    "batteryLife": 8,
-    "performanceScore": 8.6,
-    "notes": "Win 11 Pro  ,  AZERTY , Garantie 3ans j+1 pro support (sac offert)\n",
-    "images": [
-      "https://yaratech.ma/wp-content/uploads/2025/03/Lenovo-ThinkPad-T14s-Gen-5-yaratech.ma-7-1.webp",
-      "https://yaratech.ma/wp-content/uploads/2025/03/Lenovo-ThinkPad-T14s-Gen-5-yaratech.ma-5-1.webp"
-    ],
-    "supportedProfiles": [
-      "developer"
-    ],
-    "supportedOS": [
-      "windows",
-      "linux"
-    ],
-    "id": "hnwd8sj"
   }
 ]

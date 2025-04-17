@@ -692,6 +692,14 @@ export default function PackagesPage() {
     }
   }
 
+  // Debug useEffect
+  useEffect(() => {
+    if (isEditDialogOpen) {
+      console.log("Debug - editSelectedLaptopId:", editSelectedLaptopId)
+      console.log("Debug - laptops available:", laptops.map(l => l.id))
+    }
+  }, [isEditDialogOpen, editSelectedLaptopId, laptops])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">

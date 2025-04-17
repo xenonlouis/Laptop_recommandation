@@ -25,12 +25,86 @@
       ],
       "id": "m626lh4"
     },
-    "accessories": [],
+    "accessories": [
+      {
+        "id": "acc1",
+        "name": "Logitech MX Master 3S",
+        "type": "mouse",
+        "brand": "Logitech",
+        "price": 990,
+        "priceType": "TTC",
+        "image": "https://resource.logitech.com/w_800,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/mx-master-3s/gallery/mx-master-3s-mouse-top-view-graphite.png",
+        "notes": "Wireless mouse with silent clicks"
+      },
+      {
+        "id": "acc2",
+        "name": "Sony WH-1000XM4",
+        "type": "headphone",
+        "brand": "Sony",
+        "price": 2800,
+        "priceType": "TTC",
+        "image": "https://electronics.sony.com/image/5d02da5df552836db894cead8a68b5f3?fmt=png-alpha&wid=720&hei=720",
+        "notes": "Noise cancelling headphones"
+      }
+    ],
     "status": "proposed",
     "assignedTo": "John Smith",
     "createdAt": "2023-08-15T10:30:00Z",
-    "updatedAt": "2025-04-17T10:39:27.047Z",
+    "updatedAt": "2025-04-11T09:47:10.622Z",
     "notes": "Standard package for new developers"
+  },
+  {
+    "id": "pkg2",
+    "name": "Consultant Premium Package",
+    "laptop": {
+      "id": "zgpc0wq",
+      "brand": "Apple",
+      "model": "MacBook Air 13 M2",
+      "price": 14490,
+      "priceType": "TTC",
+      "processor": "Puce M2",
+      "ram": "16",
+      "storage": "256",
+      "batteryLife": 16,
+      "performanceScore": 8.8,
+      "notes": "",
+      "images": [
+        "https://uno.ma/pub/media/catalog/product/cache/af8d7fd2c4634f9c922fba76a4a30c04/l/d/ld0005959615.jpeg"
+      ],
+      "supportedProfiles": [
+        "developer"
+      ],
+      "supportedOS": [
+        "macos"
+      ]
+    },
+    "accessories": [
+      {
+        "id": "acc3",
+        "name": "Magic Mouse",
+        "type": "mouse",
+        "brand": "Apple",
+        "price": 950,
+        "priceType": "TTC",
+        "image": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MK2E3?wid=572&hei=572&fmt=jpeg&qlt=95&.v=1626468075000",
+        "notes": "Wireless mouse for Mac"
+      },
+      {
+        "id": "acc4",
+        "name": "Bose QuietComfort",
+        "type": "headphone",
+        "brand": "Bose",
+        "price": 2500,
+        "priceType": "TTC",
+        "image": "https://assets.bose.com/content/dam/cloudassets/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/product_silo_images/QC45_PDP_Global_Static_1200x1022_Black_hero.png/jcr:content/renditions/cq5dam.web.320.320.png",
+        "notes": "Noise cancelling headphones"
+      }
+    ],
+    "status": "approved",
+    "assignedTo": "Sarah Johnson",
+    "createdAt": "2023-07-22T14:15:00Z",
+    "updatedAt": "2023-07-24T09:45:00Z",
+    "notes": "High-end package for consultants who travel frequently"
   },
   {
     "id": "pkg3",
@@ -59,12 +133,77 @@
       ],
       "id": "fb8bwvr"
     },
-    "accessories": [],
+    "accessories": [
+      {
+        "id": "acc5",
+        "name": "Keychron K8",
+        "type": "keyboard",
+        "brand": "Keychron",
+        "price": 1200,
+        "priceType": "TTC",
+        "image": "https://cdn.shopify.com/s/files/1/0059/0630/1017/t/5/assets/keychronk8wirelessmechanicalkeyboard--edited-1673935648553.jpg",
+        "notes": "Mechanical keyboard with hot-swappable switches"
+      },
+      {
+        "id": "acc6",
+        "name": "Dell WD19TB Dock",
+        "type": "dock",
+        "brand": "Dell",
+        "price": 2100,
+        "priceType": "HT",
+        "image": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/peripherals/docking-stations/wd19tbs/global-spi/ng/peripherals-docking-station-wd19tbs-xsy-hero-504x350-ng.psd?fmt=jpg",
+        "notes": "Thunderbolt dock for multiple monitors"
+      }
+    ],
     "status": "delivered",
     "assignedTo": "Abdelhay",
     "createdAt": "2023-06-10T09:20:00Z",
-    "updatedAt": "2025-04-17T09:40:21.450Z",
+    "updatedAt": "2025-04-11T10:36:36.482Z",
     "notes": "Complete workstation setup for development team"
+  },
+  {
+    "id": "pkg4",
+    "name": "Basic Consultant Setup",
+    "laptop": {
+      "id": "vlkhl1j",
+      "brand": "Hp",
+      "model": "Probook 450 G8 11Th",
+      "price": 8390,
+      "priceType": "HT",
+      "processor": "i7-1165G7",
+      "ram": "16",
+      "storage": "512",
+      "batteryLife": 4,
+      "performanceScore": 8,
+      "notes": "",
+      "images": [
+        "https://www.techpro.ma/2883-large_default/ordinateur-portable-hp-probook-450-g8-i7-32m80ea.jpg"
+      ],
+      "supportedProfiles": [
+        "consultant"
+      ],
+      "supportedOS": [
+        "windows",
+        "linux"
+      ]
+    },
+    "accessories": [
+      {
+        "id": "acc7",
+        "name": "HP Wireless Mouse",
+        "type": "mouse",
+        "brand": "HP",
+        "price": 350,
+        "priceType": "HT",
+        "image": "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06588544.png",
+        "notes": "Basic wireless mouse"
+      }
+    ],
+    "status": "rejected",
+    "assignedTo": "Alex Thompson",
+    "createdAt": "2023-09-05T11:00:00Z",
+    "updatedAt": "2023-09-07T14:20:00Z",
+    "notes": "Budget option rejected due to insufficient battery life"
   },
   {
     "id": "pkg-abc123",
@@ -1046,10 +1185,31 @@
       ],
       "id": "zgpc0wq"
     },
-    "accessories": [],
+    "accessories": [
+      {
+        "id": "acc4",
+        "name": "Bose QuietComfort",
+        "type": "headphone",
+        "brand": "Bose",
+        "price": 2500,
+        "priceType": "TTC",
+        "image": "https://assets.bose.com/content/dam/cloudassets/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/product_silo_images/QC45_PDP_Global_Static_1200x1022_Black_hero.png/jcr:content/renditions/cq5dam.web.320.320.png",
+        "notes": "Noise cancelling headphones"
+      },
+      {
+        "id": "acc7",
+        "name": "HP Wireless Mouse",
+        "type": "mouse",
+        "brand": "HP",
+        "price": 350,
+        "priceType": "HT",
+        "image": "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06588544.png",
+        "notes": "Basic wireless mouse"
+      }
+    ],
     "status": "proposed",
     "createdAt": "2025-04-11T09:54:17.078Z",
-    "updatedAt": "2025-04-17T10:39:32.803Z",
+    "updatedAt": "2025-04-11T09:54:17.078Z",
     "id": "w71qrmz"
   },
   {
@@ -1130,10 +1290,31 @@
       ],
       "id": "8bxapel"
     },
-    "accessories": [],
+    "accessories": [
+      {
+        "id": "acc4",
+        "name": "Bose QuietComfort",
+        "type": "headphone",
+        "brand": "Bose",
+        "price": 2500,
+        "priceType": "TTC",
+        "image": "https://assets.bose.com/content/dam/cloudassets/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/product_silo_images/QC45_PDP_Global_Static_1200x1022_Black_hero.png/jcr:content/renditions/cq5dam.web.320.320.png",
+        "notes": "Noise cancelling headphones"
+      },
+      {
+        "id": "acc7",
+        "name": "HP Wireless Mouse",
+        "type": "mouse",
+        "brand": "HP",
+        "price": 350,
+        "priceType": "HT",
+        "image": "https://ssl-product-images.www8-hp.com/digmedialib/prodimg/lowres/c06588544.png",
+        "notes": "Basic wireless mouse"
+      }
+    ],
     "status": "proposed",
     "createdAt": "2025-04-11T09:55:45.433Z",
-    "updatedAt": "2025-04-17T10:39:41.115Z",
+    "updatedAt": "2025-04-11T09:55:45.433Z",
     "id": "4l0uvnl"
   },
   {
@@ -1164,9 +1345,9 @@
       "id": "vlkhl1j"
     },
     "accessories": [],
-    "status": "9tglu1m",
+    "status": "proposed",
     "createdAt": "2025-04-11T09:56:50.204Z",
-    "updatedAt": "2025-04-17T10:39:02.669Z",
+    "updatedAt": "2025-04-11T09:56:50.204Z",
     "notes": "Adding a Ram stick of 16 GB ",
     "id": "up1t6au"
   },
@@ -1272,70 +1453,5 @@
     "updatedAt": "2025-04-11T10:29:27.385Z",
     "notes": "Current Package that all consultants have",
     "id": "a2a2n1h"
-  },
-  {
-    "name": "Developer Starter Kit v2 ( Windows)",
-    "laptop": {
-      "brand": "Lenovo ",
-      "model": "ThinkPad T14s Gen4",
-      "price": 179.976,
-      "priceType": "TTC",
-      "processor": "i7-1370P",
-      "ram": "32",
-      "storage": "512",
-      "batteryLife": 8,
-      "performanceScore": 8.6,
-      "notes": "Win 11 Pro  ,  AZERTY , Garantie 3ans j+1 pro support (sac offert)\n",
-      "images": [
-        "https://yaratech.ma/wp-content/uploads/2025/03/Lenovo-ThinkPad-T14s-Gen-5-yaratech.ma-7-1.webp",
-        "https://yaratech.ma/wp-content/uploads/2025/03/Lenovo-ThinkPad-T14s-Gen-5-yaratech.ma-5-1.webp"
-      ],
-      "supportedProfiles": [
-        "developer"
-      ],
-      "supportedOS": [
-        "windows",
-        "linux"
-      ],
-      "id": "hnwd8sj"
-    },
-    "accessories": [],
-    "status": "proposed",
-    "createdAt": "2025-04-17T10:38:45.821Z",
-    "updatedAt": "2025-04-17T10:38:45.821Z",
-    "notes": "ram not upgradable ",
-    "id": "9tglu1m"
-  },
-  {
-    "name": "Basic Consultant Setup ( Windows )",
-    "laptop": {
-      "brand": "Hp",
-      "model": "Probook 440 G11",
-      "price": 8850,
-      "priceType": "HT",
-      "processor": "Intel Core Ultra 7 155U",
-      "ram": "8",
-      "storage": "512",
-      "batteryLife": 6,
-      "performanceScore": 8.5,
-      "notes": "needs to upgrade ram with another 8gb ram stick",
-      "images": [
-        "https://joutech.ma/7169-large_default/ordinateur-portable-hp-hp-probook-440-14-pouces-g11-a38e8et.jpg"
-      ],
-      "supportedProfiles": [
-        "consultant",
-        "developer"
-      ],
-      "supportedOS": [
-        "windows",
-        "linux"
-      ],
-      "id": "z9axtzs"
-    },
-    "accessories": [],
-    "status": "proposed",
-    "createdAt": "2025-04-17T10:40:29.709Z",
-    "updatedAt": "2025-04-17T10:40:29.709Z",
-    "id": "vdjjhsb"
   }
 ]
