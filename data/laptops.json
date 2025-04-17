@@ -120,7 +120,7 @@
     "brand": "Lenovo",
     "model": "ThinkPad P14s Gen 5",
     "price": 14500,
-    "priceType": "HT",
+    "priceType": "TTC",
     "processor": "AMD Ryzen 7 Pro - 8840HS",
     "ram": "32",
     "storage": "1024",
