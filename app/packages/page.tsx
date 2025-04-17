@@ -566,10 +566,8 @@ export default function PackagesPage() {
 
   const handleEditClick = async (pkg: Package) => {
     setEditPackage(pkg)
-    setEditSelectedLaptopId(pkg.laptop.id)
-    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
     
-    // Make sure we have both laptops and accessories data
+    // First make sure we have the laptops and accessories data
     if (laptops.length === 0 || accessories.length === 0) {
       try {
         const [laptopsData, accessoriesData] = await Promise.all([
@@ -582,6 +580,25 @@ export default function PackagesPage() {
         console.error("Error fetching options for edit:", err)
       }
     }
+    
+    // Find the correct laptop ID by matching the brand and model
+    let laptopId = ""
+    // Try to get ID directly if available
+    if (pkg.laptop?.id) {
+      laptopId = pkg.laptop.id
+    } else {
+      // Otherwise match by brand and model
+      const matchingLaptop = laptops.find(l => 
+        l.brand === pkg.laptop.brand && l.model === pkg.laptop.model
+      )
+      if (matchingLaptop) {
+        laptopId = matchingLaptop.id
+      }
+    }
+    
+    console.log("Found laptop ID for edit:", laptopId)
+    setEditSelectedLaptopId(laptopId)
+    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
     
     setIsEditDialogOpen(true)
     setIsDetailDialogOpen(false)
@@ -696,13 +713,14 @@ export default function PackagesPage() {
     }
   }
 
-  // Debug useEffect
+  // Debug useEffect for laptop selection
   useEffect(() => {
-    if (isEditDialogOpen) {
+    if (isEditDialogOpen && editPackage) {
+      console.log("Debug - Current package laptop:", editPackage.laptop)
       console.log("Debug - editSelectedLaptopId:", editSelectedLaptopId)
-      console.log("Debug - laptops available:", laptops.map(l => l.id))
+      console.log("Debug - Available laptops:", laptops)
     }
-  }, [isEditDialogOpen, editSelectedLaptopId, laptops])
+  }, [isEditDialogOpen, editPackage, editSelectedLaptopId, laptops])
 
   if (loading) {
     return (
@@ -1094,11 +1112,17 @@ export default function PackagesPage() {
               <div className="space-y-2">
                 <Label htmlFor="edit-laptop">Select Laptop</Label>
                 <Select
-                  value={editSelectedLaptopId}
-                  onValueChange={setEditSelectedLaptopId}
+                  value={editSelectedLaptopId || ""}
+                  onValueChange={(value) => {
+                    console.log("Laptop selected:", value);
+                    setEditSelectedLaptopId(value);
+                  }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a laptop" />
+                  <SelectTrigger id="edit-laptop">
+                    <SelectValue placeholder="Select a laptop">
+                      {editSelectedLaptopId ? laptops.find(l => l.id === editSelectedLaptopId)?.brand + " " + 
+                      laptops.find(l => l.id === editSelectedLaptopId)?.model : "Select a laptop"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {laptops.map((laptop) => (

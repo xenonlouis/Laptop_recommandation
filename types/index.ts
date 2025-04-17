@@ -10,6 +10,36 @@ export type PriceType = "HT" | "TTC"
 
 export type PackageStatus = "proposed" | "approved" | "rejected" | "delivered"
 
+export type ToolkitCategory = 
+  | "development" 
+  | "connectivity" 
+  | "communication" 
+  | "specialized" 
+  | "database" 
+  | "testing" 
+  | "project_management"
+  | "design"
+  | "productivity";
+
+export interface ToolkitItem {
+  id: string;
+  name: string;
+  description: string;
+  category: ToolkitCategory;
+  downloadUrl?: string;
+  installationNotes?: string;
+  isRequired: boolean;
+  alternatives?: string[];
+}
+
+export interface Toolkit {
+  id: string;
+  profileName: string;
+  description: string;
+  operatingSystem: OperatingSystem;
+  tools: ToolkitItem[];
+}
+
 export interface Person {
   id: string
   name: string

@@ -1,4 +1,4 @@
-import type { Laptop, Package, Accessory, Person } from "@/types"
+import type { Laptop, Package, Accessory, Person, Toolkit } from "@/types"
 
 // Base URL for API requests
 const LAPTOPS_API_URL = "/api/laptops"
@@ -413,6 +413,115 @@ export async function assignPackage(packageId: string, assignedTo: string): Prom
   } catch (error) {
     console.error("Error assigning package:", error);
     throw error;
+  }
+}
+
+// Toolkit API functions
+
+export async function fetchToolkits(): Promise<Toolkit[]> {
+  try {
+    const response = await fetch('/api/toolkits')
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch toolkits: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching toolkits:', error)
+    throw error
+  }
+}
+
+export async function fetchToolkitById(id: string): Promise<Toolkit> {
+  try {
+    const response = await fetch(`/api/toolkits/${id}`)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch toolkit: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching toolkit:', error)
+    throw error
+  }
+}
+
+export async function fetchToolkitsByProfile(profileName: string): Promise<Toolkit[]> {
+  try {
+    const response = await fetch(`/api/toolkits/profile/${encodeURIComponent(profileName)}`)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch toolkits by profile: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching toolkits by profile:', error)
+    throw error
+  }
+}
+
+export async function createToolkit(toolkit: Omit<Toolkit, "id">): Promise<{ message: string; toolkit: Toolkit }> {
+  try {
+    const response = await fetch('/api/toolkits', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(toolkit),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to create toolkit: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error creating toolkit:', error)
+    throw error
+  }
+}
+
+// Alias for createToolkit to maintain backward compatibility
+export const addToolkit = createToolkit;
+
+export async function updateToolkit(toolkit: Toolkit): Promise<{ message: string }> {
+  try {
+    const response = await fetch(`/api/toolkits/${toolkit.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(toolkit),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update toolkit: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error updating toolkit:', error)
+    throw error
+  }
+}
+
+export async function deleteToolkit(id: string): Promise<{ message: string }> {
+  try {
+    const response = await fetch(`/api/toolkits/${id}`, {
+      method: 'DELETE',
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to delete toolkit: ${response.status}`)
+    }
+    
+    return await response.json()
+  } catch (error) {
+    console.error('Error deleting toolkit:', error)
+    throw error
   }
 }
 

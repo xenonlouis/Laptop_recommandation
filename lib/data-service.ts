@@ -1,10 +1,11 @@
 import fs from "fs"
 import path from "path"
-import type { Laptop, Package } from "@/types"
+import type { Laptop, Package, Toolkit } from "@/types"
 
 // Path to the JSON files
 const laptopsDataFilePath = path.join(process.cwd(), "data", "laptops.json")
 const packagesDataFilePath = path.join(process.cwd(), "data", "packages.json")
+const toolkitsDataFilePath = path.join(process.cwd(), "data", "toolkits.json")
 
 // Ensure the data directory exists
 const ensureDataDirectoryExists = () => {
@@ -185,6 +186,110 @@ export const deleteLaptop = async (id: string): Promise<boolean> => {
     return await saveLaptops(filteredLaptops)
   } catch (error) {
     console.error(`Error deleting laptop with ID ${id}:`, error)
+    return false
+  }
+}
+
+// Get all toolkits
+export const getToolkits = async (): Promise<Toolkit[]> => {
+  try {
+    ensureDataFileExists(toolkitsDataFilePath)
+    const data = await fs.promises.readFile(toolkitsDataFilePath, "utf8")
+    return JSON.parse(data) as Toolkit[]
+  } catch (error) {
+    console.error("Error reading toolkits data:", error)
+    return []
+  }
+}
+
+// Get toolkit by ID
+export const getToolkitById = async (id: string): Promise<Toolkit | null> => {
+  try {
+    const toolkits = await getToolkits()
+    return toolkits.find(toolkit => toolkit.id === id) || null
+  } catch (error) {
+    console.error("Error getting toolkit by id:", error)
+    return null
+  }
+}
+
+// Get toolkits by profile name
+export const getToolkitsByProfile = async (profileName: string): Promise<Toolkit[]> => {
+  try {
+    const toolkits = await getToolkits()
+    return toolkits.filter(toolkit => toolkit.profileName === profileName)
+  } catch (error) {
+    console.error("Error getting toolkit by profile:", error)
+    return []
+  }
+}
+
+// Add new toolkit
+export const addToolkit = async (toolkit: Omit<Toolkit, "id">): Promise<Toolkit> => {
+  try {
+    const toolkits = await getToolkits()
+    
+    // Generate a simple ID
+    const newId = `${toolkit.profileName.toLowerCase().replace(/\s+/g, '-')}-${toolkit.operatingSystem}-${Date.now().toString(36)}`
+    
+    const newToolkit: Toolkit = {
+      ...toolkit,
+      id: newId
+    }
+    
+    toolkits.push(newToolkit)
+    await saveToolkits(toolkits)
+    
+    return newToolkit
+  } catch (error) {
+    console.error("Error adding toolkit:", error)
+    throw error
+  }
+}
+
+// Update toolkit
+export const updateToolkit = async (updatedToolkit: Toolkit): Promise<boolean> => {
+  try {
+    const toolkits = await getToolkits()
+    const index = toolkits.findIndex(toolkit => toolkit.id === updatedToolkit.id)
+    
+    if (index === -1) {
+      return false
+    }
+    
+    toolkits[index] = updatedToolkit
+    return await saveToolkits(toolkits)
+  } catch (error) {
+    console.error("Error updating toolkit:", error)
+    return false
+  }
+}
+
+// Delete toolkit
+export const deleteToolkit = async (id: string): Promise<boolean> => {
+  try {
+    const toolkits = await getToolkits()
+    const filteredToolkits = toolkits.filter(toolkit => toolkit.id !== id)
+    
+    if (filteredToolkits.length === toolkits.length) {
+      return false // No toolkit was removed
+    }
+    
+    return await saveToolkits(filteredToolkits)
+  } catch (error) {
+    console.error("Error deleting toolkit:", error)
+    return false
+  }
+}
+
+// Save toolkits
+export const saveToolkits = async (toolkits: Toolkit[]): Promise<boolean> => {
+  try {
+    ensureDataFileExists(toolkitsDataFilePath)
+    await fs.promises.writeFile(toolkitsDataFilePath, JSON.stringify(toolkits, null, 2), "utf8")
+    return true
+  } catch (error) {
+    console.error("Error saving toolkits:", error)
     return false
   }
 }

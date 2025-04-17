@@ -26,6 +26,9 @@ export default function Home() {
               <Link href="/manage">
                 <Button variant="outline">Manage Laptops</Button>
               </Link>
+              <Link href="/toolkits">
+                <Button variant="outline">Toolkits</Button>
+              </Link>
               <Link href="/notion">
                 <Button variant="outline">Notion Sync</Button>
               </Link>

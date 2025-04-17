@@ -9,7 +9,8 @@ interface Params {
 // GET /api/packages/:id - Get a single package by ID
 export async function GET(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const paramsData = await params;
+    const id = paramsData.id;
     const packageData = await getPackageById(id)
 
     if (packageData) {
@@ -26,7 +27,8 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
 // PUT /api/packages/:id - Update a package
 export async function PUT(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const paramsData = await params;
+    const id = paramsData.id;
     const packageData = (await request.json()) as Package
 
     if (id !== packageData.id) {
@@ -54,7 +56,8 @@ export async function PUT(request: NextRequest, { params }: { params: Params }) 
 // DELETE /api/packages/:id - Delete a package
 export async function DELETE(request: NextRequest, { params }: { params: Params }) {
   try {
-    const { id } = params
+    const paramsData = await params;
+    const id = paramsData.id;
     const packages = await getPackages()
     const filteredPackages = packages.filter((pkg) => pkg.id !== id)
 
