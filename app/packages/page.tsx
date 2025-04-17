@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
 import { useToast } from "@/hooks/use-toast"
-import type { Package, Accessory, Laptop, PackageStatus } from "@/types"
+import type { Package, Accessory, Laptop, PackageStatus, PriceType } from "@/types"
 // Import dnd-kit components
 import { 
   DndContext, 
@@ -43,7 +43,7 @@ type StatusColumn = "proposed" | "approved" | "rejected" | "delivered";
 function SortablePackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge, onClick }: { 
   pkg: Package, 
   formatPrice: (price: number, priceType: "HT" | "TTC") => string,
-  getTotalPrice: (pkg: Package) => number,
+  getTotalPrice: (pkg: Package) => string,
   getAccessoryIcon: (type: string) => React.ReactElement,
   getStatusBadge: (status: string) => React.ReactElement,
   onClick: () => void
@@ -118,7 +118,7 @@ function SortablePackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon
       </CardContent>
       <CardFooter className="flex justify-between p-4 pt-2">
         <div className="text-xs font-medium">
-          {formatPrice(getTotalPrice(pkg), "TTC")}
+          {getTotalPrice(pkg)}
         </div>
         {getStatusBadge(pkg.status)}
       </CardFooter>
@@ -130,7 +130,7 @@ function SortablePackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon
 function PackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge }: { 
   pkg: Package, 
   formatPrice: (price: number, priceType: "HT" | "TTC") => string,
-  getTotalPrice: (pkg: Package) => number,
+  getTotalPrice: (pkg: Package) => string,
   getAccessoryIcon: (type: string) => React.ReactElement,
   getStatusBadge: (status: string) => React.ReactElement,
 }) {
@@ -160,7 +160,7 @@ function PackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getSta
       </CardContent>
       <CardFooter className="flex justify-between p-4 pt-2">
         <div className="text-xs font-medium">
-          {formatPrice(getTotalPrice(pkg), "TTC")}
+          {getTotalPrice(pkg)}
         </div>
         {getStatusBadge(pkg.status)}
       </CardFooter>
@@ -227,6 +227,7 @@ export default function PackagesPage() {
   const [newPackage, setNewPackage] = useState<Partial<Package>>({
     name: "",
     status: "proposed",
+    priceType: "HT",
     accessories: [],
     assignedTo: "",
     notes: "",
@@ -369,7 +370,8 @@ export default function PackagesPage() {
   const getTotalPrice = (pkg: Package) => {
     const laptopPrice = pkg.laptop.price
     const accessoriesPrice = pkg.accessories.reduce((sum: number, acc: Accessory) => sum + acc.price, 0)
-    return laptopPrice + accessoriesPrice
+    const totalPrice = laptopPrice + accessoriesPrice
+    return `${totalPrice.toLocaleString()} MAD (${pkg.priceType})`
   }
 
   const getAccessoryIcon = (type: string) => {
@@ -510,6 +512,7 @@ export default function PackagesPage() {
         laptop: selectedLaptop,
         accessories: selectedAccessories,
         status: newPackage.status as PackageStatus,
+        priceType: newPackage.priceType as PriceType,
         assignedTo: newPackage.assignedTo || undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -527,6 +530,7 @@ export default function PackagesPage() {
       setNewPackage({
         name: "",
         status: "proposed",
+        priceType: "HT",
         accessories: [],
         assignedTo: "",
         notes: "",
@@ -892,6 +896,24 @@ export default function PackagesPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="price-type">Price Type</Label>
+                <Select
+                  value={newPackage.priceType as string}
+                  onValueChange={(value) => setNewPackage({ ...newPackage, priceType: value as PriceType })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select price type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="HT">HT (Ex. Tax)</SelectItem>
+                    <SelectItem value="TTC">TTC (Inc. Tax)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="assigned-to">Assigned To</Label>
                 <Input
                   id="assigned-to"
@@ -1022,7 +1044,7 @@ export default function PackagesPage() {
                     Last updated: {new Date(selectedPackage.updatedAt).toLocaleDateString()}
                   </div>
                   <div className="text-lg font-semibold">
-                    Total: {formatPrice(getTotalPrice(selectedPackage), "TTC")}
+                    Total: {getTotalPrice(selectedPackage)}
                   </div>
                 </div>
               </div>
@@ -1134,6 +1156,24 @@ export default function PackagesPage() {
                   </Select>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="edit-price-type">Price Type</Label>
+                  <Select
+                    value={editPackage.priceType}
+                    onValueChange={(value) => setEditPackage({ ...editPackage, priceType: value as PriceType })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select price type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="HT">HT (Ex. Tax)</SelectItem>
+                      <SelectItem value="TTC">TTC (Inc. Tax)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-assigned-to">Assigned To</Label>
                   <Input

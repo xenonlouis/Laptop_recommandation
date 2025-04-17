@@ -29,8 +29,9 @@
     "status": "proposed",
     "assignedTo": "John Smith",
     "createdAt": "2023-08-15T10:30:00Z",
-    "updatedAt": "2025-04-17T10:39:27.047Z",
-    "notes": "Standard package for new developers"
+    "updatedAt": "2025-04-17T10:59:31.868Z",
+    "notes": "Standard package for new developers",
+    "priceType": "HT"
   },
   {
     "id": "pkg3",
@@ -39,7 +40,7 @@
       "brand": "Lenovo",
       "model": "ThinkPad P14s Gen 5",
       "price": 14500,
-      "priceType": "HT",
+      "priceType": "TTC",
       "processor": "AMD Ryzen 7 Pro - 8840HS",
       "ram": "32",
       "storage": "1024",
@@ -63,8 +64,9 @@
     "status": "delivered",
     "assignedTo": "Abdelhay",
     "createdAt": "2023-06-10T09:20:00Z",
-    "updatedAt": "2025-04-17T09:40:21.450Z",
-    "notes": "Complete workstation setup for development team"
+    "updatedAt": "2025-04-17T11:03:35.901Z",
+    "notes": "Complete workstation setup for development team",
+    "priceType": "TTC"
   },
   {
     "id": "pkg-abc123",
@@ -110,7 +112,8 @@
     "assignedTo": "John Smith",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:45.328Z",
-    "notes": "Package assigned to John Smith with PC reference 5CD2045NG9"
+    "notes": "Package assigned to John Smith with PC reference 5CD2045NG9",
+    "priceType": "HT"
   },
   {
     "id": "pkg-def456",
@@ -155,7 +158,8 @@
     "assignedTo": "Sarah Johnson",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:14.455Z",
-    "notes": "Package assigned to Sarah Johnson with PC reference 5CD2045MSC"
+    "notes": "Package assigned to Sarah Johnson with PC reference 5CD2045MSC",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ghi789",
@@ -200,7 +204,8 @@
     "assignedTo": "Michael Chen",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:15.691Z",
-    "notes": "Package assigned to Michael Chen with PC reference 5CD2045N37"
+    "notes": "Package assigned to Michael Chen with PC reference 5CD2045N37",
+    "priceType": "HT"
   },
   {
     "id": "pkg-jkl012",
@@ -245,7 +250,8 @@
     "assignedTo": "Alex Thompson",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:16.436Z",
-    "notes": "Package assigned to Alex Thompson with PC reference 5CD2045MX2"
+    "notes": "Package assigned to Alex Thompson with PC reference 5CD2045MX2",
+    "priceType": "HT"
   },
   {
     "id": "pkg-yz45678",
@@ -291,7 +297,8 @@
     "assignedTo": "Youssef Chana",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:17.026Z",
-    "notes": "Package assigned to Youssef Chana with PC reference 5CD2045NG9"
+    "notes": "Package assigned to Youssef Chana with PC reference 5CD2045NG9",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ar45679",
@@ -336,7 +343,8 @@
     "assignedTo": "Ayoub Rhiti",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:17.630Z",
-    "notes": "Package assigned to Ayoub Rhiti with PC reference 5CD2045MSC"
+    "notes": "Package assigned to Ayoub Rhiti with PC reference 5CD2045MSC",
+    "priceType": "HT"
   },
   {
     "id": "pkg-yb45680",
@@ -381,7 +389,8 @@
     "assignedTo": "Yassine BILAL",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:18.023Z",
-    "notes": "Package assigned to Yassine BILAL with PC reference 5CD2045N37"
+    "notes": "Package assigned to Yassine BILAL with PC reference 5CD2045N37",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ic45681",
@@ -426,7 +435,8 @@
     "assignedTo": "Ibrahim CK",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:18.518Z",
-    "notes": "Package assigned to Ibrahim CK with PC reference 5CD2045MX2"
+    "notes": "Package assigned to Ibrahim CK with PC reference 5CD2045MX2",
+    "priceType": "HT"
   },
   {
     "id": "pkg-mb45682",
@@ -471,7 +481,8 @@
     "assignedTo": "Mehdi B",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:19.014Z",
-    "notes": "Package assigned to Mehdi B with PC reference 5CD2045MWZ"
+    "notes": "Package assigned to Mehdi B with PC reference 5CD2045MWZ",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ag45683",
@@ -516,7 +527,8 @@
     "assignedTo": "Anas Ghamri",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:19.464Z",
-    "notes": "Package assigned to Anas Ghamri with PC reference 5CD2045MTT"
+    "notes": "Package assigned to Anas Ghamri with PC reference 5CD2045MTT",
+    "priceType": "HT"
   },
   {
     "id": "pkg-y45684",
@@ -561,7 +573,8 @@
     "assignedTo": "Youssef",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:19.973Z",
-    "notes": "Package assigned to Youssef with PC reference 5CD2045N0Wi7-1165G7"
+    "notes": "Package assigned to Youssef with PC reference 5CD2045N0Wi7-1165G7",
+    "priceType": "HT"
   },
   {
     "id": "pkg-m45685",
@@ -606,7 +619,8 @@
     "assignedTo": "Mohamed",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:20.418Z",
-    "notes": "Package assigned to Mohamed with PC reference 5CD2045MT5"
+    "notes": "Package assigned to Mohamed with PC reference 5CD2045MT5",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ye45686",
@@ -651,7 +665,8 @@
     "assignedTo": "Youssra EL Machraa",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:20.880Z",
-    "notes": "Package assigned to Youssra EL Machraa with PC reference 5CD2045ND5"
+    "notes": "Package assigned to Youssra EL Machraa with PC reference 5CD2045ND5",
+    "priceType": "HT"
   },
   {
     "id": "pkg-ne45687",
@@ -696,7 +711,8 @@
     "assignedTo": "Nouhayla EL HADRI",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:21.303Z",
-    "notes": "Package assigned to Nouhayla EL HADRI with PC reference 5CD2042PVH"
+    "notes": "Package assigned to Nouhayla EL HADRI with PC reference 5CD2042PVH",
+    "priceType": "HT"
   },
   {
     "id": "pkg-me45688",
@@ -741,7 +757,8 @@
     "assignedTo": "Mounia E.",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:21.713Z",
-    "notes": "Package assigned to Mounia E. with PC reference 5CD2042PMR"
+    "notes": "Package assigned to Mounia E. with PC reference 5CD2042PMR",
+    "priceType": "HT"
   },
   {
     "id": "pkg-aa45689",
@@ -786,7 +803,8 @@
     "assignedTo": "Anouar AIT ABDELMALEK",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:22.129Z",
-    "notes": "Package assigned to Anouar AIT ABDELMALEK with PC reference 5CD2045MV4"
+    "notes": "Package assigned to Anouar AIT ABDELMALEK with PC reference 5CD2045MV4",
+    "priceType": "HT"
   },
   {
     "id": "pkg-im45690",
@@ -831,7 +849,8 @@
     "assignedTo": "Ismail mountasser",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:22.535Z",
-    "notes": "Package assigned to Ismail mountasser with PC reference 5CD2042PYC"
+    "notes": "Package assigned to Ismail mountasser with PC reference 5CD2042PYC",
+    "priceType": "HT"
   },
   {
     "id": "pkg-l45691",
@@ -876,7 +895,8 @@
     "assignedTo": "Loubna",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:22.928Z",
-    "notes": "Package assigned to Loubna with PC reference 5CD2042PHL"
+    "notes": "Package assigned to Loubna with PC reference 5CD2042PHL",
+    "priceType": "HT"
   },
   {
     "id": "pkg-sz45692",
@@ -921,7 +941,8 @@
     "assignedTo": "Safaa Zakine",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:23.272Z",
-    "notes": "Package assigned to Safaa Zakine with PC reference 5CD2042PHZ"
+    "notes": "Package assigned to Safaa Zakine with PC reference 5CD2042PHZ",
+    "priceType": "HT"
   },
   {
     "id": "pkg-yh45693",
@@ -966,7 +987,8 @@
     "assignedTo": "Yassmine Hsaini",
     "createdAt": "2024-04-15T10:00:00Z",
     "updatedAt": "2025-04-11T10:15:23.651Z",
-    "notes": "Package assigned to Yassmine Hsaini with PC reference 5CD2042PSK"
+    "notes": "Package assigned to Yassmine Hsaini with PC reference 5CD2042PSK",
+    "priceType": "HT"
   },
   {
     "name": "Abdelhay's Package",
@@ -1020,7 +1042,8 @@
     "assignedTo": "Abdelhay",
     "createdAt": "2025-04-11T09:43:06.544Z",
     "updatedAt": "2025-04-11T10:14:50.158Z",
-    "id": "plj8b9h"
+    "id": "plj8b9h",
+    "priceType": "HT"
   },
   {
     "name": "Developer Starter Kit ( MacBook )",
@@ -1049,8 +1072,9 @@
     "accessories": [],
     "status": "proposed",
     "createdAt": "2025-04-11T09:54:17.078Z",
-    "updatedAt": "2025-04-17T10:39:32.803Z",
-    "id": "w71qrmz"
+    "updatedAt": "2025-04-17T11:03:07.916Z",
+    "id": "w71qrmz",
+    "priceType": "TTC"
   },
   {
     "name": "Basic Consultant Setup ( Windows )",
@@ -1103,7 +1127,8 @@
     "status": "pkg2",
     "createdAt": "2025-04-11T09:55:14.232Z",
     "updatedAt": "2025-04-11T10:25:44.408Z",
-    "id": "k6jmi04"
+    "id": "k6jmi04",
+    "priceType": "HT"
   },
   {
     "name": " Basic Consultant Setup ( MacBook )",
@@ -1133,8 +1158,9 @@
     "accessories": [],
     "status": "proposed",
     "createdAt": "2025-04-11T09:55:45.433Z",
-    "updatedAt": "2025-04-17T10:39:41.115Z",
-    "id": "4l0uvnl"
+    "updatedAt": "2025-04-17T11:03:13.368Z",
+    "id": "4l0uvnl",
+    "priceType": "TTC"
   },
   {
     "name": "Upgrading Current Laptop Ram",
@@ -1168,7 +1194,8 @@
     "createdAt": "2025-04-11T09:56:50.204Z",
     "updatedAt": "2025-04-17T10:39:02.669Z",
     "notes": "Adding a Ram stick of 16 GB ",
-    "id": "up1t6au"
+    "id": "up1t6au",
+    "priceType": "HT"
   },
   {
     "name": "Current Package",
@@ -1203,7 +1230,8 @@
     "updatedAt": "2025-04-11T10:32:55.581Z",
     "notes": "Current Package that all consultants have",
     "id": "i2busv4",
-    "assignedTo": "Ghada"
+    "assignedTo": "Ghada",
+    "priceType": "HT"
   },
   {
     "name": "Current Package",
@@ -1237,7 +1265,8 @@
     "createdAt": "2025-04-11T10:29:13.656Z",
     "updatedAt": "2025-04-11T10:29:17.489Z",
     "notes": "Current Package that all consultants have",
-    "id": "usspavo"
+    "id": "usspavo",
+    "priceType": "HT"
   },
   {
     "name": "Current Package",
@@ -1271,20 +1300,21 @@
     "createdAt": "2025-04-11T10:29:27.385Z",
     "updatedAt": "2025-04-11T10:29:27.385Z",
     "notes": "Current Package that all consultants have",
-    "id": "a2a2n1h"
+    "id": "a2a2n1h",
+    "priceType": "HT"
   },
   {
     "name": "Developer Starter Kit v2 ( Windows)",
     "laptop": {
       "brand": "Lenovo ",
       "model": "ThinkPad T14s Gen4",
-      "price": 179.976,
+      "price": 17999,
       "priceType": "TTC",
       "processor": "i7-1370P",
       "ram": "32",
       "storage": "512",
       "batteryLife": 8,
-      "performanceScore": 8.6,
+      "performanceScore": 9.3,
       "notes": "Win 11 Pro  ,  AZERTY , Garantie 3ans j+1 pro support (sac offert)\n",
       "images": [
         "https://yaratech.ma/wp-content/uploads/2025/03/Lenovo-ThinkPad-T14s-Gen-5-yaratech.ma-7-1.webp",
@@ -1302,9 +1332,10 @@
     "accessories": [],
     "status": "proposed",
     "createdAt": "2025-04-17T10:38:45.821Z",
-    "updatedAt": "2025-04-17T10:38:45.821Z",
+    "updatedAt": "2025-04-17T11:03:18.152Z",
     "notes": "ram not upgradable ",
-    "id": "9tglu1m"
+    "id": "9tglu1m",
+    "priceType": "TTC"
   },
   {
     "name": "Basic Consultant Setup ( Windows )",
@@ -1336,6 +1367,7 @@
     "status": "proposed",
     "createdAt": "2025-04-17T10:40:29.709Z",
     "updatedAt": "2025-04-17T10:40:29.709Z",
-    "id": "vdjjhsb"
+    "id": "vdjjhsb",
+    "priceType": "HT"
   }
 ]

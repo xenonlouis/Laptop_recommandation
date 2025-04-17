@@ -49,8 +49,15 @@ export const getLaptopById = async (id: string): Promise<Laptop | null> => {
 export const getPackages = async (): Promise<Package[]> => {
   try {
     ensureDataFileExists(packagesDataFilePath)
+    
     const data = await fs.promises.readFile(packagesDataFilePath, "utf8")
-    return JSON.parse(data) as Package[]
+    const packages = JSON.parse(data) as Package[]
+    
+    // Add default priceType if missing
+    return packages.map(pkg => ({
+      ...pkg,
+      priceType: pkg.priceType || "HT" // Default to HT if not specified
+    }))
   } catch (error) {
     console.error("Error reading packages data:", error)
     return []

@@ -55,6 +55,7 @@ export interface Package {
   laptop: Laptop
   accessories: Accessory[]
   status: PackageStatus
+  priceType: PriceType
   assignedTo?: string
   createdAt: string
   updatedAt: string
