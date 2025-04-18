@@ -78,7 +78,7 @@ export async function createTool(toolData: Omit<ToolDetails, "id">): Promise<Too
 export async function updateTool(id: string, toolData: Partial<ToolDetails>): Promise<ToolDetails> {
   try {
     const res = await fetch(`/api/tools/${id}`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },

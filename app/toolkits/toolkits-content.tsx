@@ -4,9 +4,8 @@ import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { fetchToolkits } from "@/lib/api-client"
-import { fetchTools } from "@/lib/api-client-tools"
+import { fetchTools, ToolDetails } from "@/lib/api-client-tools"
 import { Toolkit, ToolkitItem, OperatingSystem } from "@/types"
-import { Tool } from "@/lib/api-client-tools"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -28,7 +27,7 @@ export function ToolkitsContent() {
   const [error, setError] = useState<string | null>(null)
   const [selectedOperatingSystem, setSelectedOperatingSystem] = useState<OperatingSystem>("windows")
   const [uniqueProfiles, setUniqueProfiles] = useState<string[]>([])
-  const [allTools, setAllTools] = useState<Tool[]>([])
+  const [allTools, setAllTools] = useState<ToolDetails[]>([])
 
   const searchParams = useSearchParams()
   const profileParam = searchParams.get('profile')
@@ -200,7 +199,20 @@ export function ToolkitsContent() {
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle>{toolkit.profileName}</CardTitle>
+                      <div className="flex items-center gap-3 mb-1">
+                        {toolkit.icon ? (
+                          <img 
+                            src={toolkit.icon} 
+                            alt={`${toolkit.profileName} icon`} 
+                            className="w-8 h-8 object-contain"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center text-lg">
+                            {toolkit.profileName.charAt(0)}
+                          </div>
+                        )}
+                        <CardTitle>{toolkit.profileName}</CardTitle>
+                      </div>
                       <CardDescription>{toolkit.description}</CardDescription>
                     </div>
                     <Link href={`/toolkits/edit/${toolkit.id}`}>

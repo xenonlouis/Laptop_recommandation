@@ -52,6 +52,7 @@ export interface Toolkit {
   operatingSystem: OperatingSystem;
   tools?: ToolkitItem[];
   toolIds: string[];
+  icon?: string; // URL to the toolkit's logo/icon
 }
 
 export interface Person {

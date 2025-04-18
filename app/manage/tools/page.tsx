@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,8 +22,7 @@ import { ArrowLeft, Plus, Pencil, Trash2, MoreVertical, Search, Loader2 } from "
 import { useToast } from "@/components/ui/use-toast"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { fetchTools, createTool, updateTool, deleteTool } from "@/lib/api-client-tools"
-import { Tool } from "@/lib/api-client-tools"
+import { fetchTools, createTool, updateTool, deleteTool, ToolDetails } from "@/lib/api-client-tools"
 import { ToolkitCategory } from "@/types"
 
 interface ToolFormData {
@@ -37,14 +37,14 @@ interface ToolFormData {
 }
 
 export default function ManageTools() {
-  const [tools, setTools] = useState<Tool[]>([])
+  const [tools, setTools] = useState<ToolDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [currentTool, setCurrentTool] = useState<Tool | null>(null)
+  const [currentTool, setCurrentTool] = useState<ToolDetails | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [newTool, setNewTool] = useState<ToolFormData>({
     name: "",
@@ -115,17 +115,21 @@ export default function ManageTools() {
         processedAlternatives = newTool.alternatives;
       }
 
-      // Prepare tool data
+      // Prepare new tool data
       const toolData = {
         name: newTool.name,
         description: newTool.description,
         category: newTool.category as ToolkitCategory,
-        isRequired: newTool.isRequired || false,
         downloadUrl: newTool.downloadUrl || undefined,
         installationNotes: newTool.installationNotes || undefined,
+        isRequired: newTool.isRequired,
         alternatives: processedAlternatives,
         icon: newTool.icon || undefined,
-      } as Omit<Tool, 'id' | 'createdAt' | 'updatedAt' | 'usageCount' | 'popularity'>;
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        usageCount: 0,
+        popularity: 5.0
+      };
 
       await createTool(toolData)
 
@@ -182,9 +186,9 @@ export default function ManageTools() {
         ...currentTool,
         alternatives: processedAlternatives,
         icon: currentTool.icon || undefined,
-      } as Tool;
+      } as ToolDetails;
 
-      await updateTool(updatedTool)
+      await updateTool(updatedTool.id, updatedTool)
 
       // Refresh the tool list
       await fetchData()

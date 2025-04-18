@@ -60,13 +60,13 @@
     "category": "communication",
     "downloadUrl": "https://slack.com/downloads",
     "installationNotes": "Download and install the app, then sign in with your team's credentials",
-    "isRequired": true,
+    "isRequired": false,
     "alternatives": [
       "Microsoft Teams",
       "Discord"
     ],
     "createdAt": "2023-01-12T10:45:00Z",
-    "updatedAt": "2023-05-25T15:48:00Z",
+    "updatedAt": "2025-04-17T23:49:11.219Z",
     "usageCount": 1280,
     "popularity": 9,
     "icon": "https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png"
@@ -268,5 +268,222 @@
     "usageCount": 750,
     "popularity": 7.6,
     "icon": "https://logowik.com/content/uploads/images/cypress8748.logowik.com.webp"
+  },
+  {
+    "id": "tool-16",
+    "name": "Anypoint Studio",
+    "description": "Eclipse-based IDE specifically designed for MuleSoft development",
+    "category": "development",
+    "downloadUrl": "https://www.mulesoft.com/platform/studio",
+    "installationNotes": "Download and run the installer. Java JDK 8 or higher required.",
+    "isRequired": true,
+    "alternatives": [
+      "Eclipse with MuleSoft plugin",
+      "IntelliJ IDEA with MuleSoft plugin"
+    ],
+    "createdAt": "2023-02-15T09:30:00Z",
+    "updatedAt": "2023-07-20T14:45:00Z",
+    "usageCount": 890,
+    "popularity": 8.5,
+    "icon": "https://www.mulesoft.com/sites/default/files/2018-10/anypoint-studio_0.png"
+  },
+  {
+    "id": "tool-17",
+    "name": "MUnit",
+    "description": "Testing framework for Mule applications",
+    "category": "testing",
+    "downloadUrl": "https://docs.mulesoft.com/munit/2.3/",
+    "installationNotes": "Included with Anypoint Studio or can be added as a Maven dependency",
+    "isRequired": true,
+    "alternatives": [
+      "JUnit with custom Mule testing extensions"
+    ],
+    "createdAt": "2023-02-16T10:15:00Z",
+    "updatedAt": "2023-07-21T11:30:00Z",
+    "usageCount": 720,
+    "popularity": 7.8,
+    "icon": "https://www.mulesoft.com/sites/default/files/2018-10/munit-logo.png"
+  },
+  {
+    "id": "tool-18",
+    "name": "Anypoint Platform CLI",
+    "description": "Command-line interface for interacting with Anypoint Platform",
+    "category": "development",
+    "downloadUrl": "https://docs.mulesoft.com/anypoint-cli/5.1/",
+    "installationNotes": "Install via npm: npm install -g anypoint-cli-v4",
+    "isRequired": false,
+    "alternatives": [
+      "Anypoint Platform UI",
+      "API Manager REST API"
+    ],
+    "createdAt": "2023-02-17T11:45:00Z",
+    "updatedAt": "2023-07-22T12:15:00Z",
+    "usageCount": 680,
+    "popularity": 7.5,
+    "icon": "https://www.mulesoft.com/sites/default/files/2018-10/CLI.png"
+  },
+  {
+    "id": "tool-19",
+    "name": "Salesforce Inspector",
+    "description": "Chrome extension for viewing and modifying Salesforce data and metadata",
+    "category": "development",
+    "downloadUrl": "https://chrome.google.com/webstore/detail/salesforce-inspector/aodjmnfhjibkcdimpodiifdjnnncaafh",
+    "installationNotes": "Install as a Chrome extension from the Chrome Web Store",
+    "isRequired": true,
+    "alternatives": [
+      "SFDX CLI",
+      "Workbench"
+    ],
+    "createdAt": "2023-02-18T13:30:00Z",
+    "updatedAt": "2023-07-23T14:45:00Z",
+    "usageCount": 960,
+    "popularity": 8.7,
+    "icon": "https://lh3.googleusercontent.com/YrIhuXYEpBCW_NcoYzYg2RF3YZhUWJ0GakbYzDH2TNHwPi-JwGXBf3mHaWYxDABdQSeUZD8EkKg=w128-h128-e365-rj-sc0x00ffffff"
+  },
+  {
+    "id": "tool-20",
+    "name": "SFMC CLI",
+    "description": "Command-line interface for Salesforce Marketing Cloud",
+    "category": "development",
+    "downloadUrl": "https://github.com/salesforce-marketingcloud/mc-cli",
+    "installationNotes": "Install via npm: npm install -g @salesforce/mc-cli",
+    "isRequired": false,
+    "alternatives": [
+      "SFMC UI",
+      "SFMC API"
+    ],
+    "createdAt": "2023-02-19T14:30:00Z",
+    "updatedAt": "2023-07-24T15:45:00Z",
+    "usageCount": 740,
+    "popularity": 7.9,
+    "icon": "https://www.salesforce.com/content/dam/web/en_us/www/images/sales-cloud/logo-salesforce-marketing-cloud.png"
+  },
+  {
+    "id": "tool-21",
+    "name": "Marketing Cloud Connect",
+    "description": "Integration package for connecting Sales/Service Cloud with Marketing Cloud",
+    "category": "specialized",
+    "downloadUrl": "https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3000000B3biPEAR",
+    "installationNotes": "Install from AppExchange and follow configuration guide",
+    "isRequired": true,
+    "alternatives": [
+      "Custom API Integration",
+      "Third-party integration tools"
+    ],
+    "createdAt": "2023-02-20T15:30:00Z",
+    "updatedAt": "2023-07-25T16:45:00Z",
+    "usageCount": 820,
+    "popularity": 8.2,
+    "icon": "https://www.salesforce.com/content/dam/web/en_us/www/images/marketing-cloud/marketing-cloud-card-icon.png"
+  },
+  {
+    "id": "tool-22",
+    "name": "SoapUI",
+    "description": "Open-source tool for testing SOAP and REST APIs",
+    "category": "testing",
+    "downloadUrl": "https://www.soapui.org/downloads/soapui/",
+    "installationNotes": "Download and run the installer",
+    "isRequired": false,
+    "alternatives": [
+      "Postman",
+      "Insomnia",
+      "ReadyAPI"
+    ],
+    "createdAt": "2023-02-21T16:30:00Z",
+    "updatedAt": "2023-07-26T17:45:00Z",
+    "usageCount": 810,
+    "popularity": 7.9,
+    "icon": "https://www.soapui.org/smartbearbrand/media/images/logos/product-only/su_product-only.png"
+  },
+  {
+    "id": "tool-23",
+    "name": "Salesforce CLI",
+    "description": "Command-line interface for Salesforce Development",
+    "category": "development",
+    "downloadUrl": "https://developer.salesforce.com/tools/sfdxcli",
+    "installationNotes": "Download and run the installer, or install via npm: npm install -g sfdx-cli",
+    "isRequired": true,
+    "alternatives": [
+      "Salesforce UI",
+      "Workbench"
+    ],
+    "createdAt": "2023-02-22T17:30:00Z",
+    "updatedAt": "2023-07-27T18:45:00Z",
+    "usageCount": 920,
+    "popularity": 8.6,
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
+  },
+  {
+    "id": "tool-24",
+    "name": "Salesforce Extensions for VS Code",
+    "description": "Extensions for VS Code that provide features for Salesforce development",
+    "category": "development",
+    "downloadUrl": "https://marketplace.visualstudio.com/items?itemName=salesforce.salesforcedx-vscode",
+    "installationNotes": "Install from VS Code Marketplace. Requires VS Code.",
+    "isRequired": true,
+    "alternatives": [
+      "Illuminated Cloud (IntelliJ)",
+      "Welkin Suite"
+    ],
+    "createdAt": "2023-02-23T18:30:00Z",
+    "updatedAt": "2023-07-28T19:45:00Z",
+    "usageCount": 880,
+    "popularity": 8.4,
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
+  },
+  {
+    "id": "tool-25",
+    "name": "Salesforce Developer Console",
+    "description": "Web-based IDE for developing on the Salesforce platform",
+    "category": "development",
+    "downloadUrl": "https://help.salesforce.com/s/articleView?id=sf.code_dev_console.htm",
+    "installationNotes": "Available in your Salesforce org. Access via Setup > Developer Console",
+    "isRequired": true,
+    "alternatives": [
+      "VS Code with Salesforce Extensions",
+      "Illuminated Cloud"
+    ],
+    "createdAt": "2023-02-24T19:30:00Z",
+    "updatedAt": "2023-07-29T20:45:00Z",
+    "usageCount": 950,
+    "popularity": 8.7,
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
+  },
+  {
+    "id": "tool-26",
+    "name": "Workbench",
+    "description": "Web-based suite of tools for Salesforce data and metadata management",
+    "category": "development",
+    "downloadUrl": "https://workbench.developerforce.com/",
+    "installationNotes": "Web-based, no installation required",
+    "isRequired": false,
+    "alternatives": [
+      "Salesforce Inspector",
+      "SFDX CLI"
+    ],
+    "createdAt": "2023-02-25T20:30:00Z",
+    "updatedAt": "2023-07-30T21:45:00Z",
+    "usageCount": 840,
+    "popularity": 8.1,
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
+  },
+  {
+    "id": "tool-27",
+    "name": "Microsoft Teams",
+    "description": "Team collaboration platform with chat, meetings, and file sharing capabilities",
+    "category": "communication",
+    "downloadUrl": "https://www.microsoft.com/en-us/microsoft-teams/download-app",
+    "installationNotes": "Download and install the app, then sign in with your Microsoft account or work credentials",
+    "isRequired": true,
+    "alternatives": [
+      "Slack",
+      "Discord",
+      "Zoom"
+    ],
+    "createdAt": "2023-03-01T09:30:00Z",
+    "updatedAt": "2023-08-05T10:45:00Z",
+    "usageCount": 1350,
+    "popularity": 9.2,
+    "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg"
   }
 ]
