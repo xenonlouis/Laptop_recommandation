@@ -282,10 +282,10 @@
       "IntelliJ IDEA with MuleSoft plugin"
     ],
     "createdAt": "2023-02-15T09:30:00Z",
-    "updatedAt": "2023-07-20T14:45:00Z",
+    "updatedAt": "2025-04-18T00:05:18.851Z",
     "usageCount": 890,
     "popularity": 8.5,
-    "icon": "https://www.mulesoft.com/sites/default/files/2018-10/anypoint-studio_0.png"
+    "icon": "https://res.cloudinary.com/apideck/icons/mulesoft"
   },
   {
     "id": "tool-17",
@@ -317,10 +317,10 @@
       "API Manager REST API"
     ],
     "createdAt": "2023-02-17T11:45:00Z",
-    "updatedAt": "2023-07-22T12:15:00Z",
+    "updatedAt": "2025-04-18T00:05:53.044Z",
     "usageCount": 680,
     "popularity": 7.5,
-    "icon": "https://www.mulesoft.com/sites/default/files/2018-10/CLI.png"
+    "icon": "https://res.cloudinary.com/apideck/icons/mulesoft"
   },
   {
     "id": "tool-19",
@@ -335,10 +335,10 @@
       "Workbench"
     ],
     "createdAt": "2023-02-18T13:30:00Z",
-    "updatedAt": "2023-07-23T14:45:00Z",
+    "updatedAt": "2025-04-18T00:04:34.263Z",
     "usageCount": 960,
     "popularity": 8.7,
-    "icon": "https://lh3.googleusercontent.com/YrIhuXYEpBCW_NcoYzYg2RF3YZhUWJ0GakbYzDH2TNHwPi-JwGXBf3mHaWYxDABdQSeUZD8EkKg=w128-h128-e365-rj-sc0x00ffffff"
+    "icon": "https://lh3.googleusercontent.com/l9so7AtPuV92cDJg5PvoDynmz8RNBy3jmqkB9nK44zFIyxUKCRWgvZeeUsWgcGUvlW5uhY-7lCL2HqIxinQsUrLJhg=s120"
   },
   {
     "id": "tool-20",
@@ -353,10 +353,10 @@
       "SFMC API"
     ],
     "createdAt": "2023-02-19T14:30:00Z",
-    "updatedAt": "2023-07-24T15:45:00Z",
+    "updatedAt": "2025-04-18T00:05:43.753Z",
     "usageCount": 740,
     "popularity": 7.9,
-    "icon": "https://www.salesforce.com/content/dam/web/en_us/www/images/sales-cloud/logo-salesforce-marketing-cloud.png"
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
     "id": "tool-21",
@@ -371,10 +371,10 @@
       "Third-party integration tools"
     ],
     "createdAt": "2023-02-20T15:30:00Z",
-    "updatedAt": "2023-07-25T16:45:00Z",
+    "updatedAt": "2025-04-18T00:05:33.767Z",
     "usageCount": 820,
     "popularity": 8.2,
-    "icon": "https://www.salesforce.com/content/dam/web/en_us/www/images/marketing-cloud/marketing-cloud-card-icon.png"
+    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
     "id": "tool-22",
@@ -390,10 +390,10 @@
       "ReadyAPI"
     ],
     "createdAt": "2023-02-21T16:30:00Z",
-    "updatedAt": "2023-07-26T17:45:00Z",
+    "updatedAt": "2025-04-18T00:04:12.978Z",
     "usageCount": 810,
     "popularity": 7.9,
-    "icon": "https://www.soapui.org/smartbearbrand/media/images/logos/product-only/su_product-only.png"
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN4q2KTFwfgdsfd2mzAeLKuyuwWALpaoBjlA&s"
   },
   {
     "id": "tool-23",
