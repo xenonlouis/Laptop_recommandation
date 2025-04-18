@@ -16,7 +16,8 @@
       "tool-10",
       "tool-26",
       "tool-m9muk4un"
-    ]
+    ],
+    "icon": "https://cdn-icons-png.flaticon.com/512/1995/1995515.png"
   },
   {
     "id": "sfmc-macos",
@@ -84,7 +85,8 @@
       "tool-m9mudn1h",
       "tool-14",
       "tool-7"
-    ]
+    ],
+    "icon": "https://cdn-icons-png.flaticon.com/512/6213/6213731.png"
   },
   {
     "id": "mulesoft-macos",
