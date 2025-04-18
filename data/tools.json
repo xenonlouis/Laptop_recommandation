@@ -485,5 +485,34 @@
     "usageCount": 1350,
     "popularity": 9.2,
     "icon": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Microsoft_Office_Teams_%282018%E2%80%93present%29.svg"
+  },
+  {
+    "name": "Notepad++",
+    "description": "Notepad++ is a free (as in “free speech” and also as in “free beer”) source code editor and Notepad replacement that supports several languages. Running in the MS Windows environment, its use is governed by GNU General Public License.",
+    "category": "development",
+    "downloadUrl": "https://notepad-plus-plus.org/downloads/",
+    "installationNotes": "Go to the download link and download latest version ",
+    "isRequired": true,
+    "alternatives": [],
+    "icon": "https://notepad-plus-plus.org/images/logo.svg",
+    "createdAt": "2025-04-18T13:45:31.877Z",
+    "updatedAt": "2025-04-18T13:46:15.706Z",
+    "usageCount": 0,
+    "popularity": 0,
+    "id": "tool-m9mudn1h"
+  },
+  {
+    "name": "Microsoft 365",
+    "description": "Microsoft Office, d'un ensemble de services Cloud et un service d'intelligence artificielle.",
+    "category": "communication",
+    "downloadUrl": "https://m365.cloud.microsoft/?auth=2",
+    "isRequired": false,
+    "alternatives": [],
+    "icon": "https://www.rcb-informatique.fr/wp-content/uploads/2024/06/Microsoft-365.jpeg",
+    "createdAt": "2025-04-18T13:50:34.895Z",
+    "updatedAt": "2025-04-18T13:51:43.772Z",
+    "usageCount": 0,
+    "popularity": 0,
+    "id": "tool-m9muk4un"
   }
 ]

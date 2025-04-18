@@ -1,18 +1,45 @@
 [
   {
     "id": "sfmc-windows",
-    "profileName": "SFMC Consultant",
+    "profileName": "Salesforce Consultant",
     "description": "Standard toolkit for Salesforce Marketing Cloud consultants using Windows",
     "operatingSystem": "windows",
-    "toolIds": ["tool-1", "tool-11", "tool-7", "tool-2", "tool-3", "tool-14", "tool-4", "tool-19", "tool-20", "tool-21", "tool-22", "tool-23", "tool-24", "tool-26", "tool-27"],
-    "icon": "https://cdn-icons-png.flaticon.com/512/1995/1995515.png"
+    "toolIds": [
+      "tool-1",
+      "tool-11",
+      "tool-14",
+      "tool-19",
+      "tool-20",
+      "tool-24",
+      "tool-27",
+      "tool-m9mudn1h",
+      "tool-10",
+      "tool-26",
+      "tool-m9muk4un"
+    ]
   },
   {
     "id": "sfmc-macos",
     "profileName": "SFMC Consultant",
     "description": "Standard toolkit for Salesforce Marketing Cloud consultants using macOS",
     "operatingSystem": "macos",
-    "toolIds": ["tool-1", "tool-11", "tool-7", "tool-2", "tool-3", "tool-14", "tool-4", "tool-19", "tool-20", "tool-21", "tool-22", "tool-23", "tool-24", "tool-26", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-11",
+      "tool-7",
+      "tool-2",
+      "tool-3",
+      "tool-14",
+      "tool-4",
+      "tool-19",
+      "tool-20",
+      "tool-21",
+      "tool-22",
+      "tool-23",
+      "tool-24",
+      "tool-26",
+      "tool-27"
+    ],
     "icon": "https://cdn-icons-png.flaticon.com/512/1995/1995515.png"
   },
   {
@@ -20,7 +47,20 @@
     "profileName": "MuleSoft Developer",
     "description": "Standard toolkit for MuleSoft integration developers using Windows",
     "operatingSystem": "windows",
-    "toolIds": ["tool-1", "tool-3", "tool-7", "tool-9", "tool-2", "tool-12", "tool-4", "tool-16", "tool-17", "tool-18", "tool-22", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-3",
+      "tool-7",
+      "tool-9",
+      "tool-2",
+      "tool-12",
+      "tool-4",
+      "tool-16",
+      "tool-17",
+      "tool-18",
+      "tool-22",
+      "tool-27"
+    ],
     "icon": "https://www.mstsolutions.com/wp-content/uploads/2020/09/Mulesoft-preview.jpg"
   },
   {
@@ -28,15 +68,43 @@
     "profileName": "Full-Stack Developer",
     "description": "Standard toolkit for full-stack developers using Windows",
     "operatingSystem": "windows",
-    "toolIds": ["tool-1", "tool-3", "tool-6", "tool-2", "tool-8", "tool-9", "tool-10", "tool-13", "tool-22", "tool-27"],
-    "icon": "https://cdn-icons-png.flaticon.com/512/6213/6213731.png"
+    "toolIds": [
+      "tool-1",
+      "tool-3",
+      "tool-6",
+      "tool-2",
+      "tool-8",
+      "tool-9",
+      "tool-10",
+      "tool-13",
+      "tool-22",
+      "tool-27",
+      "tool-m9muk4un",
+      "tool-11",
+      "tool-m9mudn1h",
+      "tool-14",
+      "tool-7"
+    ]
   },
   {
     "id": "mulesoft-macos",
     "profileName": "MuleSoft Developer",
     "description": "Standard toolkit for MuleSoft integration developers using macOS",
     "operatingSystem": "macos",
-    "toolIds": ["tool-1", "tool-3", "tool-7", "tool-9", "tool-2", "tool-12", "tool-4", "tool-16", "tool-17", "tool-18", "tool-22", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-3",
+      "tool-7",
+      "tool-9",
+      "tool-2",
+      "tool-12",
+      "tool-4",
+      "tool-16",
+      "tool-17",
+      "tool-18",
+      "tool-22",
+      "tool-27"
+    ],
     "icon": "https://www.mulesoft.com/sites/default/files/2021-01/Mulesoft-logo.svg"
   },
   {
@@ -44,7 +112,18 @@
     "profileName": "Full-Stack Developer",
     "description": "Standard toolkit for full-stack developers using macOS",
     "operatingSystem": "macos",
-    "toolIds": ["tool-1", "tool-3", "tool-6", "tool-2", "tool-8", "tool-10", "tool-13", "tool-14", "tool-22", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-3",
+      "tool-6",
+      "tool-2",
+      "tool-8",
+      "tool-10",
+      "tool-13",
+      "tool-14",
+      "tool-22",
+      "tool-27"
+    ],
     "icon": "https://cdn-icons-png.flaticon.com/512/6213/6213731.png"
   },
   {
@@ -52,7 +131,21 @@
     "profileName": "Salesforce Developer",
     "description": "Standard toolkit for Salesforce platform developers using Windows",
     "operatingSystem": "windows",
-    "toolIds": ["tool-1", "tool-2", "tool-3", "tool-4", "tool-11", "tool-14", "tool-19", "tool-22", "tool-23", "tool-24", "tool-25", "tool-26", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-2",
+      "tool-3",
+      "tool-4",
+      "tool-11",
+      "tool-14",
+      "tool-19",
+      "tool-22",
+      "tool-23",
+      "tool-24",
+      "tool-25",
+      "tool-26",
+      "tool-27"
+    ],
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
@@ -60,7 +153,21 @@
     "profileName": "Salesforce Developer",
     "description": "Standard toolkit for Salesforce platform developers using macOS",
     "operatingSystem": "macos",
-    "toolIds": ["tool-1", "tool-2", "tool-3", "tool-4", "tool-11", "tool-14", "tool-19", "tool-22", "tool-23", "tool-24", "tool-25", "tool-26", "tool-27"],
+    "toolIds": [
+      "tool-1",
+      "tool-2",
+      "tool-3",
+      "tool-4",
+      "tool-11",
+      "tool-14",
+      "tool-19",
+      "tool-22",
+      "tool-23",
+      "tool-24",
+      "tool-25",
+      "tool-26",
+      "tool-27"
+    ],
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   }
-] 
+]

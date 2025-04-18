@@ -1,7 +1,7 @@
 [
   {
     "id": "pkg1",
-    "name": "Developer Starter Kit ( Windows )",
+    "name": "Consultant Starter Kit ( Windows )",
     "laptop": {
       "brand": "Lenovo",
       "model": "ThinkPad E14 Gen 5 (Intel)",
@@ -29,17 +29,17 @@
     "status": "proposed",
     "assignedTo": "",
     "createdAt": "2023-08-15T10:30:00Z",
-    "updatedAt": "2025-04-17T11:07:58.879Z",
-    "notes": "Standard package for new developers",
+    "updatedAt": "2025-04-18T13:39:28.774Z",
+    "notes": "Standard package for new consultants",
     "priceType": "HT"
   },
   {
     "id": "pkg3",
-    "name": "Developer Workstation Setup",
+    "name": "Developer Starter Kit 1 ( Windows )",
     "laptop": {
       "brand": "Lenovo",
       "model": "ThinkPad P14s Gen 5",
-      "price": 14500,
+      "price": 16000,
       "priceType": "TTC",
       "processor": "AMD Ryzen 7 Pro - 8840HS",
       "ram": "32",
@@ -61,11 +61,11 @@
       "id": "fb8bwvr"
     },
     "accessories": [],
-    "status": "delivered",
+    "status": "proposed",
     "assignedTo": "Abdelhay",
     "createdAt": "2023-06-10T09:20:00Z",
-    "updatedAt": "2025-04-17T11:03:35.901Z",
-    "notes": "Complete workstation setup for development team",
+    "updatedAt": "2025-04-18T13:41:20.601Z",
+    "notes": "Importé de Paris , Source : Fnac , Lien : https://www.fnac.com/mp51218482/Lenovo-ThinkPad-P14s-Gen-5-21ME-Conception-de-charniere-a-180-degres-AMD-Ryzen-7-Pro-8840HS-jusqu-a-5-1-GHz-AMD-PRO-Win-11-Pro-Radeon-780M-32-Go-RAM-1-To-SSD-TCG-Opal-Encryption-2-NVMe-Performance-14-IPS-1920-x-1200-Gigabit-Et/w-4",
     "priceType": "TTC"
   },
   {
@@ -1304,7 +1304,7 @@
     "priceType": "HT"
   },
   {
-    "name": "Developer Starter Kit v2 ( Windows)",
+    "name": "Developer Starter Kit 2 ( Windows )",
     "laptop": {
       "brand": "Lenovo ",
       "model": "ThinkPad T14s Gen4",
@@ -1332,42 +1332,9 @@
     "accessories": [],
     "status": "proposed",
     "createdAt": "2025-04-17T10:38:45.821Z",
-    "updatedAt": "2025-04-17T11:03:18.152Z",
-    "notes": "ram not upgradable ",
+    "updatedAt": "2025-04-18T13:42:15.939Z",
+    "notes": "Contrainte de min Order de 10 , ram not upgradable ",
     "id": "9tglu1m",
     "priceType": "TTC"
-  },
-  {
-    "name": "Basic Consultant Setup ( Windows )",
-    "laptop": {
-      "brand": "Hp",
-      "model": "Probook 440 G11",
-      "price": 8850,
-      "priceType": "HT",
-      "processor": "Intel Core Ultra 7 155U",
-      "ram": "8",
-      "storage": "512",
-      "batteryLife": 6,
-      "performanceScore": 8.5,
-      "notes": "needs to upgrade ram with another 8gb ram stick",
-      "images": [
-        "https://joutech.ma/7169-large_default/ordinateur-portable-hp-hp-probook-440-14-pouces-g11-a38e8et.jpg"
-      ],
-      "supportedProfiles": [
-        "consultant",
-        "developer"
-      ],
-      "supportedOS": [
-        "windows",
-        "linux"
-      ],
-      "id": "z9axtzs"
-    },
-    "accessories": [],
-    "status": "proposed",
-    "createdAt": "2025-04-17T10:40:29.709Z",
-    "updatedAt": "2025-04-17T10:40:29.709Z",
-    "id": "vdjjhsb",
-    "priceType": "HT"
   }
 ]
