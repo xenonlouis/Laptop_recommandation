@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, RotateCcw, Archive, Clock, Trash, RefreshCw } from "lucide-react";
+import { ArrowLeft, RotateCcw, Archive, Clock, Trash, RefreshCw, ArrowUp, ArrowDown, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +12,29 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Loader2, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type SyncEntity = "laptops" | "packages" | "accessories" | "people";
 
@@ -21,6 +44,260 @@ interface Checkpoint {
   createdAt: string;
   files: string[];
   path: string;
+}
+
+// Interface for the sync status summary
+interface EntitySummary {
+  ahead: number;
+  behind: number;
+  modified: number;
+  unchanged: number;
+}
+
+interface SyncSummary {
+  laptops: EntitySummary;
+  accessories: EntitySummary;
+  packages: EntitySummary;
+  people: EntitySummary;
+  tools?: EntitySummary;
+  toolkits?: EntitySummary;
+  lastChecked: string;
+}
+
+// DiffDialog Component for showing detailed comparison
+interface DiffDialogProps {
+  entityType: string;
+  entityDetails: any;
+  diffType: 'ahead' | 'behind' | 'modified';
+}
+
+function DiffDialog({ entityType, entityDetails, diffType }: DiffDialogProps) {
+  const [open, setOpen] = useState(false);
+  
+  // Generate display name for an entity based on its type
+  const getEntityName = (entity: any) => {
+    if (!entity) return "Unknown";
+    
+    switch (entityType.toLowerCase()) {
+      case 'laptops': 
+        return `${entity.brand} ${entity.model}`;
+      case 'accessories': 
+        return entity.name || "Unnamed accessory";
+      case 'packages': 
+        return entity.name || "Unnamed package";
+      case 'people': 
+        return entity.name || "Unnamed person";
+      case 'tools': 
+        return entity.name || "Unnamed tool";
+      case 'toolkits': 
+        return entity.profileName || "Unnamed toolkit";
+      default:
+        return entity.id || "Unknown";
+    }
+  };
+  
+  // Get badge color based on diff type
+  const getBadgeColor = () => {
+    switch (diffType) {
+      case 'ahead': return "bg-green-100 text-green-800 hover:bg-green-200";
+      case 'behind': return "bg-red-100 text-red-800 hover:bg-red-200";
+      case 'modified': return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+      default: return "";
+    }
+  };
+  
+  // Get icon based on diff type
+  const getIcon = () => {
+    switch (diffType) {
+      case 'ahead': return <ArrowUp className="h-3 w-3 mr-1" />;
+      case 'behind': return <ArrowDown className="h-3 w-3 mr-1" />;
+      case 'modified': return <AlertCircle className="h-3 w-3 mr-1" />;
+      default: return null;
+    }
+  };
+  
+  // Format value for display
+  const formatValue = (value: any) => {
+    if (value === undefined || value === null) return "—";
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  };
+  
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Badge variant="outline" className={cn("cursor-pointer", getBadgeColor())}>
+          {getIcon()} {diffType === 'modified' ? entityDetails.length : entityDetails.length} {diffType}
+        </Badge>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="capitalize flex items-center gap-2">
+            {getIcon()} {entityType} ({diffType})
+          </DialogTitle>
+          <DialogDescription>
+            {diffType === 'ahead' && `${entityDetails.length} ${entityType} exist locally but not in Notion`}
+            {diffType === 'behind' && `${entityDetails.length} ${entityType} exist in Notion but not locally`}
+            {diffType === 'modified' && `${entityDetails.length} ${entityType} exist in both places but have differences`}
+          </DialogDescription>
+        </DialogHeader>
+        
+        {diffType === 'modified' ? (
+          <Tabs defaultValue="changes" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="changes">Changes</TabsTrigger>
+              <TabsTrigger value="comparison">Side by Side</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="changes" className="space-y-4">
+              {entityDetails.map((item: any, index: number) => (
+                <div key={index} className="border rounded-md p-4">
+                  <h3 className="font-medium mb-2">{getEntityName(item.local)}</h3>
+                  <div className="text-sm text-muted-foreground mb-3">
+                    Modified fields: {item.changes.join(', ')}
+                  </div>
+                  
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Field</TableHead>
+                        <TableHead>Local Value</TableHead>
+                        <TableHead>Notion Value</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {item.changes.map((field: string) => (
+                        <TableRow key={field}>
+                          <TableCell className="font-medium">{field}</TableCell>
+                          <TableCell>{formatValue(item.local[field])}</TableCell>
+                          <TableCell>{formatValue(item.notion[field])}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ))}
+            </TabsContent>
+            
+            <TabsContent value="comparison">
+              {entityDetails.map((item: any, index: number) => (
+                <div key={index} className="border rounded-md p-4 mb-4">
+                  <h3 className="font-medium mb-4">{getEntityName(item.local)}</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Local Version</h4>
+                      <pre className="bg-muted p-3 rounded-md text-xs overflow-auto">
+                        {JSON.stringify(item.local, null, 2)}
+                      </pre>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Notion Version</h4>
+                      <pre className="bg-muted p-3 rounded-md text-xs overflow-auto">
+                        {JSON.stringify(item.notion, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <div className="space-y-4">
+            {entityDetails.map((item: any, index: number) => (
+              <div key={index} className="border rounded-md p-4">
+                <h3 className="font-medium mb-2">{getEntityName(item)}</h3>
+                <pre className="bg-muted p-3 rounded-md text-xs overflow-auto">
+                  {JSON.stringify(item, null, 2)}
+                </pre>
+              </div>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// EntityStatusBadge component with tooltip
+function EntityStatusBadge({ count, type, tooltipContent }: { count: number, type: 'ahead' | 'behind' | 'modified', tooltipContent: React.ReactNode }) {
+  const getBadgeContent = () => {
+    switch (type) {
+      case 'ahead':
+        return <><ArrowUp className="h-3 w-3 mr-1" /> {count} ahead</>;
+      case 'behind':
+        return <><ArrowDown className="h-3 w-3 mr-1" /> {count} behind</>;
+      case 'modified':
+        return <><AlertCircle className="h-3 w-3 mr-1" /> {count} modified</>;
+      default:
+        return null;
+    }
+  };
+  
+  const getBadgeColor = () => {
+    switch (type) {
+      case 'ahead': return "bg-green-100 text-green-800 hover:bg-green-200";
+      case 'behind': return "bg-red-100 text-red-800 hover:bg-red-200";
+      case 'modified': return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+      default: return "";
+    }
+  };
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge variant="outline" className={cn(getBadgeColor())}>
+            {getBadgeContent()}
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-xs p-3">
+          {tooltipContent}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+// Update the EntityStatusCard component
+function EntityStatusCard({ entityName, status, details }: { entityName: string, status: EntitySummary, details?: any }) {
+  return (
+    <div className="border rounded-md p-4">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-lg font-medium">{entityName}</h3>
+        <div className="flex gap-2">
+          {status.ahead > 0 && details?.ahead && (
+            <DiffDialog 
+              entityType={entityName} 
+              entityDetails={details.ahead} 
+              diffType="ahead" 
+            />
+          )}
+          {status.behind > 0 && details?.behind && (
+            <DiffDialog 
+              entityType={entityName} 
+              entityDetails={details.behind} 
+              diffType="behind" 
+            />
+          )}
+          {status.modified > 0 && details?.modified && (
+            <DiffDialog 
+              entityType={entityName} 
+              entityDetails={details.modified} 
+              diffType="modified" 
+            />
+          )}
+          {status.ahead === 0 && status.behind === 0 && status.modified === 0 && (
+            <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-200">
+              <CheckCircle className="h-3 w-3 mr-1" /> In sync
+            </Badge>
+          )}
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {status.unchanged} {entityName.toLowerCase()} synchronized with Notion
+      </p>
+    </div>
+  );
 }
 
 export default function NotionPage() {
@@ -33,12 +310,16 @@ export default function NotionPage() {
     "laptops", "packages", "accessories", "people"
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState<SyncSummary | null>(null);
+  const [syncDetails, setSyncDetails] = useState<any | null>(null);
+  const [isFetchingStatus, setIsFetchingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch checkpoints on page load
+  // Fetch checkpoints and sync status on page load
   useEffect(() => {
     fetchCheckpoints();
+    fetchSyncStatus();
   }, []);
 
   // Fetch checkpoints from API
@@ -59,6 +340,30 @@ export default function NotionPage() {
       setError("Failed to load checkpoints");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Fetch sync status between local and Notion
+  const fetchSyncStatus = async () => {
+    try {
+      setIsFetchingStatus(true);
+      const response = await fetch("/api/notion/status");
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch sync status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setSyncStatus(data.summary);
+      setSyncDetails(data.details);
+    } catch (err) {
+      console.error("Error fetching sync status:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load sync status",
+      });
+    } finally {
+      setIsFetchingStatus(false);
     }
   };
 
@@ -125,8 +430,9 @@ export default function NotionPage() {
         description: `Successfully synced ${selectedEntities.join(", ")} to Notion.`,
       });
 
-      // Refresh checkpoints after sync
+      // Refresh checkpoints and sync status after sync
       fetchCheckpoints();
+      fetchSyncStatus();
     } catch (error) {
       console.error("Error during sync:", error);
       toast({
@@ -162,6 +468,9 @@ export default function NotionPage() {
         title: "Restore Completed",
         description: `Successfully restored from checkpoint ${checkpointId}.`,
       });
+      
+      // Refresh sync status after restore
+      fetchSyncStatus();
     } catch (err) {
       console.error("Error during restore:", err);
       
@@ -270,6 +579,30 @@ export default function NotionPage() {
     }
   };
 
+  // Format time from now (similar to GitHub's "last updated X minutes ago")
+  const formatTimeFromNow = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+      
+      if (diffInSeconds < 60) {
+        return 'just now';
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } else {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+      }
+    } catch (err) {
+      return 'unknown time ago';
+    }
+  };
+
   return (
     <>
       {/* Progress overlay */}
@@ -302,6 +635,99 @@ export default function NotionPage() {
             Synchronize your laptops, accessories, packages, and people with Notion.
           </p>
         </div>
+
+        {/* GitHub-style Sync Status Card */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Sync Status</CardTitle>
+                <CardDescription>
+                  {syncStatus ? 
+                    `Last checked ${formatTimeFromNow(syncStatus.lastChecked)}` : 
+                    "Check the sync status between your local data and Notion"
+                  }
+                </CardDescription>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={fetchSyncStatus}
+                disabled={isFetchingStatus}
+                className="flex items-center gap-2"
+              >
+                {isFetchingStatus ? 
+                  <Loader2 className="h-4 w-4 animate-spin" /> : 
+                  <RefreshCw className="h-4 w-4" />
+                }
+                Refresh Status
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isFetchingStatus ? (
+              <div className="flex justify-center items-center py-6">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Checking sync status...</span>
+              </div>
+            ) : !syncStatus ? (
+              <Alert>
+                <AlertTitle>Status Unavailable</AlertTitle>
+                <AlertDescription>
+                  Unable to retrieve sync status. Please check your Notion connection.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-4">
+                {/* Laptops status */}
+                <EntityStatusCard 
+                  entityName="Laptops" 
+                  status={syncStatus.laptops} 
+                  details={syncDetails?.laptops} 
+                />
+
+                {/* Accessories status */}
+                <EntityStatusCard 
+                  entityName="Accessories" 
+                  status={syncStatus.accessories} 
+                  details={syncDetails?.accessories} 
+                />
+
+                {/* Packages status */}
+                <EntityStatusCard 
+                  entityName="Packages" 
+                  status={syncStatus.packages} 
+                  details={syncDetails?.packages} 
+                />
+
+                {/* People status */}
+                <EntityStatusCard 
+                  entityName="People" 
+                  status={syncStatus.people} 
+                  details={syncDetails?.people} 
+                />
+
+                {/* Tools status (if implemented) */}
+                {syncStatus.tools && (
+                  <EntityStatusCard 
+                    entityName="Tools" 
+                    status={syncStatus.tools} 
+                    details={syncDetails?.tools} 
+                  />
+                )}
+                
+                {/* Toolkits status (if implemented) */}
+                {syncStatus.toolkits && (
+                  <EntityStatusCard 
+                    entityName="Toolkits" 
+                    status={syncStatus.toolkits} 
+                    details={syncDetails?.toolkits} 
+                  />
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

@@ -31,6 +31,10 @@ export interface Tool {
   isRequired: boolean;
   alternatives?: string[];
   icon?: string; // URL to the tool's logo/icon
+  popularity?: number; // 0-10 scale based on usage
+  usageCount?: number; // How many times the tool has been used
+  createdAt?: string; // ISO date string
+  updatedAt?: string; // ISO date string
 }
 
 export interface ToolkitItem {

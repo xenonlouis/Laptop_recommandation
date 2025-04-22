@@ -1,0 +1,17 @@
+[
+  {
+    "id": "70a747d4-518f-4687-a598-83f004dc296d",
+    "entityType": "accessories",
+    "entityId": "acc-1",
+    "entityName": "acc-1",
+    "timestamp": "2025-04-22T13:13:17.444Z",
+    "operation": "update",
+    "changes": {
+      "added": 0,
+      "removed": 0,
+      "modified": 1
+    },
+    "syncedWithNotion": false,
+    "changeDescription": "Updated Logitech MX Master 3 test record"
+  }
+]

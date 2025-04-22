@@ -1,7 +1,154 @@
-import fs from "fs"
-import path from "path"
-import type { Laptop, Package, Toolkit, ToolkitItem } from "@/types"
-import { Tool } from "./api-client-tools"
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
+import * as path from 'path';
+import { Laptop, Package, Toolkit, Tool, Accessory, Person } from "../types";
+
+// Define data file paths
+const LAPTOP_DATA_PATH = path.resolve('data/laptops.json');
+const ACCESSORIES_DATA_PATH = path.resolve('data/accessories.json');
+const PACKAGES_DATA_PATH = path.resolve('data/packages.json');
+const PEOPLE_DATA_PATH = path.resolve('data/people.json');
+const TOOLS_DATA_PATH = path.resolve('data/tools.json');
+const TOOLKITS_DATA_PATH = path.resolve('data/toolkits.json');
+
+/**
+ * Read and parse a JSON file
+ */
+function readJsonFile<T>(filePath: string): T[] {
+  try {
+    if (!existsSync(filePath)) {
+      console.warn(`File does not exist: ${filePath}`);
+      return [];
+    }
+    
+    const data = readFileSync(filePath, 'utf8');
+    return JSON.parse(data) as T[];
+  } catch (error) {
+    console.error(`Error reading ${filePath}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Get all laptops from local data file
+ */
+export function getLaptops(): Laptop[] {
+  return readJsonFile<Laptop>(LAPTOP_DATA_PATH);
+}
+
+/**
+ * Get all accessories from local data file
+ */
+export function getAccessories(): Accessory[] {
+  return readJsonFile<Accessory>(ACCESSORIES_DATA_PATH);
+}
+
+/**
+ * Get all packages from local data file
+ */
+export function getPackages(): Package[] {
+  return readJsonFile<Package>(PACKAGES_DATA_PATH);
+}
+
+/**
+ * Get all people from local data file
+ */
+export function getPeople(): Person[] {
+  return readJsonFile<Person>(PEOPLE_DATA_PATH);
+}
+
+/**
+ * Get all tools from local data file
+ */
+export function getTools(): Tool[] {
+  return readJsonFile<Tool>(TOOLS_DATA_PATH);
+}
+
+/**
+ * Get all toolkits from local data file
+ */
+export function getToolkits(): Toolkit[] {
+  return readJsonFile<Toolkit>(TOOLKITS_DATA_PATH);
+}
+
+/**
+ * Get entity by ID from the appropriate data file
+ */
+export function getEntityById<T extends { id: string }>(entityType: string, id: string): T | null {
+  let entities: T[] = [];
+  
+  switch (entityType.toLowerCase()) {
+    case 'laptop':
+    case 'laptops':
+      entities = readJsonFile<T>(LAPTOP_DATA_PATH);
+      break;
+    case 'accessory':
+    case 'accessories':
+      entities = readJsonFile<T>(ACCESSORIES_DATA_PATH);
+      break;
+    case 'package':
+    case 'packages':
+      entities = readJsonFile<T>(PACKAGES_DATA_PATH);
+      break;
+    case 'person':
+    case 'people':
+      entities = readJsonFile<T>(PEOPLE_DATA_PATH);
+      break;
+    case 'tool':
+    case 'tools':
+      entities = readJsonFile<T>(TOOLS_DATA_PATH);
+      break;
+    case 'toolkit':
+    case 'toolkits':
+      entities = readJsonFile<T>(TOOLKITS_DATA_PATH);
+      break;
+    default:
+      console.warn(`Unknown entity type: ${entityType}`);
+      return null;
+  }
+  
+  const entity = entities.find(e => e.id === id);
+  return entity || null;
+}
+
+/**
+ * Get multiple entities by their IDs
+ */
+export function getEntitiesByIds<T extends { id: string }>(entityType: string, ids: string[]): T[] {
+  let entities: T[] = [];
+  
+  switch (entityType.toLowerCase()) {
+    case 'laptop':
+    case 'laptops':
+      entities = readJsonFile<T>(LAPTOP_DATA_PATH);
+      break;
+    case 'accessory':
+    case 'accessories':
+      entities = readJsonFile<T>(ACCESSORIES_DATA_PATH);
+      break;
+    case 'package':
+    case 'packages':
+      entities = readJsonFile<T>(PACKAGES_DATA_PATH);
+      break;
+    case 'person':
+    case 'people':
+      entities = readJsonFile<T>(PEOPLE_DATA_PATH);
+      break;
+    case 'tool':
+    case 'tools':
+      entities = readJsonFile<T>(TOOLS_DATA_PATH);
+      break;
+    case 'toolkit':
+    case 'toolkits':
+      entities = readJsonFile<T>(TOOLKITS_DATA_PATH);
+      break;
+    default:
+      console.warn(`Unknown entity type: ${entityType}`);
+      return [];
+  }
+  
+  return entities.filter(e => ids.includes(e.id));
+}
 
 // Path to the JSON files
 const laptopsDataFilePath = path.join(process.cwd(), "data", "laptops.json")
@@ -12,24 +159,24 @@ const toolsDataFilePath = path.join(process.cwd(), "data", "tools.json")
 // Ensure the data directory exists
 const ensureDataDirectoryExists = () => {
   const dataDir = path.join(process.cwd(), "data")
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true })
+  if (!existsSync(dataDir)) {
+    mkdirSync(dataDir, { recursive: true })
   }
 }
 
 // Create an empty JSON file if it doesn't exist
 const ensureDataFileExists = (filePath: string, initialData: any[] = []) => {
   ensureDataDirectoryExists()
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify(initialData, null, 2), "utf8")
+  if (!existsSync(filePath)) {
+    writeFileSync(filePath, JSON.stringify(initialData, null, 2), "utf8")
   }
 }
 
 // Read laptops from the JSON file
-export const getLaptops = async (): Promise<Laptop[]> => {
+export const getLaptopsFromJson = async (): Promise<Laptop[]> => {
   try {
     ensureDataFileExists(laptopsDataFilePath)
-    const data = await fs.promises.readFile(laptopsDataFilePath, "utf8")
+    const data = await readFile(laptopsDataFilePath, "utf8")
     return JSON.parse(data) as Laptop[]
   } catch (error) {
     console.error("Error reading laptops data:", error)
@@ -40,7 +187,7 @@ export const getLaptops = async (): Promise<Laptop[]> => {
 // Get a single laptop by ID
 export const getLaptopById = async (id: string): Promise<Laptop | null> => {
   try {
-    const laptops = await getLaptops()
+    const laptops = await getLaptopsFromJson()
     return laptops.find((laptop) => laptop.id === id) || null
   } catch (error) {
     console.error(`Error getting laptop with ID ${id}:`, error)
@@ -49,11 +196,11 @@ export const getLaptopById = async (id: string): Promise<Laptop | null> => {
 }
 
 // Read packages from the JSON file
-export const getPackages = async (): Promise<Package[]> => {
+export const getPackagesFromJson = async (): Promise<Package[]> => {
   try {
     ensureDataFileExists(packagesDataFilePath)
     
-    const data = await fs.promises.readFile(packagesDataFilePath, "utf8")
+    const data = await readFile(packagesDataFilePath, "utf8")
     const packages = JSON.parse(data) as Package[]
     
     // Add default priceType if missing
@@ -70,7 +217,7 @@ export const getPackages = async (): Promise<Package[]> => {
 // Get a single package by ID
 export const getPackageById = async (id: string): Promise<Package | null> => {
   try {
-    const packages = await getPackages()
+    const packages = await getPackagesFromJson()
     return packages.find((pkg) => pkg.id === id) || null
   } catch (error) {
     console.error(`Error getting package with ID ${id}:`, error)
@@ -81,7 +228,7 @@ export const getPackageById = async (id: string): Promise<Package | null> => {
 // Update a package
 export const updatePackage = async (updatedPackage: Package): Promise<boolean> => {
   try {
-    const packages = await getPackages()
+    const packages = await getPackagesFromJson()
     const index = packages.findIndex((pkg) => pkg.id === updatedPackage.id)
 
     if (index === -1) {
@@ -99,7 +246,7 @@ export const updatePackage = async (updatedPackage: Package): Promise<boolean> =
 // Add a new package
 export const addPackage = async (newPackage: Omit<Package, "id">): Promise<boolean> => {
   try {
-    const packages = await getPackages()
+    const packages = await getPackagesFromJson()
     
     // Generate a random ID
     const packageWithId = {
@@ -119,7 +266,7 @@ export const addPackage = async (newPackage: Omit<Package, "id">): Promise<boole
 export const savePackages = async (packages: Package[]): Promise<boolean> => {
   try {
     ensureDataDirectoryExists()
-    await fs.promises.writeFile(packagesDataFilePath, JSON.stringify(packages, null, 2), "utf8")
+    await writeFile(packagesDataFilePath, JSON.stringify(packages, null, 2), "utf8")
     return true
   } catch (error) {
     console.error("Error saving packages data:", error)
@@ -131,7 +278,7 @@ export const savePackages = async (packages: Package[]): Promise<boolean> => {
 export const saveLaptops = async (laptops: Laptop[]): Promise<boolean> => {
   try {
     ensureDataDirectoryExists()
-    await fs.promises.writeFile(laptopsDataFilePath, JSON.stringify(laptops, null, 2), "utf8")
+    await writeFile(laptopsDataFilePath, JSON.stringify(laptops, null, 2), "utf8")
     return true
   } catch (error) {
     console.error("Error saving laptops data:", error)
@@ -142,7 +289,7 @@ export const saveLaptops = async (laptops: Laptop[]): Promise<boolean> => {
 // Add a new laptop
 export const addLaptop = async (laptop: Laptop): Promise<boolean> => {
   try {
-    const laptops = await getLaptops()
+    const laptops = await getLaptopsFromJson()
 
     // Generate a unique ID if not provided
     if (!laptop.id) {
@@ -160,7 +307,7 @@ export const addLaptop = async (laptop: Laptop): Promise<boolean> => {
 // Update an existing laptop
 export const updateLaptop = async (updatedLaptop: Laptop): Promise<boolean> => {
   try {
-    const laptops = await getLaptops()
+    const laptops = await getLaptopsFromJson()
     const index = laptops.findIndex((laptop) => laptop.id === updatedLaptop.id)
 
     if (index === -1) {
@@ -178,7 +325,7 @@ export const updateLaptop = async (updatedLaptop: Laptop): Promise<boolean> => {
 // Delete a laptop
 export const deleteLaptop = async (id: string): Promise<boolean> => {
   try {
-    const laptops = await getLaptops()
+    const laptops = await getLaptopsFromJson()
     const filteredLaptops = laptops.filter((laptop) => laptop.id !== id)
 
     if (filteredLaptops.length === laptops.length) {
@@ -193,10 +340,10 @@ export const deleteLaptop = async (id: string): Promise<boolean> => {
 }
 
 // Get all toolkits
-export const getToolkits = async (): Promise<Toolkit[]> => {
+export const getToolkitsFromJson = async (): Promise<Toolkit[]> => {
   try {
     ensureDataFileExists(toolkitsDataFilePath)
-    const data = await fs.promises.readFile(toolkitsDataFilePath, "utf8")
+    const data = await readFile(toolkitsDataFilePath, "utf8")
     return JSON.parse(data) as Toolkit[]
   } catch (error) {
     console.error("Error reading toolkits data:", error)
@@ -207,7 +354,7 @@ export const getToolkits = async (): Promise<Toolkit[]> => {
 // Get toolkit by ID
 export const getToolkitById = async (id: string): Promise<Toolkit | null> => {
   try {
-    const toolkits = await getToolkits()
+    const toolkits = await getToolkitsFromJson()
     return toolkits.find(toolkit => toolkit.id === id) || null
   } catch (error) {
     console.error("Error getting toolkit by id:", error)
@@ -218,7 +365,7 @@ export const getToolkitById = async (id: string): Promise<Toolkit | null> => {
 // Get toolkits by profile name
 export const getToolkitsByProfile = async (profileName: string): Promise<Toolkit[]> => {
   try {
-    const toolkits = await getToolkits()
+    const toolkits = await getToolkitsFromJson()
     return toolkits.filter(toolkit => toolkit.profileName === profileName)
   } catch (error) {
     console.error("Error getting toolkit by profile:", error)
@@ -229,7 +376,7 @@ export const getToolkitsByProfile = async (profileName: string): Promise<Toolkit
 // Add new toolkit
 export const addToolkit = async (toolkit: Omit<Toolkit, "id">): Promise<Toolkit> => {
   try {
-    const toolkits = await getToolkits()
+    const toolkits = await getToolkitsFromJson()
     
     // Generate a simple ID
     const newId = `${toolkit.profileName.toLowerCase().replace(/\s+/g, '-')}-${toolkit.operatingSystem}-${Date.now().toString(36)}`
@@ -252,7 +399,7 @@ export const addToolkit = async (toolkit: Omit<Toolkit, "id">): Promise<Toolkit>
 // Update toolkit
 export const updateToolkit = async (updatedToolkit: Toolkit): Promise<boolean> => {
   try {
-    const toolkits = await getToolkits()
+    const toolkits = await getToolkitsFromJson()
     const index = toolkits.findIndex(toolkit => toolkit.id === updatedToolkit.id)
     
     if (index === -1) {
@@ -270,7 +417,7 @@ export const updateToolkit = async (updatedToolkit: Toolkit): Promise<boolean> =
 // Delete toolkit
 export const deleteToolkit = async (id: string): Promise<boolean> => {
   try {
-    const toolkits = await getToolkits()
+    const toolkits = await getToolkitsFromJson()
     const filteredToolkits = toolkits.filter(toolkit => toolkit.id !== id)
     
     if (filteredToolkits.length === toolkits.length) {
@@ -287,20 +434,20 @@ export const deleteToolkit = async (id: string): Promise<boolean> => {
 // Save toolkits
 export const saveToolkits = async (toolkits: Toolkit[]): Promise<boolean> => {
   try {
-    ensureDataFileExists(toolkitsDataFilePath)
-    await fs.promises.writeFile(toolkitsDataFilePath, JSON.stringify(toolkits, null, 2), "utf8")
+    ensureDataDirectoryExists()
+    await writeFile(toolkitsDataFilePath, JSON.stringify(toolkits, null, 2), "utf8")
     return true
   } catch (error) {
-    console.error("Error saving toolkits:", error)
+    console.error("Error saving toolkits data:", error)
     return false
   }
 }
 
 // Get all tools
-export const getTools = async (): Promise<Tool[]> => {
+export const getToolsFromJson = async (): Promise<Tool[]> => {
   try {
     ensureDataFileExists(toolsDataFilePath)
-    const data = await fs.promises.readFile(toolsDataFilePath, "utf8")
+    const data = await readFile(toolsDataFilePath, "utf8")
     return JSON.parse(data) as Tool[]
   } catch (error) {
     console.error("Error reading tools data:", error)
@@ -311,7 +458,7 @@ export const getTools = async (): Promise<Tool[]> => {
 // Get a single tool by ID
 export const getToolById = async (id: string): Promise<Tool | null> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     return tools.find((tool) => tool.id === id) || null
   } catch (error) {
     console.error(`Error getting tool with ID ${id}:`, error)
@@ -322,7 +469,7 @@ export const getToolById = async (id: string): Promise<Tool | null> => {
 // Get tools by category
 export const getToolsByCategory = async (category: string): Promise<Tool[]> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     return tools.filter((tool) => tool.category === category)
   } catch (error) {
     console.error(`Error getting tools for category ${category}:`, error)
@@ -333,9 +480,11 @@ export const getToolsByCategory = async (category: string): Promise<Tool[]> => {
 // Get popular tools
 export const getPopularTools = async (limit: number = 10): Promise<Tool[]> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     return [...tools]
-      .sort((a, b) => b.popularity - a.popularity)
+      .sort((a, b) => {
+        return (b.popularity ?? 0) - (a.popularity ?? 0);
+      })
       .slice(0, limit)
   } catch (error) {
     console.error("Error getting popular tools:", error)
@@ -347,7 +496,7 @@ export const getPopularTools = async (limit: number = 10): Promise<Tool[]> => {
 export const saveTools = async (tools: Tool[]): Promise<boolean> => {
   try {
     ensureDataDirectoryExists()
-    await fs.promises.writeFile(toolsDataFilePath, JSON.stringify(tools, null, 2), "utf8")
+    await writeFile(toolsDataFilePath, JSON.stringify(tools, null, 2), "utf8")
     return true
   } catch (error) {
     console.error("Error saving tools data:", error)
@@ -358,7 +507,7 @@ export const saveTools = async (tools: Tool[]): Promise<boolean> => {
 // Add a new tool
 export const addTool = async (tool: Omit<Tool, "id" | "createdAt" | "updatedAt" | "usageCount" | "popularity">): Promise<Tool> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     
     // Create a new tool with required fields
     const newTool: Tool = {
@@ -383,7 +532,7 @@ export const addTool = async (tool: Omit<Tool, "id" | "createdAt" | "updatedAt" 
 // Update a tool
 export const updateTool = async (updatedTool: Tool): Promise<boolean> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     const index = tools.findIndex((tool) => tool.id === updatedTool.id)
     
     if (index === -1) {
@@ -406,7 +555,7 @@ export const updateTool = async (updatedTool: Tool): Promise<boolean> => {
 // Delete a tool
 export const deleteTool = async (id: string): Promise<boolean> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     const filteredTools = tools.filter((tool) => tool.id !== id)
     
     if (filteredTools.length === tools.length) {
@@ -423,7 +572,7 @@ export const deleteTool = async (id: string): Promise<boolean> => {
 // Track tool usage
 export const trackToolUsage = async (id: string): Promise<boolean> => {
   try {
-    const tools = await getTools()
+    const tools = await getToolsFromJson()
     const index = tools.findIndex((tool) => tool.id === id)
     
     if (index === -1) {
@@ -431,14 +580,14 @@ export const trackToolUsage = async (id: string): Promise<boolean> => {
     }
     
     // Increment usage count and recalculate popularity (0-10 scale)
-    tools[index].usageCount += 1
+    tools[index].usageCount = (tools[index].usageCount ?? 0) + 1
     
     // Find max usage count to scale popularity
-    const maxUsage = Math.max(...tools.map(t => t.usageCount))
+    const maxUsage = Math.max(...tools.map(t => t.usageCount ?? 0))
     
     // Update popularity if we have usage data
     if (maxUsage > 0) {
-      tools[index].popularity = Math.min(10, Math.round((tools[index].usageCount / maxUsage) * 10))
+      tools[index].popularity = Math.min(10, Math.round(((tools[index].usageCount ?? 0) / maxUsage) * 10))
     }
     
     return await saveTools(tools)
