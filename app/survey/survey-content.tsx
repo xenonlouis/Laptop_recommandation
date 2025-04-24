@@ -309,9 +309,20 @@ export function SurveyContent() {
     
     try {
       console.log(">>> handleSubmit: Entering try block");
+      
+      // Clean up comma-separated fields before submission
+      const cleanedSurveyData = {
+        ...surveyData,
+        programmingLanguages: surveyData.programmingLanguages.filter(Boolean),
+        developmentType: surveyData.developmentType.filter(Boolean),
+        requiredPorts: surveyData.requiredPorts.filter(Boolean),
+        // Also clean experienceWithOtherOS just in case, though it uses checkboxes
+        experienceWithOtherOS: surveyData.experienceWithOtherOS.filter(Boolean),
+      };
+      
       // Create a cleaned version of the data for submission
       const submissionData = {
-        ...surveyData,
+        ...cleanedSurveyData, // Use the cleaned data
         submittedAt: new Date().toISOString()
       };
       
@@ -735,8 +746,9 @@ export function SurveyContent() {
             <Label className="text-base">Required Ports</Label>
             <Input 
               id="requiredPorts" 
+              placeholder="e.g., HDMI, USB-C, Ethernet"
               value={surveyData.requiredPorts.join(", ")} 
-              onChange={(e) => updateSurveyData("requiredPorts", e.target.value.split(", ").map(port => port.trim()))}
+              onChange={(e) => updateSurveyData("requiredPorts", e.target.value.split(",").map(port => port.trim()))}
               className="mt-2"
             />
           </div>
@@ -846,7 +858,7 @@ export function SurveyContent() {
             <Input 
               placeholder="e.g., Java, Python, JavaScript, Apex" 
               value={(surveyData.programmingLanguages || []).join(', ')} 
-              onChange={(e) => updateSurveyData('programmingLanguages', e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} 
+              onChange={(e) => updateSurveyData('programmingLanguages', e.target.value.split(',').map(s=>s.trim()))} 
             />
           </div>
           <div>
@@ -863,7 +875,7 @@ export function SurveyContent() {
             <Input 
               placeholder="e.g., Web Development, Backend Services, Data Science, Mobile"
               value={(surveyData.developmentType || []).join(', ')} 
-              onChange={(e) => updateSurveyData('developmentType', e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} 
+              onChange={(e) => updateSurveyData('developmentType', e.target.value.split(',').map(s=>s.trim()))} 
             />
           </div>
            <div>
