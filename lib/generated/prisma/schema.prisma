@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Survey Response Model ---
+model SurveyResponse {
+  // Core Fields
+  id          String   @id @default(uuid()) // Primary Key, auto-generated UUID
+  submittedAt DateTime @default(now()) // Timestamp, auto-generated on creation
+
+  // Personal Information
+  name     String
+  email    String @unique // Ensure email is unique in the database
+  position String
+
+  // Role Identification
+  primaryRole           String? // Store UserProfile ('developer'/'consultant') as String, allow null
+  developmentPercentage Int?
+
+  // OS Preferences
+  primaryOS             String? // Store OperatingSystem as String, allow null
+  experienceWithOtherOS String[] // Prisma supports String arrays for Postgres
+  preferredOS           String? // Store OperatingSystem as String, allow null
+  osPreferenceReason    String?
+
+  // Development Questions
+  programmingLanguages          String[]
+  otherLanguages                String?
+  developmentType               String[]
+  otherDevelopmentType          String?
+  resourceIntensiveEnvironments Boolean?
+  multipleEnvironments          Boolean?
+  terminalImportance            Int?
+
+  // Consultant Questions
+  clientPresentationFrequency String?
+  largeDataModels             Boolean?
+  specializedSoftware         Boolean?
+  specializedSoftwareList     String?
+  batteryLifeImportance       Int?
+  remoteWorkFrequency         String?
+
+  // Software Tools Section
+  selectedTools            String[]
+  otherTools               String?
+  simultaneousApplications String?
+
+  // Workflow Patterns
+  multipleWorkspaces        Boolean?
+  typicalBrowserTabs        String?
+  externalDisplays          String?
+  resourceIntensiveApps     Boolean?
+  resourceIntensiveAppsList String?
+
+  // Matching Results
+  matchedToolkitId String? // Store the ID of the matched toolkit
+  matchScore       Int? // Store the calculated match score
+
+  // Optional: Index for faster lookups if needed later
+  @@index([email])
+}

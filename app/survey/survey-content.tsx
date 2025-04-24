@@ -174,7 +174,7 @@ export function SurveyContent() {
   
   // State for the dynamic list of sections based on role
   const [activeSections, setActiveSections] = useState<SurveySection[]>(["personalInfo"]); 
-
+  
   // Fetch available tools on component mount
   useEffect(() => {
     const loadTools = async () => {
@@ -383,8 +383,8 @@ export function SurveyContent() {
         });
       } else if (error instanceof Error) {
         errorMessage = error.message;
-         setSubmissionResult({
-           success: false,
+      setSubmissionResult({
+        success: false,
            message: errorMessage
          });
       } else {
@@ -405,7 +405,7 @@ export function SurveyContent() {
     } finally {
       // Only re-enable the button if the submission failed
       if (!submissionSuccess) {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
       }
       // Otherwise, keep isSubmitting true until the redirect happens
     }
@@ -506,7 +506,7 @@ export function SurveyContent() {
           <div>
             <Label htmlFor="position">Position</Label>
              <Select
-                value={surveyData.position}
+              value={surveyData.position}
                 onValueChange={(value) => updateSurveyData("position", value)}
               >
                 <SelectTrigger id="position" className="mt-2">
@@ -862,7 +862,7 @@ export function SurveyContent() {
               onChange={(e) => updateSurveyData('developmentType', e.target.value.split(',').map(s=>s.trim()))} 
             />
           </div>
-           <div>
+          <div>
             <Label htmlFor="otherDevType">Other Development Types</Label>
             <Input 
               id="otherDevType" 
@@ -950,7 +950,7 @@ export function SurveyContent() {
                 onCheckedChange={(checked) => updateSurveyData('largeDataModels', checked === true)} 
               />
               <Label htmlFor="largeData">Do you work with large data models or datasets (e.g., complex Excel, BI tools)?</Label>
-            </div>
+          </div>
             <div className="flex items-center space-x-2 pt-2 md:pt-6">
               <Checkbox 
                 id="specSoft" 
@@ -958,7 +958,7 @@ export function SurveyContent() {
                 onCheckedChange={(checked) => updateSurveyData('specializedSoftware', checked === true)} 
               />
               <Label htmlFor="specSoft">Do you use specialized software (e.g., Salesforce, SAP, specific analytics tools)?</Label>
-            </div>
+                  </div>
             <div className="md:col-span-2">
               <Label htmlFor="specSoftList">List specialized software used:</Label>
               <Input 
@@ -967,7 +967,7 @@ export function SurveyContent() {
                 onChange={(e) => updateSurveyData('specializedSoftwareList', e.target.value)} 
                 placeholder="e.g., Salesforce CRM, Tableau, PowerBI"
               />
-            </div>
+                  </div>
              <div className="md:col-span-2">
               <Label htmlFor="batteryImportance">How important is long battery life (e.g., for working away from power outlets)?</Label>
               <Slider 
@@ -982,9 +982,9 @@ export function SurveyContent() {
               <span className="text-sm text-muted-foreground pt-2 block text-center">
                 {surveyData.batteryLifeImportance ?? 5} / 10 (Higher is more important)
               </span>
+                  </div>
+              </div>
             </div>
-        </div>
-      </div>
     );
   }
 
@@ -995,8 +995,8 @@ export function SurveyContent() {
           <h3 className="text-lg font-medium">Workflow & Usage Patterns</h3>
           <p className="text-sm text-muted-foreground">
             How do you typically work?
-          </p>
-        </div>
+              </p>
+            </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
            <div className="flex items-center space-x-2">
             <Checkbox 
@@ -1013,7 +1013,7 @@ export function SurveyContent() {
               onCheckedChange={(checked) => updateSurveyData('resourceIntensiveApps', checked === true)} 
             />
             <Label htmlFor="resIntApp">Do you regularly run resource-intensive applications (besides development tools)?</Label>
-          </div>
+                  </div>
           <div>
             <Label htmlFor="tabs">Typically, how many browser tabs do you keep open?</Label>
             <Select value={surveyData.typicalBrowserTabs || ''} onValueChange={(value) => updateSurveyData('typicalBrowserTabs', value)}>
@@ -1025,7 +1025,7 @@ export function SurveyContent() {
                 <SelectItem value="very_many">Very Many (50+)</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+                </div>
           <div>
             <Label htmlFor="displays">How many external displays do you typically use?</Label>
              <Select value={surveyData.externalDisplays || ''} onValueChange={(value) => updateSurveyData('externalDisplays', value)}>
@@ -1037,7 +1037,7 @@ export function SurveyContent() {
                 <SelectItem value="3+">3 or more</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+            </div>
           <div className="md:col-span-2">
             <Label htmlFor="resIntAppList">If yes to resource-intensive apps, please list them:</Label>
             <Textarea 
@@ -1080,7 +1080,7 @@ export function SurveyContent() {
           Previous
         </Button>
         
-        <Button
+          <Button
           onClick={() => {
             const { isValid } = validateSection(currentSection);
             if (!isValid) {
@@ -1096,27 +1096,27 @@ export function SurveyContent() {
               goToNextSection();
             }
           }}
-          disabled={isSubmitting}
-          className="flex items-center"
-        >
-          {isSubmitting ? (
-             <>
-               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-               Processing...
-             </>
+            disabled={isSubmitting}
+            className="flex items-center"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Processing...
+              </>
           // Check if it's the last active section
           ) : currentSectionIndex === activeSections.length - 1 ? (
-            <>
-              Complete Survey
-              <CheckCircle className="h-4 w-4 ml-2" />
-            </>
-          ) : (
-            <>
-              Next
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </>
-          )}
-        </Button>
+              <>
+                Complete Survey
+                <CheckCircle className="h-4 w-4 ml-2" />
+              </>
+            ) : (
+              <>
+                Next
+                <ChevronRight className="h-4 w-4 ml-2" />
+              </>
+            )}
+          </Button>
       </div>
     </div>
   );

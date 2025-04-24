@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Loader2, Edit, Trash2, PlusCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +27,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { deleteSurveyResponse } from "@/lib/api-client-survey";
 
@@ -51,6 +62,9 @@ export default function SurveyResponsesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isMigrateDialogOpen, setIsMigrateDialogOpen] = useState(false);
+  const [migrateJsonText, setMigrateJsonText] = useState("");
+  const [isMigrating, setIsMigrating] = useState(false);
 
   useEffect(() => {
     // Try to get stored admin key
@@ -122,6 +136,56 @@ export default function SurveyResponsesPage() {
     }
   }
 
+  // --- Handle Manual Migration Submit --- 
+  async function handleMigrateSubmit() {
+    if (!adminKey) {
+      toast({ title: "Error", description: "Authentication key missing." });
+      return;
+    }
+    if (!migrateJsonText.trim()) {
+      toast({ title: "Error", description: "Please paste JSON data into the text area." });
+      return;
+    }
+
+    let jsonData;
+    try {
+      jsonData = JSON.parse(migrateJsonText);
+    } catch (err) {
+      toast({ title: "Error", description: "Invalid JSON format. Please check the pasted text." });
+      return;
+    }
+
+    setIsMigrating(true);
+    try {
+      const res = await fetch('/api/survey/responses/migrate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': adminKey
+        },
+        body: JSON.stringify(jsonData),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        const description = result.message || `Failed with status ${res.status}.`;
+        toast({ title: "Migration Failed", description });
+      } else {
+        setResponses(prev => [result, ...prev]);
+        setMigrateJsonText("");
+        setIsMigrateDialogOpen(false);
+        toast({ title: "Success", description: `Response for ${result.name} migrated successfully.` });
+      }
+    } catch (error: any) {
+      console.error("Error migrating response:", error);
+      toast({ title: "Migration Error", description: error.message || "An unexpected error occurred." });
+    } finally {
+      setIsMigrating(false);
+    }
+  }
+  // -------------------------------------
+
   if (loading) {
     return (
       <div className="container mx-auto p-6 flex items-center justify-center h-[50vh]">
@@ -177,10 +241,52 @@ export default function SurveyResponsesPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Survey Responses</h1>
-        <div className="flex gap-4">
-          <Link href="/survey">
-            <Button variant="outline">Create New Survey</Button>
-          </Link>
+        <div className="flex items-center gap-2"> 
+          <Dialog open={isMigrateDialogOpen} onOpenChange={setIsMigrateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <PlusCircle className="mr-2 h-4 w-4" /> Migrate Single Response
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Migrate Survey Response</DialogTitle>
+                <DialogDescription>
+                  Paste the full JSON object for a single survey response from your old data file below.
+                  Ensure required fields (id, name, email, position, submittedAt) are present.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-1 items-center gap-4">
+                  <Label htmlFor="migrate-json" className="sr-only">
+                    Response JSON
+                  </Label>
+                  <Textarea
+                    id="migrate-json"
+                    placeholder='{
+  "id": "...",
+  "submittedAt": "...",
+  "name": "...",
+  "email": "...",
+  ...
+}'
+                    value={migrateJsonText}
+                    onChange={(e) => setMigrateJsonText(e.target.value)}
+                    className="col-span-3 min-h-[250px] font-mono text-xs"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="outline" disabled={isMigrating}>Cancel</Button>
+                </DialogClose>
+                <Button type="button" onClick={handleMigrateSubmit} disabled={isMigrating}>
+                   {isMigrating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                   Save Migrated Response
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Button 
             variant="ghost"
             onClick={() => {
@@ -204,7 +310,7 @@ export default function SurveyResponsesPage() {
                   <CardTitle className="truncate hover:underline">{response.name}</CardTitle>
                 </Link>
                 <CardDescription>
-                  {response.department} - {response.position}
+                  {response.position}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">

@@ -1,12 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { Octokit } from '@octokit/rest';
+import prisma from '@/lib/prisma'; // Import Prisma client
 import { SurveyResponse } from '@/types';
-
-// GitHub configuration
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const REPO_OWNER = 'xenonlouis';
-const REPO_NAME = 'Laptop_Survey';
-const FILE_PATH = 'data/survey-responses.json';
 
 // Protected route to get all survey responses
 export async function GET(request: NextRequest) {
@@ -23,27 +17,18 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Initialize GitHub client
-    const octokit = new Octokit({ auth: GITHUB_TOKEN });
+    // Fetch all responses from the database using Prisma
+    console.log('Fetching all survey responses from database...');
+    const responses = await prisma.surveyResponse.findMany({
+      // Optional: Add ordering if desired
+      orderBy: {
+        submittedAt: 'desc', // Example: newest first
+      },
+    });
+    console.log(`Found ${responses.length} responses.`);
     
-    try {
-      const { data: fileData } = await octokit.repos.getContent({
-        owner: REPO_OWNER,
-        repo: REPO_NAME,
-        path: FILE_PATH,
-      });
-      
-      if ('content' in fileData) {
-        const content = Buffer.from(fileData.content, 'base64').toString();
-        const responses: SurveyResponse[] = JSON.parse(content);
-        return NextResponse.json(responses);
-      }
-      
-      return NextResponse.json([]);
-    } catch (error) {
-      // File doesn't exist yet
-      return NextResponse.json([]);
-    }
+    return NextResponse.json(responses);
+
   } catch (error) {
     console.error('Error fetching survey responses:', error);
     return NextResponse.json(

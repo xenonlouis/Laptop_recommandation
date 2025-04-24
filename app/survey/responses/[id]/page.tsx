@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { SurveyResponse, Toolkit, Tool } from "@/types";
 import { fetchToolkits } from "@/lib/api-client";
@@ -41,6 +41,20 @@ export default function SurveyResponseDetailsPage() {
   const [allTools, setAllTools] = useState<Tool[]>([]);
   const [matchedToolkitDetails, setMatchedToolkitDetails] = useState<Toolkit | null>(null);
   const [matchedToolkitTools, setMatchedToolkitTools] = useState<Tool[]>([]);
+
+  // --- Create a memoized map for tool names --- 
+  const toolNameMap = useMemo(() => {
+    if (!allTools) return {};
+    return Object.fromEntries(allTools.map(tool => [tool.id, tool.name]));
+  }, [allTools]);
+  // ---------------------------------------------
+
+  // --- Create a map for full tool objects by ID for easier lookup --- 
+  const toolDetailsMap = useMemo(() => {
+    if (!allTools) return {};
+    return Object.fromEntries(allTools.map(tool => [tool.id, tool]));
+  }, [allTools]);
+  // -------------------------------------------------------------------
 
   useEffect(() => {
     const adminKey = localStorage.getItem("survey-admin-key");
@@ -214,7 +228,7 @@ export default function SurveyResponseDetailsPage() {
             <div>
               <CardTitle className="text-xl">{response.name}</CardTitle>
               <CardDescription className="text-sm mt-1">
-                {response.email} • {response.department} • {response.position}
+                {response.email} • {response.position}
               </CardDescription>
             </div>
             <Badge variant="outline">
@@ -225,11 +239,10 @@ export default function SurveyResponseDetailsPage() {
         
         <CardContent>
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="preferences">Preferences</TabsTrigger>
               <TabsTrigger value="software">Software</TabsTrigger>
-              <TabsTrigger value="hardware">Hardware</TabsTrigger>
               <TabsTrigger value="recommendation">Recommendation</TabsTrigger>
             </TabsList>
             
@@ -244,10 +257,6 @@ export default function SurveyResponseDetailsPage() {
                   <div>
                     <p className="text-sm font-medium">Email</p>
                     <p>{response.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Department</p>
-                    <p>{response.department}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Position</p>
@@ -302,8 +311,22 @@ export default function SurveyResponseDetailsPage() {
                     <p>{response.developmentType?.join(", ") || "None specified"}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Selected Tools</p>
-                    <p>{response.selectedTools?.join(", ") || "None selected"}</p>
+                    <p className="text-sm font-medium mb-2">Selected Tools</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 mt-1">
+                      {response.selectedTools && response.selectedTools.length > 0 ? (
+                        response.selectedTools.map(id => {
+                          const tool = toolDetailsMap[id];
+                          return (
+                            <div key={id} className="flex items-center gap-2 text-sm py-0.5">
+                              {tool?.icon && <img src={tool.icon} alt="" className="h-4 w-4 object-contain flex-shrink-0" />}
+                              <span>{tool?.name || id}</span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <span className="text-sm text-muted-foreground italic">None selected</span>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className="text-sm font-medium">Other Tools</p>
@@ -317,40 +340,14 @@ export default function SurveyResponseDetailsPage() {
               </div>
             </TabsContent>
             
-            <TabsContent value="hardware" className="mt-4 space-y-4">
-              <div>
-                <h3 className="font-medium text-lg mb-2">Hardware Requirements</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium">Required Ports</p>
-                    <p>{response.requiredPorts?.join(", ") || "None specified"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Screen Size Preference</p>
-                    <p>{response.screenSizePreference || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Dedicated Graphics</p>
-                    <p>{response.dedicatedGraphicsNeeded ? "Yes" : "No"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Storage Needed</p>
-                    <p>{response.storageNeeded || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">External Displays</p>
-                    <p>{response.externalDisplays || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Multiple Workspaces</p>
-                    <p>{response.multipleWorkspaces ? "Yes" : "No"}</p>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
             <TabsContent value="recommendation" className="mt-6 space-y-6">
               <h3 className="font-medium text-lg">Recommended Toolkit</h3>
+              
+              <p className="text-sm text-muted-foreground">
+                Recommendation is based on factors like preferred OS ({response.preferredOS || response.primaryOS || 'N/A'}), 
+                primary role ({response.primaryRole || 'N/A'}), and selected software tools.
+              </p>
+
               {matchedToolkitDetails ? (
                 <Card className="border bg-muted/30">
                   <CardHeader>
@@ -376,10 +373,15 @@ export default function SurveyResponseDetailsPage() {
                           {matchedToolkitTools.map(tool => (
                             <div key={tool.id} className="border rounded-md p-3 bg-card/50">
                               <div className="font-medium text-sm flex items-center gap-2">
-                                <Wrench className="h-4 w-4 text-muted-foreground"/>
-                                {tool.name}
+                                {tool.icon && <img src={tool.icon} alt="" className="h-4 w-4 object-contain flex-shrink-0" />}
+                                <span>{tool.name}</span>
+                                {response.selectedTools?.includes(tool.id) && (
+                                  <span title="Also selected by user">
+                                    <CheckCircle className="h-3.5 w-3.5 text-primary ml-0.5 flex-shrink-0" />
+                                  </span>
+                                )}
                               </div>
-                              <div className="text-xs text-muted-foreground capitalize pl-6">
+                              <div className="text-xs text-muted-foreground capitalize pl-6 pt-0.5">
                                 {formatCategory(tool.category)}
                               </div>
                             </div>
