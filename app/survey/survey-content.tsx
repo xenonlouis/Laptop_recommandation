@@ -323,6 +323,7 @@ export function SurveyContent() {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
+    let submissionSuccess = false; // Flag to track success
     
     try {
       console.log(">>> handleSubmit: Entering try block");
@@ -364,23 +365,49 @@ export function SurveyContent() {
       }, 1500); // Shortened delay a bit
 
       console.log(">>> handleSubmit: Try block finished successfully");
+      submissionSuccess = true; // Set flag on success
       
     } catch (error) {
       console.error(">>> handleSubmit: Entering catch block", error);
+      let errorMessage = "An error occurred while submitting your survey.";
+      let errorTitle = "Submission Failed";
+
+      // Check if the error is likely the duplicate submission error
+      if (error instanceof Error && error.message.toLowerCase().includes('already submitted')) {
+        errorMessage = "It looks like you have already submitted the survey with this email address.";
+        errorTitle = "Already Submitted";
+        // Optionally, still set submissionResult for consistency, or handle differently
+        setSubmissionResult({
+          success: false, // Indicate failure due to duplication
+          message: errorMessage 
+        });
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+         setSubmissionResult({
+           success: false,
+           message: errorMessage
+         });
+      } else {
+         setSubmissionResult({
+           success: false,
+           message: errorMessage // Default message
+         });
+      }
+
       console.error("Error submitting survey:", error);
+      submissionSuccess = false; // Ensure flag is false on error
       
-      // Show error message
-      setSubmissionResult({
-        success: false,
-        message: error instanceof Error ? error.message : "An error occurred while submitting your survey."
-      });
-      
+      // Show specific toast based on error type
       toast({
-        title: "Submission failed",
-        description: "There was a problem submitting your survey. Please try again.",
+        title: errorTitle,
+        description: errorMessage
       });
     } finally {
-      setIsSubmitting(false);
+      // Only re-enable the button if the submission failed
+      if (!submissionSuccess) {
+        setIsSubmitting(false);
+      }
+      // Otherwise, keep isSubmitting true until the redirect happens
     }
   }
 
