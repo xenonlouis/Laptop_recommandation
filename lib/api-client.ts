@@ -1,4 +1,4 @@
-import type { Laptop, Package, Accessory, Person, Toolkit } from "@/types"
+import type { Laptop, Package, Accessory, Person, Toolkit, SurveyResponse } from "@/types"
 
 // Base URL for API requests
 const LAPTOPS_API_URL = "/api/laptops"
@@ -524,4 +524,46 @@ export async function deleteToolkit(id: string): Promise<{ message: string }> {
     throw error
   }
 }
+
+// Survey Responses
+export const fetchSurveyResponses = async (): Promise<SurveyResponse[]> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/surveys`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch survey responses');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching survey responses:', error);
+    return [];
+  }
+};
+
+export const submitSurveyResponse = async (surveyData: Omit<SurveyResponse, 'id'>): Promise<SurveyResponse> => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/surveys`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(surveyData),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to submit survey response');
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('Error submitting survey response:', error);
+    throw error;
+  }
+};
 

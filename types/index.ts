@@ -118,3 +118,69 @@ export interface RecommendationNode {
   laptops?: Laptop[]
 }
 
+export interface SurveyResponse {
+  id: string;
+  submittedAt: string;
+  
+  // Personal Information
+  name: string;
+  email: string;
+  department: string;
+  position: string;
+  
+  // Role Identification
+  primaryRole: UserProfile | null;
+  developmentPercentage: number;
+
+  // OS Preferences
+  primaryOS: OperatingSystem | null;
+  experienceWithOtherOS: OperatingSystem[];
+  preferredOS: OperatingSystem | null;
+  osPreferenceReason: string;
+
+  // Development Questions
+  programmingLanguages: string[];
+  otherLanguages: string;
+  developmentType: string[];
+  otherDevelopmentType: string;
+  resourceIntensiveEnvironments: boolean;
+  multipleEnvironments: boolean;
+  terminalImportance: number;
+
+  // Consultant Questions
+  clientPresentationFrequency: string;
+  largeDataModels: boolean;
+  specializedSoftware: boolean;
+  specializedSoftwareList: string;
+  batteryLifeImportance: number;
+  remoteWorkFrequency: string;
+
+  // Software Tools Section
+  selectedTools: string[];
+  otherTools: string;
+  simultaneousApplications: string;
+
+  // Hardware Requirements
+  requiredPorts: string[];
+  otherPorts: string;
+  screenSizePreference: string;
+  dedicatedGraphicsNeeded: boolean;
+  storageNeeded: string;
+
+  // Workflow Patterns
+  multipleWorkspaces: boolean;
+  typicalBrowserTabs: string;
+  externalDisplays: string;
+  resourceIntensiveApps: boolean;
+  resourceIntensiveAppsList: string;
+
+  // Special Considerations
+  accessibilityRequirements: string;
+  securityRequirements: string;
+  legacySoftwareRequirements: string;
+
+  // Added fields for matched toolkit results
+  matchedToolkitId?: string | null;
+  matchScore?: number | null;
+}
+

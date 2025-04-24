@@ -1,7 +1,7 @@
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 import * as path from 'path';
-import { Laptop, Package, Toolkit, Tool, Accessory, Person } from "../types";
+import { Laptop, Package, Toolkit, Tool, Accessory, Person, SurveyResponse } from "../types";
 
 // Define data file paths
 const LAPTOP_DATA_PATH = path.resolve('data/laptops.json');
@@ -595,5 +595,26 @@ export const trackToolUsage = async (id: string): Promise<boolean> => {
     console.error(`Error tracking usage for tool ${id}:`, error)
     return false
   }
+}
+
+// Survey Response data
+let surveyResponses: SurveyResponse[] = []
+
+export const getSurveyResponses = (): SurveyResponse[] => {
+  return [...surveyResponses]
+}
+
+export const addSurveyResponse = (surveyData: Omit<SurveyResponse, 'id'>): SurveyResponse => {
+  // Extract submittedAt if already provided, otherwise create a new timestamp
+  const { submittedAt = new Date().toISOString(), ...otherData } = surveyData;
+  
+  const newResponse: SurveyResponse = {
+    id: crypto.randomUUID(),
+    submittedAt,
+    ...otherData
+  }
+  
+  surveyResponses.push(newResponse)
+  return newResponse
 }
 
