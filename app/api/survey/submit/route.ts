@@ -189,8 +189,9 @@ export async function POST(request: NextRequest) {
         owner: REPO_OWNER,
         repo: REPO_NAME,
         path: FILE_PATH,
-        message: `Add survey response from ${data.name}`,
+        message: `Add survey response from ${finalResponseToSave.name}`,
         content: Buffer.from(JSON.stringify(responses, null, 2)).toString('base64'),
+        branch: 'main'
       };
       if (sha) {
         payload.sha = sha;
