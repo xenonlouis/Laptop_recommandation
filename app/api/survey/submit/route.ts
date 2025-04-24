@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
     console.log('Survey data received:', { name: data.name, email: data.email });
     
     // Ensure required fields are present
-    if (!data.name || !data.email || !data.department || !data.position) {
-      console.log('Required fields missing:', { name: !!data.name, email: !!data.email, department: !!data.department, position: !!data.position });
+    if (!data.name || !data.email  || !data.position) {
+      console.log('Required fields missing:', { name: !!data.name, email: !!data.email, position: !!data.position });
       return NextResponse.json(
         { error: 'Required fields missing' },
         { status: 400 }

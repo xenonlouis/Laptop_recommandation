@@ -360,24 +360,6 @@
   },
   {
     "id": "tool-21",
-    "name": "Marketing Cloud Connect",
-    "description": "Integration package for connecting Sales/Service Cloud with Marketing Cloud",
-    "category": "specialized",
-    "downloadUrl": "https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3000000B3biPEAR",
-    "installationNotes": "Install from AppExchange and follow configuration guide",
-    "isRequired": true,
-    "alternatives": [
-      "Custom API Integration",
-      "Third-party integration tools"
-    ],
-    "createdAt": "2023-02-20T15:30:00Z",
-    "updatedAt": "2025-04-18T00:05:33.767Z",
-    "usageCount": 820,
-    "popularity": 8.2,
-    "icon": "https://developer.salesforce.com/resources2/favicon.ico"
-  },
-  {
-    "id": "tool-22",
     "name": "SoapUI",
     "description": "Open-source tool for testing SOAP and REST APIs",
     "category": "testing",
@@ -396,7 +378,7 @@
     "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN4q2KTFwfgdsfd2mzAeLKuyuwWALpaoBjlA&s"
   },
   {
-    "id": "tool-23",
+    "id": "tool-22",
     "name": "Salesforce CLI",
     "description": "Command-line interface for Salesforce Development",
     "category": "development",
@@ -414,7 +396,7 @@
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
-    "id": "tool-24",
+    "id": "tool-23",
     "name": "Salesforce Extensions for VS Code",
     "description": "Extensions for VS Code that provide features for Salesforce development",
     "category": "development",
@@ -432,7 +414,7 @@
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
-    "id": "tool-25",
+    "id": "tool-24",
     "name": "Salesforce Developer Console",
     "description": "Web-based IDE for developing on the Salesforce platform",
     "category": "development",
@@ -450,7 +432,7 @@
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
-    "id": "tool-26",
+    "id": "tool-25",
     "name": "Workbench",
     "description": "Web-based suite of tools for Salesforce data and metadata management",
     "category": "development",
@@ -468,7 +450,7 @@
     "icon": "https://developer.salesforce.com/resources2/favicon.ico"
   },
   {
-    "id": "tool-27",
+    "id": "tool-26",
     "name": "Microsoft Teams",
     "description": "Team collaboration platform with chat, meetings, and file sharing capabilities",
     "category": "communication",
@@ -488,18 +470,21 @@
   },
   {
     "name": "Notepad++",
-    "description": "Notepad++ is a free (as in “free speech” and also as in “free beer”) source code editor and Notepad replacement that supports several languages. Running in the MS Windows environment, its use is governed by GNU General Public License.",
+    "description": "Notepad++ is a free (as in \"free speech\" and also as in \"free beer\") source code editor and Notepad replacement that supports several languages. Running in the MS Windows environment, its use is governed by GNU General Public License.",
     "category": "development",
     "downloadUrl": "https://notepad-plus-plus.org/downloads/",
-    "installationNotes": "Go to the download link and download latest version ",
-    "isRequired": true,
-    "alternatives": [],
-    "icon": "https://notepad-plus-plus.org/images/logo.svg",
-    "createdAt": "2025-04-18T13:45:31.877Z",
-    "updatedAt": "2025-04-18T13:46:15.706Z",
-    "usageCount": 0,
-    "popularity": 0,
-    "id": "tool-m9mudn1h"
+    "installationNotes": "Download the installer from the website and run it.",
+    "isRequired": false,
+    "alternatives": [
+      "Sublime Text",
+      "VS Code"
+    ],
+    "createdAt": "2024-04-18T00:05:33.767Z",
+    "updatedAt": "2024-04-18T00:05:33.767Z",
+    "usageCount": 500,
+    "popularity": 7,
+    "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Notepad%2B%2B_Logo.svg/2048px-Notepad%2B%2B_Logo.svg.png",
+    "id": "tool-m9muk4un"
   },
   {
     "name": "Microsoft 365",
@@ -515,4 +500,4 @@
     "popularity": 0,
     "id": "tool-m9muk4un"
   }
-] 
+]

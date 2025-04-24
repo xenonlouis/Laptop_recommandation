@@ -125,7 +125,6 @@ export interface SurveyResponse {
   // Personal Information
   name: string;
   email: string;
-  department: string;
   position: string;
   
   // Role Identification
@@ -160,24 +159,12 @@ export interface SurveyResponse {
   otherTools: string;
   simultaneousApplications: string;
 
-  // Hardware Requirements
-  requiredPorts: string[];
-  otherPorts: string;
-  screenSizePreference: string;
-  dedicatedGraphicsNeeded: boolean;
-  storageNeeded: string;
-
   // Workflow Patterns
   multipleWorkspaces: boolean;
   typicalBrowserTabs: string;
   externalDisplays: string;
   resourceIntensiveApps: boolean;
   resourceIntensiveAppsList: string;
-
-  // Special Considerations
-  accessibilityRequirements: string;
-  securityRequirements: string;
-  legacySoftwareRequirements: string;
 
   // Added fields for matched toolkit results
   matchedToolkitId?: string | null;

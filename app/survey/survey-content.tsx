@@ -39,16 +39,13 @@ type SurveySection =
   | "developmentQuestions" 
   | "consultantQuestions" 
   | "softwareTools" 
-  | "hardwarePreferences"
-  | "workflowPatterns"
-  | "specialConsiderations";
+  | "workflowPatterns";
 
 // Define the shape of the survey data
 interface SurveyData {
   // Personal Information
   name: string;
   email: string;
-  department: string;
   position: string;
   
   // Role Identification
@@ -107,7 +104,6 @@ interface SurveyData {
 const initialSurveyData: SurveyData = {
   name: "",
   email: "",
-  department: "",
   position: "",
   primaryRole: null,
   developmentPercentage: 50,
@@ -176,6 +172,9 @@ export function SurveyContent() {
   const [hasCompletedSurvey, setHasCompletedSurvey] = useState<boolean>(false);
   const [emailChecked, setEmailChecked] = useState<boolean>(false);
   
+  // State for the dynamic list of sections based on role
+  const [activeSections, setActiveSections] = useState<SurveySection[]>(["personalInfo"]); 
+
   // Fetch available tools on component mount
   useEffect(() => {
     const loadTools = async () => {
@@ -193,33 +192,51 @@ export function SurveyContent() {
     loadTools();
   }, []);
 
-  // Get all sections in order (Added new sections in logical order)
-  const sections: SurveySection[] = [
+  // Original base sections list (order matters)
+  const baseSections: SurveySection[] = [
     "personalInfo",
     "roleIdentification",
     "osPreference",
     "developmentQuestions",
     "consultantQuestions",
     "softwareTools",
-    "hardwarePreferences",
     "workflowPatterns",
-    "specialConsiderations",
   ];
 
-  // Calculate progress percentage
-  const currentSectionIndex = sections.indexOf(currentSection);
-  const progress = Math.round(((currentSectionIndex + 1) / sections.length) * 100);
+  // Effect to update active sections based on role
+  useEffect(() => {
+    let updatedSections = [...baseSections];
 
-  // Helper to determine if development questions should be shown
+    // Remove development questions if not developer focused
+    if (!isDeveloperFocused()) {
+      updatedSections = updatedSections.filter(s => s !== "developmentQuestions");
+    }
+
+    // Remove consultant questions if not consultant focused (strict)
+    if (surveyData.primaryRole !== 'consultant') { 
+      updatedSections = updatedSections.filter(s => s !== "consultantQuestions");
+    }
+    
+    setActiveSections(updatedSections);
+
+  // Dependencies: primaryRole and developmentPercentage trigger recalculation
+  }, [surveyData.primaryRole, surveyData.developmentPercentage]); 
+
+  // Calculate progress percentage using activeSections
+  const currentSectionIndex = activeSections.indexOf(currentSection);
+  const progress = Math.round(((currentSectionIndex + 1) / activeSections.length) * 100);
+
+  // Helper to determine if development questions should be shown (UPDATED LOGIC)
   function isDeveloperFocused(): boolean {
-    return surveyData.primaryRole === "developer" || 
-           surveyData.developmentPercentage >= 30;
+    // Strictly check if primary role is developer
+    return surveyData.primaryRole === "developer"; 
+    // Removed || surveyData.developmentPercentage >= 30;
   }
 
-  // Helper to determine if consultant questions should be shown
+  // Helper to determine if consultant questions should be shown (already updated)
   function isConsultantFocused(): boolean {
-    return surveyData.primaryRole === "consultant" || 
-           (surveyData.primaryRole === "developer" && surveyData.developmentPercentage < 70);
+    // Strictly check if primary role is consultant
+    return surveyData.primaryRole === "consultant"; 
   }
 
   // --- Validation Logic ---
@@ -230,7 +247,6 @@ export function SurveyContent() {
       if (!surveyData.name.trim()) errors.name = "Full Name is required.";
       if (!surveyData.email.trim()) errors.email = "Email Address is required.";
       else if (!/\S+@\S+\.\S+/.test(surveyData.email)) errors.email = "Email address is invalid.";
-      if (!surveyData.department.trim()) errors.department = "Department is required.";
       if (!surveyData.position.trim()) errors.position = "Position is required.";
       
       // Check if email has already been used (if checked)
@@ -262,17 +278,17 @@ export function SurveyContent() {
     // Clear errors if section is valid
     setValidationErrors({});
     
-    const currentIndex = sections.indexOf(currentSection);
-    if (currentIndex < sections.length - 1) {
-      setCurrentSection(sections[currentIndex + 1]);
+    const currentIndex = activeSections.indexOf(currentSection);
+    if (currentIndex < activeSections.length - 1) {
+      setCurrentSection(activeSections[currentIndex + 1]);
       window.scrollTo(0, 0); // Scroll to top when changing sections
     }
   }
 
   function goToPreviousSection() {
-    const currentIndex = sections.indexOf(currentSection);
+    const currentIndex = activeSections.indexOf(currentSection);
     if (currentIndex > 0) {
-      setCurrentSection(sections[currentIndex - 1]);
+      setCurrentSection(activeSections[currentIndex - 1]);
       window.scrollTo(0, 0); // Scroll to top when changing sections
     }
   }
@@ -297,7 +313,8 @@ export function SurveyContent() {
     console.log(">>> handleSubmit: Function called");
     
     // Validate the final section before submitting
-    const { isValid } = validateSection("hardwarePreferences"); // Assuming hardware is the last input section
+    const lastSection = activeSections[activeSections.length - 1];
+    const { isValid } = validateSection(lastSection); 
     if (!isValid) {
       toast({ title: "Missing Information", description: "Please ensure all required fields in the final section are filled." });
       return; // Stop submission
@@ -315,8 +332,6 @@ export function SurveyContent() {
         ...surveyData,
         programmingLanguages: surveyData.programmingLanguages.filter(Boolean),
         developmentType: surveyData.developmentType.filter(Boolean),
-        requiredPorts: surveyData.requiredPorts.filter(Boolean),
-        // Also clean experienceWithOtherOS just in case, though it uses checkboxes
         experienceWithOtherOS: surveyData.experienceWithOtherOS.filter(Boolean),
       };
       
@@ -392,6 +407,16 @@ export function SurveyContent() {
 
   // Determine which section to render
   function renderCurrentSection() {
+    // Only render if the current section is actually in the active list
+    if (!activeSections.includes(currentSection)) {
+        // This case might happen briefly during state updates or if navigation logic has a bug.
+        // Try to find the nearest valid section.
+        const firstValidSection = activeSections[0] || "personalInfo"; 
+        console.warn(`Attempted to render inactive section: ${currentSection}. Falling back to ${firstValidSection}.`);
+        setCurrentSection(firstValidSection);
+        return <div>Loading section...</div>;
+    }
+    
     switch (currentSection) {
       case "personalInfo":
         return renderPersonalInfoSection();
@@ -400,19 +425,18 @@ export function SurveyContent() {
       case "osPreference":
         return renderOsPreferenceSection();
       case "developmentQuestions":
-        return isDeveloperFocused() ? renderDevelopmentQuestionsSection() : null;
+        // Double check using isDeveloperFocused as well, though activeSections should handle it
+        return isDeveloperFocused() ? renderDevelopmentQuestionsSection() : null; 
       case "consultantQuestions":
-        return isConsultantFocused() ? renderConsultantQuestionsSection() : null;
+        // Double check using isConsultantFocused as well
+        return isConsultantFocused() ? renderConsultantQuestionsSection() : null; 
       case "softwareTools":
         return renderSoftwareToolsSection();
-      case "hardwarePreferences":
-        return renderHardwareRequirementsSection();
       case "workflowPatterns":
         return renderWorkflowPatternsSection();
-      case "specialConsiderations":
-        return renderSpecialConsiderationsSection();
       default:
-        return <div>Loading section...</div>;
+        // Should not be reached if activeSections logic is correct
+        return <div>Invalid section state.</div>;
     }
   }
 
@@ -453,26 +477,20 @@ export function SurveyContent() {
           </div>
           
           <div>
-            <Label htmlFor="department">Department</Label>
-            <Input
-              id="department"
-              value={surveyData.department}
-              onChange={(e) => updateSurveyData("department", e.target.value)}
-              className="mt-2"
-              placeholder="Enter your department"
-            />
-            {validationErrors.department && <p className="text-red-500 text-xs mt-1">{validationErrors.department}</p>}
-          </div>
-          
-          <div>
             <Label htmlFor="position">Position</Label>
-            <Input
-              id="position"
-              value={surveyData.position}
-              onChange={(e) => updateSurveyData("position", e.target.value)}
-              className="mt-2"
-              placeholder="Enter your position/job title"
-            />
+             <Select
+                value={surveyData.position}
+                onValueChange={(value) => updateSurveyData("position", value)}
+              >
+                <SelectTrigger id="position" className="mt-2">
+                  <SelectValue placeholder="Select your position" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Consultant Junior">Consultant Junior</SelectItem>
+                  <SelectItem value="Senior">Senior</SelectItem>
+                  {/* Add other positions if needed */}
+                </SelectContent>
+              </Select>
             {validationErrors.position && <p className="text-red-500 text-xs mt-1">{validationErrors.position}</p>}
           </div>
           
@@ -735,67 +753,6 @@ export function SurveyContent() {
     );
   }
 
-  function renderHardwareRequirementsSection() {
-    // Implementation will follow
-    return (
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Hardware Requirements</h2>
-        
-        <div className="space-y-4">
-          <div>
-            <Label className="text-base">Required Ports</Label>
-            <Input 
-              id="requiredPorts" 
-              placeholder="e.g., HDMI, USB-C, Ethernet"
-              value={surveyData.requiredPorts.join(", ")} 
-              onChange={(e) => updateSurveyData("requiredPorts", e.target.value.split(",").map(port => port.trim()))}
-              className="mt-2"
-            />
-          </div>
-          
-          <div>
-            <Label className="text-base">Other Ports</Label>
-            <Input 
-              id="otherPorts" 
-              value={surveyData.otherPorts} 
-              onChange={(e) => updateSurveyData("otherPorts", e.target.value)}
-              className="mt-2"
-            />
-          </div>
-          
-          <div>
-            <Label className="text-base">Screen Size Preference</Label>
-            <Input 
-              id="screenSizePreference" 
-              value={surveyData.screenSizePreference} 
-              onChange={(e) => updateSurveyData("screenSizePreference", e.target.value)}
-              className="mt-2"
-            />
-          </div>
-          
-          <div>
-            <Label className="text-base">Dedicated Graphics Needed</Label>
-            <Checkbox 
-              id="dedicatedGraphicsNeeded" 
-              checked={surveyData.dedicatedGraphicsNeeded}
-              onCheckedChange={(checked) => fixedCheckHandler("dedicatedGraphicsNeeded", checked)}
-            />
-          </div>
-          
-          <div>
-            <Label className="text-base">Storage Needed</Label>
-            <Input 
-              id="storageNeeded" 
-              value={surveyData.storageNeeded} 
-              onChange={(e) => updateSurveyData("storageNeeded", e.target.value)}
-              className="mt-2"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   function renderRoleIdentificationSection() {
     return (
       <div className="space-y-6">
@@ -815,11 +772,11 @@ export function SurveyContent() {
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="developer" id="role-dev" />
-                  <Label htmlFor="role-dev">Developer / Engineer</Label>
+                  <Label htmlFor="role-dev">Developer role</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="consultant" id="role-consultant" />
-                  <Label htmlFor="role-consultant">Consultant / Analyst</Label>
+                  <Label htmlFor="role-consultant">Consultant / project manager role</Label>
                 </div>
                 {/* Add other roles if applicable */}
               </RadioGroup>
@@ -1068,57 +1025,12 @@ export function SurveyContent() {
     );
   }
 
-  function renderSpecialConsiderationsSection() {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium">Special Considerations</h3>
-          <p className="text-sm text-muted-foreground">
-            Any other requirements or constraints we should be aware of?
-          </p>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="accessReq">Accessibility Requirements</Label>
-            <Textarea 
-              id="accessReq" 
-              value={surveyData.accessibilityRequirements || ''} 
-              onChange={(e) => updateSurveyData('accessibilityRequirements', e.target.value)} 
-              placeholder="e.g., Screen reader compatibility, specific keyboard/mouse needs..."
-              className="mt-2"
-            />
-          </div>
-          <div>
-            <Label htmlFor="secReq">Security Requirements</Label>
-             <Textarea 
-              id="secReq" 
-              value={surveyData.securityRequirements || ''} 
-              onChange={(e) => updateSurveyData('securityRequirements', e.target.value)} 
-              placeholder="e.g., Need for encrypted storage, specific VPN software..."
-              className="mt-2"
-            />
-          </div>
-          <div>
-            <Label htmlFor="legacyReq">Legacy Software Requirements</Label>
-             <Textarea 
-              id="legacyReq" 
-              value={surveyData.legacySoftwareRequirements || ''} 
-              onChange={(e) => updateSurveyData('legacySoftwareRequirements', e.target.value)} 
-              placeholder="e.g., Need to run specific older applications, compatibility needs..."
-              className="mt-2"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Progress indicator */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-sm">Section {currentSectionIndex + 1} of {sections.length}</span>
+          <span className="text-sm">Section {currentSectionIndex + 1} of {activeSections.length}</span>
           <span className="text-sm font-medium">{progress}% completed</span>
         </div>
         <Progress value={progress} className="h-2" />
@@ -1150,8 +1062,8 @@ export function SurveyContent() {
             }
             setValidationErrors({}); // Clear errors if valid
             
-            // Last section index is now sections.length - 1
-            if (currentSectionIndex === sections.length - 1) {
+            // Check if it's the last active section
+            if (currentSectionIndex === activeSections.length - 1) {
               handleSubmit();
             } else {
               goToNextSection();
@@ -1161,12 +1073,12 @@ export function SurveyContent() {
           className="flex items-center"
         >
           {isSubmitting ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Processing...
-            </>
-          // Condition for "Complete Survey" is now last section index
-          ) : currentSectionIndex === sections.length - 1 ? (
+             <>
+               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+               Processing...
+             </>
+          // Check if it's the last active section
+          ) : currentSectionIndex === activeSections.length - 1 ? (
             <>
               Complete Survey
               <CheckCircle className="h-4 w-4 ml-2" />
