@@ -33,50 +33,125 @@ async function calculateBestToolkitMatch(
 ): Promise<{ bestMatch: Toolkit | null; score: number }> {
   let bestMatch: Toolkit | null = null;
   let highestScore = -1;
+  let highestKeyToolScore = -1; // Track key tool score for the best match
 
-  // Filter toolkits by preferred/primary OS first (important optimization)
+  // --- Define Key Tools and Keywords ---
+  const keyDeveloperTools: { [id: string]: number } = {
+    'tool-1': 5, // VS Code (General Dev)
+    'tool-2': 3, // Git (General Dev)
+    'tool-3': 3, // Node.js (General Dev)
+    'tool-6': 4, // Docker (General Dev)
+    'tool-16': 15, // Anypoint Studio (Mulesoft Specific)
+    'tool-18': 8,  // Anypoint Platform CLI (Mulesoft Specific)
+    'tool-19': 8,  // Salesforce Inspector (SF Specific)
+    'tool-22': 10, // Salesforce CLI (SF Specific)
+    'tool-23': 10, // Salesforce Extensions for VS Code (SF Specific)
+    // Add other key tools and weights as needed
+  };
+  const specializedKeywords: { [keyword: string]: { profiles: string[], score: number } } = {
+    'mulesoft': { profiles: ['integration', 'mulesoft'], score: 10 },
+    'salesforce': { profiles: ['salesforce', 'crm', 'admin', 'developer', 'consultant', 'sfmc'], score: 8 },
+    'talend': { profiles: ['integration', 'etl', 'data'], score: 8 },
+    // Add other keywords
+  };
+  // -------------------------------------
+
+  // Filter toolkits by preferred/primary OS first
   const relevantOS = surveyData.preferredOS || surveyData.primaryOS;
   const compatibleToolkits = relevantOS 
     ? toolkits.filter(tk => tk.operatingSystem === relevantOS)
-    : toolkits; // Consider all if no OS preference
+    : toolkits;
 
   console.log(`Found ${compatibleToolkits.length} toolkits compatible with OS: ${relevantOS || 'any'}`);
 
   for (const toolkit of compatibleToolkits) {
     let currentScore = 0;
+    let currentKeyToolScore = 0; // Track key tool score for this toolkit
+    const profileNameLower = toolkit.profileName.toLowerCase();
 
-    // 1. OS Score
+    // --- Scoring Logic --- 
+
+    // 1. OS Score (Keep as is)
     if (surveyData.preferredOS && surveyData.preferredOS === toolkit.operatingSystem) {
-      currentScore += 10; // Strong match
+      currentScore += 10;
     } else if (surveyData.primaryOS === toolkit.operatingSystem) {
-      currentScore += 5; // Good match
+      currentScore += 5;
     }
 
-    // 2. Role Score (Simple mapping - needs refinement based on actual profileNames)
-    // TODO: Refine this mapping based on actual Toolkit profileName values
-    if (toolkit.profileName.toLowerCase().includes('developer') && surveyData.primaryRole === 'developer') {
-      currentScore += 10;
-    } else if (toolkit.profileName.toLowerCase().includes('consultant') && surveyData.primaryRole === 'consultant') {
-      currentScore += 10;
+    // 2. Role Score (Refined)
+    const isDeveloperRole = surveyData.primaryRole === 'developer';
+    const isConsultantRole = surveyData.primaryRole === 'consultant';
+    const isDeveloperToolkit = profileNameLower.includes('developer') || profileNameLower.includes('engineer');
+    const isConsultantToolkit = profileNameLower.includes('consultant') || profileNameLower.includes('analyst') || profileNameLower.includes('admin');
+
+    if (isDeveloperToolkit && isDeveloperRole) currentScore += 10;
+    if (isConsultantToolkit && isConsultantRole) currentScore += 10;
+
+    // Add points based on development percentage for relevant toolkits
+    if (isDeveloperToolkit && surveyData.developmentPercentage && surveyData.developmentPercentage > 50) {
+        currentScore += Math.round((surveyData.developmentPercentage - 50) / 10); // +0 to +5 points
+    }
+    // Slightly penalize dev toolkits if consultant role and low dev percentage?
+    // if (isDeveloperToolkit && isConsultantRole && surveyData.developmentPercentage && surveyData.developmentPercentage < 30) {
+    //     currentScore -= 5;
+    // }
+
+    // 3. Selected Tools Score (Weighted + Track Key Tool Score)
+    if (toolkit.toolIds && surveyData.selectedTools) {
+      surveyData.selectedTools.forEach(toolId => {
+        if (toolkit.toolIds.includes(toolId)) {
+          const toolScore = keyDeveloperTools[toolId] || 2;
+          currentScore += toolScore;
+          if (keyDeveloperTools[toolId]) {
+            currentKeyToolScore += toolScore;
+          }
+        }
+      });
+    }
+
+    // 4. Specialized Software List Score
+    if (surveyData.specializedSoftwareList) {
+        const listLower = surveyData.specializedSoftwareList.toLowerCase();
+        Object.entries(specializedKeywords).forEach(([keyword, data]) => {
+            if (listLower.includes(keyword)) {
+                // Check if toolkit profile seems relevant to the keyword
+                if (data.profiles.some(pKeyword => profileNameLower.includes(pKeyword))) {
+                    currentScore += data.score;
+                }
+            }
+        });
     }
     
-    // 3. Selected Tools Score
-    if (toolkit.toolIds && surveyData.selectedTools) {
-      const matches = toolkit.toolIds.filter(toolId => surveyData.selectedTools.includes(toolId));
-      currentScore += matches.length * 2; // Example: +2 points per matching tool
+    // 5. Terminal Importance Score (Minor influence)
+    if (isDeveloperToolkit && surveyData.terminalImportance && surveyData.terminalImportance > 6) {
+        currentScore += Math.round(surveyData.terminalImportance / 3); // +2 or +3 points for high importance
     }
 
-    // Add more scoring criteria here (Hardware, Workflow etc.) based on SurveyData fields...
+    // --- End Scoring Logic --- 
 
-    console.log(`Toolkit: ${toolkit.profileName} (${toolkit.operatingSystem}), Score: ${currentScore}`);
+    console.log(`Toolkit: ${toolkit.profileName} (${toolkit.operatingSystem}), Score: ${currentScore}, KeyToolScore: ${currentKeyToolScore}`);
 
+    // --- Update Best Match with Tie-Breaking --- 
     if (currentScore > highestScore) {
+      // New highest score, update everything
       highestScore = currentScore;
+      highestKeyToolScore = currentKeyToolScore;
       bestMatch = toolkit;
+    } else if (currentScore === highestScore) {
+      // Tied score, check key tool score
+      if (currentKeyToolScore > highestKeyToolScore) {
+        // Higher key tool score wins the tie
+        highestKeyToolScore = currentKeyToolScore;
+        bestMatch = toolkit;
+        console.log(` --> Tied score, but new best match due to higher key tool score: ${toolkit.profileName}`);
+      }
     }
+    // --- End Update Best Match --- 
   }
 
-  console.log(`Best match: ${bestMatch?.profileName || 'None'}, Score: ${highestScore}`);
+  console.log(`Best match: ${bestMatch?.profileName || 'None'}, Score: ${highestScore}, KeyToolScore: ${highestKeyToolScore}`);
+  // Ensure a minimum score threshold? E.g., if highestScore < 5, return null?
+  // if (highestScore < 5) return { bestMatch: null, score: highestScore }; 
   return { bestMatch, score: highestScore };
 }
 

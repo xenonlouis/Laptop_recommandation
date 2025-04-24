@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Loader2, CheckCircle, Star, Wrench } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // Helper function to format dates
 const formatDate = (dateString: string): string => {
@@ -25,6 +26,103 @@ const formatDate = (dateString: string): string => {
     minute: '2-digit'
   }).format(date);
 };
+
+// --- Copy and Adapt Toolkit Matching Logic --- 
+// (Include keyDeveloperTools and specializedKeywords definitions here)
+const keyDeveloperTools: { [id: string]: number } = {
+  'tool-1': 5, 'tool-2': 3, 'tool-3': 3, 'tool-6': 4, 'tool-16': 15,
+  'tool-18': 8, 'tool-19': 8, 'tool-22': 10, 'tool-23': 10,
+};
+const specializedKeywords: { [keyword: string]: { profiles: string[], score: number } } = {
+  'mulesoft': { profiles: ['integration', 'mulesoft'], score: 10 },
+  'salesforce': { profiles: ['salesforce', 'crm', 'admin', 'developer', 'consultant', 'sfmc'], score: 8 },
+  'talend': { profiles: ['integration', 'etl', 'data'], score: 8 },
+};
+
+// Define return type for clarity
+type ToolkitScore = { toolkit: Toolkit; score: number; keyToolScore: number };
+
+// Adapted function to calculate ALL scores with tie-breaking
+function calculateAllToolkitScores(
+  surveyData: SurveyResponse | null,
+  toolkits: Toolkit[]
+): ToolkitScore[] {
+  if (!surveyData || !toolkits || toolkits.length === 0) {
+    return [];
+  }
+
+  const allScores: ToolkitScore[] = [];
+
+  const relevantOS = surveyData.preferredOS || surveyData.primaryOS;
+  const compatibleToolkits = relevantOS 
+    ? toolkits.filter(tk => tk.operatingSystem === relevantOS)
+    : toolkits;
+
+  for (const toolkit of compatibleToolkits) {
+    let currentScore = 0;
+    let currentKeyToolScore = 0;
+    const profileNameLower = toolkit.profileName.toLowerCase();
+
+    // 1. OS Score
+    if (surveyData.preferredOS && surveyData.preferredOS === toolkit.operatingSystem) currentScore += 10;
+    else if (surveyData.primaryOS === toolkit.operatingSystem) currentScore += 5;
+
+    // 2. Role Score
+    const isDeveloperRole = surveyData.primaryRole === 'developer';
+    const isConsultantRole = surveyData.primaryRole === 'consultant';
+    const isDeveloperToolkit = profileNameLower.includes('developer') || profileNameLower.includes('engineer');
+    const isConsultantToolkit = profileNameLower.includes('consultant') || profileNameLower.includes('analyst') || profileNameLower.includes('admin');
+    if (isDeveloperToolkit && isDeveloperRole) currentScore += 10;
+    if (isConsultantToolkit && isConsultantRole) currentScore += 10;
+    if (isDeveloperToolkit && surveyData.developmentPercentage && surveyData.developmentPercentage > 50) {
+        currentScore += Math.round((surveyData.developmentPercentage - 50) / 10);
+    }
+
+    // 3. Selected Tools Score (Weighted + Track Key Tool Score)
+    if (toolkit.toolIds && surveyData.selectedTools) {
+      surveyData.selectedTools.forEach(toolId => {
+        if (toolkit.toolIds.includes(toolId)) {
+          const toolScore = keyDeveloperTools[toolId] || 2;
+          currentScore += toolScore; 
+          if (keyDeveloperTools[toolId]) { 
+            currentKeyToolScore += toolScore; 
+          }
+        }
+      });
+    }
+
+    // 4. Specialized Software List Score
+    if (surveyData.specializedSoftwareList) {
+      const listLower = surveyData.specializedSoftwareList.toLowerCase();
+      Object.entries(specializedKeywords).forEach(([keyword, data]) => {
+        if (listLower.includes(keyword)) {
+          if (data.profiles.some(pKeyword => profileNameLower.includes(pKeyword))) {
+            currentScore += data.score;
+          }
+        }
+      });
+    }
+    
+    // 5. Terminal Importance Score
+    if (isDeveloperToolkit && surveyData.terminalImportance && surveyData.terminalImportance > 6) {
+      currentScore += Math.round(surveyData.terminalImportance / 3);
+    }
+    
+    // Store the result including keyToolScore
+    allScores.push({ toolkit, score: currentScore, keyToolScore: currentKeyToolScore });
+  }
+
+  // Sort scores descending, using keyToolScore as tie-breaker
+  allScores.sort((a, b) => {
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+    return b.keyToolScore - a.keyToolScore;
+  });
+
+  return allScores;
+}
+// --- End of Adapted Logic ---
 
 export default function SurveyResponseDetailsPage() {
   const router = useRouter();
@@ -55,6 +153,27 @@ export default function SurveyResponseDetailsPage() {
     return Object.fromEntries(allTools.map(tool => [tool.id, tool]));
   }, [allTools]);
   // -------------------------------------------------------------------
+
+  // --- Calculate all scores using useMemo --- 
+  const allCalculatedScores = useMemo(() => {
+    return calculateAllToolkitScores(response, allToolkits);
+  }, [response, allToolkits]);
+  // --------------------------------------------
+
+  // --- Derive Top Toolkit and its Tools from Scores --- 
+  const topScoringResult = useMemo(() => {
+    return allCalculatedScores.length > 0 ? allCalculatedScores[0] : null;
+  }, [allCalculatedScores]);
+
+  const topScoringToolkitTools = useMemo(() => {
+    if (!topScoringResult || !topScoringResult.toolkit.toolIds || !allTools || allTools.length === 0) {
+      return [];
+    }
+    return topScoringResult.toolkit.toolIds
+      .map(toolId => allTools.find(tool => tool.id === toolId))
+      .filter((tool): tool is Tool => tool !== undefined);
+  }, [topScoringResult, allTools]);
+  // ------------------------------------------------------
 
   useEffect(() => {
     const adminKey = localStorage.getItem("survey-admin-key");
@@ -345,32 +464,30 @@ export default function SurveyResponseDetailsPage() {
               
               <p className="text-sm text-muted-foreground">
                 Recommendation is based on factors like preferred OS ({response.preferredOS || response.primaryOS || 'N/A'}), 
-                primary role ({response.primaryRole || 'N/A'}), and selected software tools.
+                primary role ({response.primaryRole || 'N/A'}), and selected software tools. Scores are recalculated live.
               </p>
 
-              {matchedToolkitDetails ? (
+              {topScoringResult ? (
                 <Card className="border bg-muted/30">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                        <CheckCircle className="h-6 w-6 text-green-600" />
-                       <CardTitle>{matchedToolkitDetails.profileName}</CardTitle>
+                       <CardTitle>{topScoringResult.toolkit.profileName}</CardTitle>
                     </div>
                     <CardDescription className="pt-1">
-                      {matchedToolkitDetails.description || "Toolkit identified as the best match based on survey answers."}
+                      {topScoringResult.toolkit.description || "Toolkit identified as the best match based on current scoring."}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                       <span>OS: <Badge variant="secondary">{matchedToolkitDetails.operatingSystem}</Badge></span>
-                       {response.matchScore !== undefined && response.matchScore !== null && (
-                         <span>Match Score: <Badge variant="secondary">{response.matchScore}</Badge></span>
-                       )}
+                       <span>OS: <Badge variant="secondary">{topScoringResult.toolkit.operatingSystem}</Badge></span>
+                       <span>Calculated Score: <Badge variant="secondary">{topScoringResult.score}</Badge></span>
                     </div>
                     <div>
-                      <h4 className="font-medium mb-2">Included Tools ({matchedToolkitTools.length})</h4>
-                      {matchedToolkitTools.length > 0 ? (
+                      <h4 className="font-medium mb-2">Included Tools ({topScoringToolkitTools.length})</h4>
+                      {topScoringToolkitTools.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {matchedToolkitTools.map(tool => (
+                          {topScoringToolkitTools.map(tool => (
                             <div key={tool.id} className="border rounded-md p-3 bg-card/50">
                               <div className="font-medium text-sm flex items-center gap-2">
                                 {tool.icon && <img src={tool.icon} alt="" className="h-4 w-4 object-contain flex-shrink-0" />}
@@ -388,18 +505,44 @@ export default function SurveyResponseDetailsPage() {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground italic">No specific tools associated with this toolkit ID.</p>
+                        <p className="text-sm text-muted-foreground italic">No specific tools associated with this toolkit.</p>
                       )}
                     </div>
                   </CardContent>
                 </Card>
               ) : (
-                <Alert variant="default">
-                  <Star className="h-4 w-4" />
-                  <AlertDescription>
-                    No specific toolkit match found for this response (ID: {response.matchedToolkitId || 'N/A'}). The matching algorithm may need refinement, or the response predates the matching feature.
-                  </AlertDescription>
-                </Alert>
+                 <Alert variant="default">
+                   <Star className="h-4 w-4" />
+                   <AlertDescription>
+                     No compatible toolkit match found based on current scoring criteria.
+                   </AlertDescription>
+                 </Alert>
+              )}
+
+              {allCalculatedScores.length > 0 && (
+                <div className="mt-8">
+                  <h4 className="font-medium text-md mb-3">Detailed Score Breakdown</h4>
+                  <Card>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[60%]">Toolkit Profile</TableHead>
+                          <TableHead>OS</TableHead>
+                          <TableHead className="text-right">Calculated Score</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {allCalculatedScores.map(({ toolkit, score }, index) => (
+                          <TableRow key={toolkit.id} className={index === 0 ? "bg-muted/50 font-semibold" : ""}>
+                            <TableCell>{toolkit.profileName}</TableCell>
+                            <TableCell><Badge variant="secondary">{toolkit.operatingSystem}</Badge></TableCell>
+                            <TableCell className="text-right">{score}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </div>
               )}
             </TabsContent>
           </Tabs>
