@@ -259,6 +259,12 @@ export default function PeoplePage() {
   const [selectedPackageIds, setSelectedPackageIds] = useState<Record<string, boolean>>({});
   const [showBatchActions, setShowBatchActions] = useState<boolean>(false);
 
+  // Batch assign state
+  const [batchAssignMode, setBatchAssignMode] = useState(false);
+  const [selectedPeopleIds, setSelectedPeopleIds] = useState<Record<string, boolean>>({});
+  const [batchAssignPackageId, setBatchAssignPackageId] = useState<string>("");
+  const selectedPeopleCount = Object.values(selectedPeopleIds).filter(Boolean).length;
+
   const fetchData = async () => {
     setLoading(true)
     setError(null)
@@ -642,6 +648,47 @@ export default function PeoplePage() {
     }
   };
 
+  // Toggle batch assign mode
+  const toggleBatchAssignMode = () => {
+    setBatchAssignMode((prev) => !prev);
+    setSelectedPeopleIds({});
+    setBatchAssignPackageId("");
+  };
+
+  // Toggle person selection
+  const togglePersonSelection = (personId: string) => {
+    setSelectedPeopleIds((prev) => ({
+      ...prev,
+      [personId]: !prev[personId],
+    }));
+  };
+
+  // Batch assign handler
+  const handleBatchAssign = async () => {
+    if (!batchAssignPackageId || selectedPeopleCount === 0) {
+      alert("Please select at least one person and a package.");
+      return;
+    }
+    if (!confirm(`Assign selected package to ${selectedPeopleCount} people?`)) return;
+    setLoading(true);
+    try {
+      const assignTasks = Object.entries(selectedPeopleIds)
+        .filter(([_, checked]) => checked)
+        .map(([personId]) => assignPackage(batchAssignPackageId, personId));
+      await Promise.all(assignTasks);
+      setSelectedPeopleIds({});
+      setBatchAssignPackageId("");
+      setBatchAssignMode(false);
+      await fetchData();
+      alert("Batch assignment complete!");
+    } catch (error) {
+      console.error("Batch assign error:", error);
+      alert("There was an error assigning the package. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -801,6 +848,35 @@ export default function PeoplePage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {batchAssignMode && (
+              <>
+                <Select value={batchAssignPackageId} onValueChange={setBatchAssignPackageId}>
+                  <SelectTrigger className="w-56">
+                    <SelectValue placeholder="Select package to assign" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allPackages.map((pkg) => (
+                      <SelectItem key={pkg.id} value={pkg.id}>
+                        {pkg.name} ({pkg.laptop.brand} {pkg.laptop.model})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="default"
+                  disabled={!batchAssignPackageId || selectedPeopleCount === 0}
+                  onClick={handleBatchAssign}
+                >
+                  Assign Selected ({selectedPeopleCount})
+                </Button>
+              </>
+            )}
+            <Button
+              variant={batchAssignMode ? "default" : "outline"}
+              onClick={toggleBatchAssignMode}
+            >
+              {batchAssignMode ? "Exit Batch Assign" : "Batch Assign"}
+            </Button>
             {showBatchActions && (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">
@@ -925,6 +1001,7 @@ export default function PeoplePage() {
           <Table>
             <TableHeader>
               <TableRow>
+                {batchAssignMode && <TableHead></TableHead>}
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Department</TableHead>
@@ -937,6 +1014,14 @@ export default function PeoplePage() {
             <TableBody>
               {people.map((person) => (
                 <TableRow key={person.id}>
+                  {batchAssignMode && (
+                    <TableCell>
+                      <Checkbox
+                        checked={!!selectedPeopleIds[person.id]}
+                        onCheckedChange={() => togglePersonSelection(person.id)}
+                      />
+                    </TableCell>
+                  )}
                   <TableCell className="font-medium">{person.name}</TableCell>
                   <TableCell>{person.email || "-"}</TableCell>
                   <TableCell>{person.department || "-"}</TableCell>
