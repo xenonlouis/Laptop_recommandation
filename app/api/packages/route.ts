@@ -1,37 +1,80 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getPackages, addPackage } from "@/lib/data-service"
-import type { Package } from "@/types"
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 // GET /api/packages - Get all packages
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const packages = await getPackages()
-    return NextResponse.json(packages)
+    const packages = await prisma.package.findMany({
+      include: {
+        laptop: true,
+        accessories: {
+          include: {
+            accessory: true
+          }
+        }
+      }
+    });
+
+    // Format the data to match the expected structure
+    const formattedPackages = packages.map(pkg => {
+      // Get accessories
+      const accessories = pkg.accessories.map(pa => pa.accessory);
+      
+      return {
+        ...pkg,
+        accessories,
+      };
+    });
+
+    return NextResponse.json(formattedPackages);
   } catch (error) {
-    console.error("Error fetching packages:", error)
-    return NextResponse.json({ error: "Failed to fetch packages" }, { status: 500 })
+    console.error('Error fetching packages:', error);
+    return NextResponse.json({ error: 'Failed to fetch packages' }, { status: 500 });
   }
 }
 
-// POST /api/packages - Add a new package
-export async function POST(request: NextRequest) {
+// POST /api/packages - Create a new package
+export async function POST(req: NextRequest) {
   try {
-    const packageData = (await request.json()) as Omit<Package, "id">
-
-    // Validate required fields
-    if (!packageData.name || !packageData.laptop) {
-      return NextResponse.json({ error: "Name and laptop are required" }, { status: 400 })
-    }
-
-    const success = await addPackage(packageData)
-
-    if (success) {
-      return NextResponse.json({ message: "Package added successfully" }, { status: 201 })
-    } else {
-      return NextResponse.json({ error: "Failed to add package" }, { status: 500 })
-    }
+    const data = await req.json();
+    const { accessories, laptop, ...packageData } = data;
+    
+    // Create the package with relationships
+    const newPackage = await prisma.package.create({
+      data: {
+        ...packageData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        laptop: laptop ? { 
+          connect: { id: laptop.id } 
+        } : undefined,
+        accessories: accessories && accessories.length > 0 ? {
+          create: accessories.map((accessory: any) => ({
+            accessory: {
+              connect: { id: accessory.id }
+            }
+          }))
+        } : undefined
+      },
+      include: {
+        laptop: true,
+        accessories: {
+          include: {
+            accessory: true
+          }
+        }
+      }
+    });
+    
+    // Format the response
+    const formattedPackage = {
+      ...newPackage,
+      accessories: newPackage.accessories.map(pa => pa.accessory)
+    };
+    
+    return NextResponse.json(formattedPackage);
   } catch (error) {
-    console.error("Error adding package:", error)
-    return NextResponse.json({ error: "Failed to add package" }, { status: 500 })
+    console.error('Error creating package:', error);
+    return NextResponse.json({ error: 'Failed to create package' }, { status: 500 });
   }
 } 

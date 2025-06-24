@@ -14,60 +14,244 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// --- Database Schema Models ---
+
+model Person {
+  id            String    @id @default(uuid())
+  name          String
+  email         String?   @unique
+  department    String?
+  position      String?
+  pcReference   String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  packageAssignments PackageAssignment[]
+  
+  @@map("people")
+}
+
+model Laptop {
+  id               String    @id @default(uuid())
+  brand            String
+  model            String
+  price            Decimal   @db.Decimal(10, 2)
+  priceType        String    @map("price_type") // "HT" | "TTC"
+  processor        String
+  ram              String
+  storage          String
+  batteryLife      Decimal   @map("battery_life") @db.Decimal(4, 1)
+  performanceScore Decimal   @map("performance_score") @db.Decimal(3, 1)
+  notes            String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  supportedProfiles  LaptopProfile[]
+  supportedOS        LaptopOS[]
+  packages           Package[]
+  
+  @@map("laptops")
+}
+
+model LaptopProfile {
+  laptopId String  @map("laptop_id")
+  profile  String
+  
+  laptop   Laptop  @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+  
+  @@id([laptopId, profile])
+  @@map("laptop_profiles")
+}
+
+model LaptopOS {
+  laptopId String  @map("laptop_id")
+  os       String
+  
+  laptop   Laptop  @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+  
+  @@id([laptopId, os])
+  @@map("laptop_os")
+}
+
+model Accessory {
+  id          String    @id @default(uuid())
+  name        String
+  type        String
+  brand       String
+  price       Decimal   @db.Decimal(10, 2)
+  priceType   String    @map("price_type") // "HT" | "TTC"
+  image       String?
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  packageAccessories PackageAccessory[]
+  
+  @@map("accessories")
+}
+
+model Package {
+  id          String    @id @default(uuid())
+  name        String
+  laptopId    String    @map("laptop_id")
+  status      String    // "proposed" | "approved" | "rejected" | "delivered"
+  priceType   String    @map("price_type") // "HT" | "TTC"
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @map("updated_at")
+  
+  // Legacy field (to be deprecated after migration)
+  assignedTo  String?   @map("assigned_to")
+  
+  // Relations
+  laptop      Laptop    @relation(fields: [laptopId], references: [id])
+  accessories PackageAccessory[]
+  assignments PackageAssignment[]
+  
+  @@map("packages")
+}
+
+model PackageAccessory {
+  packageId    String    @map("package_id")
+  accessoryId  String    @map("accessory_id")
+  
+  package      Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  accessory    Accessory @relation(fields: [accessoryId], references: [id], onDelete: Cascade)
+  
+  @@id([packageId, accessoryId])
+  @@map("package_accessories")
+}
+
+model PackageAssignment {
+  id          String    @id @default(uuid())
+  packageId   String    @map("package_id")
+  personId    String    @map("person_id")
+  pcReference String?   @map("pc_reference")
+  assignedAt  DateTime  @default(now()) @map("assigned_at")
+  
+  package     Package   @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  person      Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  
+  @@unique([packageId, personId])
+  @@map("package_assignments")
+}
+
+model Tool {
+  id                String    @id @default(uuid())
+  name              String
+  description       String?
+  category          String
+  downloadUrl       String?   @map("download_url")
+  installationNotes String?   @map("installation_notes")
+  isRequired        Boolean   @default(false) @map("is_required")
+  icon              String?
+  popularity        Int?
+  usageCount        Int       @default(0) @map("usage_count")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  alternatives      ToolAlternative[]
+  toolkits          ToolkitTool[]
+  
+  @@map("tools")
+}
+
+model ToolAlternative {
+  toolId      String  @map("tool_id")
+  alternative String
+  
+  tool        Tool    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  
+  @@id([toolId, alternative])
+  @@map("tool_alternatives")
+}
+
+model Toolkit {
+  id              String    @id @default(uuid())
+  profileName     String    @map("profile_name")
+  description     String?
+  operatingSystem String    @map("operating_system")
+  icon            String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  tools          ToolkitTool[]
+  surveyMatches  SurveyResponse[]
+  
+  @@map("toolkits")
+}
+
+model ToolkitTool {
+  toolkitId    String  @map("toolkit_id")
+  toolId       String  @map("tool_id")
+  
+  toolkit      Toolkit @relation(fields: [toolkitId], references: [id], onDelete: Cascade)
+  tool         Tool    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  
+  @@id([toolkitId, toolId])
+  @@map("toolkit_tools")
+}
+
 // --- Survey Response Model ---
 model SurveyResponse {
-  // Core Fields
-  id          String    @id @default(uuid()) // Primary Key, auto-generated UUID
-  submittedAt DateTime  @default(now())      // Timestamp, auto-generated on creation
+  id                  String    @id @default(uuid())
+  submittedAt         DateTime  @default(now()) @map("submitted_at")
 
   // Personal Information
-  name        String
-  email       String    @unique // Ensure email is unique in the database
-  position    String
+  name                String
+  email               String    
+  position            String
 
   // Role Identification
-  primaryRole         String?   // Store UserProfile ('developer'/'consultant') as String, allow null
-  developmentPercentage Int?
+  primaryRole         String?   @map("primary_role")
+  developmentPercentage Int?     @map("development_percentage")
 
   // OS Preferences
-  primaryOS           String?   // Store OperatingSystem as String, allow null
-  experienceWithOtherOS String[]  // Prisma supports String arrays for Postgres
-  preferredOS         String?   // Store OperatingSystem as String, allow null
-  osPreferenceReason  String?
+  primaryOS           String?   @map("primary_os")
+  experienceWithOtherOS String[] @map("experience_with_other_os")
+  preferredOS         String?   @map("preferred_os")
+  osPreferenceReason  String?   @map("os_preference_reason")
 
   // Development Questions
-  programmingLanguages String[]
-  otherLanguages       String?
-  developmentType      String[]
-  otherDevelopmentType String?
-  resourceIntensiveEnvironments Boolean?
-  multipleEnvironments Boolean?
-  terminalImportance   Int?
+  programmingLanguages String[] @map("programming_languages")
+  otherLanguages       String?  @map("other_languages")
+  developmentType      String[] @map("development_type")
+  otherDevelopmentType String?  @map("other_development_type")
+  resourceIntensiveEnvironments Boolean? @map("resource_intensive_environments")
+  multipleEnvironments Boolean? @map("multiple_environments")
+  terminalImportance   Int?     @map("terminal_importance")
 
   // Consultant Questions
-  clientPresentationFrequency String?
-  largeDataModels        Boolean?
-  specializedSoftware    Boolean?
-  specializedSoftwareList String?
-  batteryLifeImportance  Int?
-  remoteWorkFrequency    String?
+  clientPresentationFrequency String? @map("client_presentation_frequency")
+  largeDataModels        Boolean? @map("large_data_models")
+  specializedSoftware    Boolean? @map("specialized_software")
+  specializedSoftwareList String? @map("specialized_software_list")
+  batteryLifeImportance  Int?     @map("battery_life_importance")
+  remoteWorkFrequency    String?  @map("remote_work_frequency")
 
   // Software Tools Section
-  selectedTools          String[]
-  otherTools             String?
-  simultaneousApplications String?
+  selectedTools          String[] @map("selected_tools")
+  otherTools             String?  @map("other_tools")
+  simultaneousApplications String? @map("simultaneous_applications")
 
   // Workflow Patterns
-  multipleWorkspaces     Boolean?
-  typicalBrowserTabs     String?
-  externalDisplays       String?
-  resourceIntensiveApps  Boolean?
-  resourceIntensiveAppsList String?
+  multipleWorkspaces     Boolean? @map("multiple_workspaces")
+  typicalBrowserTabs     String?  @map("typical_browser_tabs")
+  externalDisplays       String?  @map("external_displays")
+  resourceIntensiveApps  Boolean? @map("resource_intensive_apps")
+  resourceIntensiveAppsList String? @map("resource_intensive_apps_list")
 
   // Matching Results
-  matchedToolkitId String? // Store the ID of the matched toolkit
-  matchScore       Int?    // Store the calculated match score
-
-  // Optional: Index for faster lookups if needed later
-  @@index([email])
+  matchedToolkitId       String?  @map("matched_toolkit_id")
+  matchScore             Int?     @map("match_score")
+  
+  // Relationships
+  matchedToolkit         Toolkit? @relation(fields: [matchedToolkitId], references: [id])
+  
+  @@map("survey_responses")
 }

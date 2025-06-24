@@ -20,7 +20,10 @@ import {
   createPerson, 
   updatePerson, 
   deletePerson,
-  updatePackage
+  updatePackage,
+  assignPackage,
+  unassignPackage,
+  fetchPersonById
 } from "@/lib/api-client"
 import { Package as PackageType, Person, PackageStatus } from "@/types"
 import {
@@ -63,6 +66,7 @@ import {
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // Sample mock data
 const MOCK_PEOPLE: Person[] = [
@@ -128,6 +132,7 @@ const MOCK_PACKAGES: PackageType[] = [
       }
     ],
     status: "delivered",
+    priceType: "HT",
     assignedTo: "John Smith",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -161,6 +166,7 @@ const MOCK_PACKAGES: PackageType[] = [
       }
     ],
     status: "approved",
+    priceType: "TTC",
     assignedTo: "Sarah Johnson",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -249,6 +255,10 @@ export default function PeoplePage() {
     'laptopModels': true,
   });
   
+  // Add state for batch operations
+  const [selectedPackageIds, setSelectedPackageIds] = useState<Record<string, boolean>>({});
+  const [showBatchActions, setShowBatchActions] = useState<boolean>(false);
+
   const fetchData = async () => {
     setLoading(true)
     setError(null)
@@ -280,16 +290,58 @@ export default function PeoplePage() {
         setPeople(peopleData)
         setAllPackages(packagesData)
 
-        // Group packages by assignedTo
+        // Create a mapping of packages by person ID
         const packagesByPerson: Record<string, PackageType[]> = {}
-        packagesData.forEach((pkg: PackageType) => {
-          if (pkg.assignedTo) {
-            if (!packagesByPerson[pkg.assignedTo]) {
-              packagesByPerson[pkg.assignedTo] = []
-            }
-            packagesByPerson[pkg.assignedTo].push(pkg)
-          }
+        
+        // Initialize empty arrays for all people
+        peopleData.forEach((person: Person) => {
+          packagesByPerson[person.id] = []
         })
+        
+        // Loop through each person to get their assigned packages
+        for (const person of peopleData) {
+          // If assignedPackages is available directly from the API, use it
+          if (person.assignedPackages && person.assignedPackages.length > 0) {
+            // Map each package to include person-specific information
+            const personPackages = person.assignedPackages.map(pkg => {
+              // Create a customized package name if it doesn't have one already
+              const customizedName = pkg.name.includes(person.name) 
+                ? pkg.name 
+                : `${person.name}'s Package (${pkg.laptop?.brand || 'Unknown'} ${pkg.laptop?.model || 'Unknown'})`;
+              
+              return {
+                ...pkg,
+                name: customizedName,
+              };
+            });
+            
+            packagesByPerson[person.id] = personPackages;
+          } else {
+            // Alternatively, fetch the person with full package details
+            try {
+              const personWithPackages = await fetchPersonById(person.id)
+              if (personWithPackages.assignedPackages && personWithPackages.assignedPackages.length > 0) {
+                // Map each package to include person-specific information
+                const personPackages = personWithPackages.assignedPackages.map(pkg => {
+                  // Create a customized package name if it doesn't have one already
+                  const customizedName = pkg.name.includes(person.name) 
+                    ? pkg.name 
+                    : `${person.name}'s Package (${pkg.laptop?.brand || 'Unknown'} ${pkg.laptop?.model || 'Unknown'})`;
+                  
+                  return {
+                    ...pkg,
+                    name: customizedName,
+                  };
+                });
+                
+                packagesByPerson[person.id] = personPackages;
+              }
+            } catch (err) {
+              console.error(`Error fetching packages for person ${person.id}:`, err)
+            }
+          }
+        }
+        
         setPeoplePackages(packagesByPerson)
       }
     } catch (err) {
@@ -416,109 +468,34 @@ export default function PeoplePage() {
 
   // Function to handle assigning a package to a person
   const handleAssignPackage = async () => {
-    if (!currentPersonForAssign || !selectedPackageId) return
+    if (!currentPersonForAssign || !selectedPackageId) return;
     
-    if (useMockData) {
-      // In mock mode, update local state
-      const packageToAssign = allPackages.find(pkg => pkg.id === selectedPackageId)
-      
-      if (packageToAssign) {
-        // Update the person with PC reference
-        const updatedPerson = {
-          ...currentPersonForAssign,
-          pcReference: pcReference,
-          updatedAt: new Date().toISOString()
-        }
-        
-        // Update the package to associate with this person
-        const updatedPackage = {
-          ...packageToAssign,
-          assignedTo: currentPersonForAssign.name,
-          updatedAt: new Date().toISOString()
-        }
-        
-        // Update people state
-        setPeople(prev => 
-          prev.map(p => p.id === currentPersonForAssign.id ? updatedPerson : p)
-        )
-        
-        // Update packages state
-        setAllPackages(prev => 
-          prev.map(p => p.id === selectedPackageId ? updatedPackage : p)
-        )
-        
-        // Update the package mapping
-        setPeoplePackages(prev => {
-          const newMapping = { ...prev }
-          if (!newMapping[currentPersonForAssign.name]) {
-            newMapping[currentPersonForAssign.name] = []
-          }
-          
-          // Check if the package is already assigned to this person
-          const existingIndex = newMapping[currentPersonForAssign.name].findIndex(
-            p => p.id === selectedPackageId
-          )
-          
-          if (existingIndex >= 0) {
-            // Replace the existing package
-            newMapping[currentPersonForAssign.name][existingIndex] = updatedPackage
-          } else {
-            // Add the package
-            newMapping[currentPersonForAssign.name].push(updatedPackage)
-          }
-          
-          return newMapping
-        })
-        
-        // Reset state
-        setSelectedPackageId("")
-        setCurrentPersonForAssign(null)
-        setPcReference("")
-      }
-      return
-    }
-    
-    setIsAssigning(true)
+    setIsAssigning(true);
     try {
-      // Find the package to use as a template
-      const packageToAssign = allPackages.find(pkg => pkg.id === selectedPackageId)
+      // Assign the package to the person
+      await assignPackage(
+        selectedPackageId, 
+        currentPersonForAssign.id,
+        pcReference || currentPersonForAssign.pcReference
+      );
       
-      if (packageToAssign) {
-        // Update the person with PC reference
-        const updatedPerson = {
-          ...currentPersonForAssign,
-          pcReference: pcReference,
-          updatedAt: new Date().toISOString()
-        }
-        
-        // Update the package to associate with this person
-        // Note: This allows the same package to be assigned to multiple people
-        // Each person can have their unique PC reference
-        const updatedPackage = {
-          ...packageToAssign,
-          assignedTo: currentPersonForAssign.name,
-          updatedAt: new Date().toISOString()
-        }
-        
-        // Save the changes
-        await updatePerson(updatedPerson)
-        await updatePackage(updatedPackage)
-        
-        // Reset state
-        setSelectedPackageId("")
-        setCurrentPersonForAssign(null)
-        setPcReference("")
-        
-        // Refresh data
-        await fetchData()
-      }
-    } catch (err) {
-      console.error("Error assigning package:", err)
-      setError("Failed to assign package. Please try again.")
+      // Refresh data after assignment
+      fetchData();
+      
+      // Reset form state
+      setSelectedPackageId("");
+      setCurrentPersonForAssign(null);
+      setPcReference("");
+      
+      // Show success message
+      alert("Package assigned successfully!");
+    } catch (error) {
+      console.error("Error assigning package:", error);
+      alert("Failed to assign package. Please try again.");
     } finally {
-      setIsAssigning(false)
+      setIsAssigning(false);
     }
-  }
+  };
 
   const openAssignDialog = (person: Person) => {
     setCurrentPersonForAssign(person)
@@ -578,6 +555,91 @@ export default function PeoplePage() {
     // Export the data
     exportToCSV(dataToExport, fieldsToExport, filename);
     setShowExportDialog(false);
+  };
+
+  // Add a function to handle unassigning a package
+  const handleUnassignPackage = async (packageId: string, personId: string) => {
+    if (!confirm("Are you sure you want to unassign this package?")) {
+      return;
+    }
+    
+    try {
+      await unassignPackage(packageId, personId);
+      
+      // Refresh data after unassignment
+      fetchData();
+      
+      // Show success message
+      alert("Package unassigned successfully!");
+    } catch (error) {
+      console.error("Error unassigning package:", error);
+      alert("Failed to unassign package. Please try again.");
+    }
+  };
+
+  // Function to toggle package selection
+  const togglePackageSelection = (packageId: string) => {
+    setSelectedPackageIds(prev => ({
+      ...prev,
+      [packageId]: !prev[packageId]
+    }));
+  };
+
+  // Count selected packages
+  const selectedPackageCount = Object.values(selectedPackageIds).filter(Boolean).length;
+
+  // Toggle batch mode
+  const toggleBatchMode = () => {
+    setShowBatchActions(!showBatchActions);
+    // Clear selections when toggling off
+    if (showBatchActions) {
+      setSelectedPackageIds({});
+    }
+  };
+
+  // Function to handle batch unassign
+  const handleBatchUnassign = async () => {
+    if (selectedPackageCount === 0) {
+      alert("Please select at least one package to unassign");
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to unassign ${selectedPackageCount} package(s)?`)) {
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      // Get all selected package IDs and their person IDs
+      const unassignTasks: Promise<any>[] = [];
+      
+      // Find all people and their packages to unassign
+      Object.entries(peoplePackages).forEach(([personId, packages]) => {
+        packages.forEach(pkg => {
+          if (selectedPackageIds[pkg.id]) {
+            unassignTasks.push(unassignPackage(pkg.id, personId));
+          }
+        });
+      });
+      
+      // Execute all unassign operations in parallel
+      await Promise.all(unassignTasks);
+      
+      // Clear selections
+      setSelectedPackageIds({});
+      
+      // Refresh data
+      await fetchData();
+      
+      // Show success message
+      alert(`Successfully unassigned ${selectedPackageCount} package(s)`);
+    } catch (error) {
+      console.error("Error during batch unassign:", error);
+      alert("There was an error unassigning some packages. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -738,88 +800,114 @@ export default function PeoplePage() {
               Manage people and their assigned packages
             </p>
           </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Person
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Person</DialogTitle>
-                <DialogDescription>
-                  Create a new person who can be assigned packages.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="name"
-                    value={newPerson.name}
-                    onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    value={newPerson.email}
-                    onChange={(e) => setNewPerson({ ...newPerson, email: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="department" className="text-right">
-                    Department
-                  </Label>
-                  <Input
-                    id="department"
-                    value={newPerson.department}
-                    onChange={(e) => setNewPerson({ ...newPerson, department: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="position" className="text-right">
-                    Position
-                  </Label>
-                  <Input
-                    id="position"
-                    value={newPerson.position}
-                    onChange={(e) => setNewPerson({ ...newPerson, position: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="pcReference" className="text-right">
-                    PC Reference
-                  </Label>
-                  <Input
-                    id="pcReference"
-                    value={newPerson.pcReference}
-                    onChange={(e) => setNewPerson({ ...newPerson, pcReference: e.target.value })}
-                    className="col-span-3"
-                    placeholder="e.g., Serial number or asset tag"
-                  />
-                </div>
+          <div className="flex items-center gap-3">
+            {showBatchActions && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">
+                  {selectedPackageCount} package{selectedPackageCount !== 1 ? 's' : ''} selected
+                </span>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={handleBatchUnassign}
+                  disabled={selectedPackageCount === 0}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Unassign Selected
+                </Button>
               </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <DialogClose asChild>
-                  <Button onClick={handleAddPerson}>Save</Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            )}
+            
+            <Button
+              variant={showBatchActions ? "default" : "outline"}
+              onClick={toggleBatchMode}
+            >
+              {showBatchActions ? "Exit Batch Mode" : "Enter Batch Mode"}
+            </Button>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Person
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Person</DialogTitle>
+                  <DialogDescription>
+                    Create a new person who can be assigned packages.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={newPerson.name}
+                      onChange={(e) => setNewPerson({ ...newPerson, name: e.target.value })}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      value={newPerson.email}
+                      onChange={(e) => setNewPerson({ ...newPerson, email: e.target.value })}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="department" className="text-right">
+                      Department
+                    </Label>
+                    <Input
+                      id="department"
+                      value={newPerson.department}
+                      onChange={(e) => setNewPerson({ ...newPerson, department: e.target.value })}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="position" className="text-right">
+                      Position
+                    </Label>
+                    <Input
+                      id="position"
+                      value={newPerson.position}
+                      onChange={(e) => setNewPerson({ ...newPerson, position: e.target.value })}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="pcReference" className="text-right">
+                      PC Reference
+                    </Label>
+                    <Input
+                      id="pcReference"
+                      value={newPerson.pcReference}
+                      onChange={(e) => setNewPerson({ ...newPerson, pcReference: e.target.value })}
+                      className="col-span-3"
+                      placeholder="e.g., Serial number or asset tag"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button onClick={handleAddPerson}>Save</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {people.length === 0 ? (
@@ -864,14 +952,35 @@ export default function PeoplePage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    {peoplePackages[person.id] || peoplePackages[person.name] ? (
+                    {peoplePackages[person.id] && peoplePackages[person.id].length > 0 ? (
                       <div className="flex flex-col gap-1">
-                        {(peoplePackages[person.id] || peoplePackages[person.name])?.map((pkg) => (
-                          <div key={pkg.id} className="flex items-center gap-2">
-                            <Link href={`/packages/${pkg.id}`} className="text-blue-500 hover:underline">
-                              {pkg.name}
-                            </Link>
-                            {getStatusBadge(pkg.status)}
+                        {peoplePackages[person.id].map((pkg) => (
+                          <div key={pkg.id} className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              {showBatchActions && (
+                                <Checkbox 
+                                  checked={!!selectedPackageIds[pkg.id]} 
+                                  onCheckedChange={() => togglePackageSelection(pkg.id)}
+                                  className="mr-1"
+                                />
+                              )}
+                              <Link href={`/packages/${pkg.id}`} className="text-blue-500 hover:underline flex items-center gap-1">
+                                <Package className="h-3.5 w-3.5" />
+                                {pkg.name}
+                              </Link>
+                              {getStatusBadge(pkg.status)}
+                            </div>
+                            {!showBatchActions && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-6 px-2 text-xs" 
+                                onClick={() => handleUnassignPackage(pkg.id, person.id)}
+                                title="Unassign package"
+                              >
+                                <Trash2 className="h-3 w-3 text-red-500" />
+                              </Button>
+                            )}
                           </div>
                         ))}
                       </div>

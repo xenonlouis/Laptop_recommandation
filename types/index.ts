@@ -68,6 +68,7 @@ export interface Person {
   pcReference?: string  // Reference/serial number of the person's PC
   createdAt: string
   updatedAt: string
+  assignedPackages?: Package[] // Packages assigned to this person
 }
 
 export interface Accessory {
@@ -105,7 +106,8 @@ export interface Package {
   accessories: Accessory[]
   status: PackageStatus
   priceType: PriceType
-  assignedTo?: string
+  assignedTo?: string // Keeping for backward compatibility
+  personIds?: string[] // New field to properly store person IDs
   createdAt: string
   updatedAt: string
   notes?: string

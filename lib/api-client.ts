@@ -298,7 +298,7 @@ export async function updateAccessory(accessory: Accessory): Promise<{ message: 
 // Update an existing person
 export async function updatePerson(person: Person): Promise<Person> {
   try {
-    const response = await fetch(PEOPLE_API_URL, {
+    const response = await fetch(`${PEOPLE_API_URL}/${person.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -378,7 +378,7 @@ export async function deleteAccessory(id: string): Promise<{ message: string }> 
 // Delete a person
 export async function deletePerson(id: string): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${PEOPLE_API_URL}?id=${id}`, {
+    const response = await fetch(`${PEOPLE_API_URL}/${id}`, {
       method: "DELETE",
     })
 
@@ -394,25 +394,45 @@ export async function deletePerson(id: string): Promise<{ success: boolean; mess
   }
 }
 
-export async function assignPackage(packageId: string, assignedTo: string): Promise<{ message: string }> {
+// Assign a package to a person
+export async function assignPackage(packageId: string, personId: string, pcReference?: string): Promise<any> {
   try {
-    const response = await fetch(`/api/packages/${packageId}/assign`, {
+    const response = await fetch(`${PACKAGES_API_URL}/${packageId}/assign`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ assignedTo }),
-    });
+      body: JSON.stringify({ personId, pcReference }),
+    })
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Failed to assign package: ${response.status}`);
+      const errorData = await response.json()
+      throw new Error(errorData.error || `Error: ${response.status}`)
     }
 
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error("Error assigning package:", error);
-    throw error;
+    console.error(`Failed to assign package ${packageId}:`, error)
+    throw error
+  }
+}
+
+// Unassign a package from a person
+export async function unassignPackage(packageId: string, personId: string): Promise<{ message: string }> {
+  try {
+    const response = await fetch(`${PACKAGES_API_URL}/${packageId}/assign?personId=${personId}`, {
+      method: "DELETE",
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `Error: ${response.status}`)
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error(`Failed to unassign package ${packageId}:`, error)
+    throw error
   }
 }
 

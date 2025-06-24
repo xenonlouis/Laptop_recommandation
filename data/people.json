@@ -2,17 +2,17 @@
   {
     "id": "yz45678",
     "name": "Youssef Chana",
-    "email": "youssef.chana@example.com",
+    "email": "youssef.chana@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045NG9",
     "createdAt": "2024-04-15T09:00:00Z",
-    "updatedAt": "2025-04-11T10:29:54.210Z"
+    "updatedAt": "2025-06-23T15:42:43.301Z"
   },
   {
     "id": "ar45679",
     "name": "Ayoub Rhiti",
-    "email": "ayoub.rhiti@example.com",
+    "email": "ayoub.rhiti@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MSC",
@@ -21,38 +21,38 @@
   },
   {
     "id": "yb45680",
-    "name": "Yassine BILAL",
-    "email": "yassine.bilal@example.com",
+    "name": "Yassine Bilal",
+    "email": "yassine.bilal@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045N37",
     "createdAt": "2024-04-15T09:02:00Z",
-    "updatedAt": "2024-04-15T09:02:00Z"
+    "updatedAt": "2025-06-23T15:46:12.522Z"
   },
   {
     "id": "ic45681",
-    "name": "Ibrahim CK",
-    "email": "ibrahim.ck@example.com",
+    "name": "Ibrahim Charif Khalifi",
+    "email": "ibrahim.charifkhalifi@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MX2",
     "createdAt": "2024-04-15T09:03:00Z",
-    "updatedAt": "2024-04-15T09:03:00Z"
+    "updatedAt": "2025-06-23T15:45:33.268Z"
   },
   {
     "id": "mb45682",
-    "name": "Mehdi B",
-    "email": "mehdi.b@example.com",
+    "name": "Mehdi Benis",
+    "email": "mehdi.bennis@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MWZ",
     "createdAt": "2024-04-15T09:04:00Z",
-    "updatedAt": "2024-04-15T09:04:00Z"
+    "updatedAt": "2025-06-23T15:46:03.024Z"
   },
   {
     "id": "ag45683",
     "name": "Anas Ghamri",
-    "email": "anas.ghamri@example.com",
+    "email": "anas.ghamri@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MTT",
@@ -62,7 +62,7 @@
   {
     "id": "y45684",
     "name": "Youssef",
-    "email": "youssef@example.com",
+    "email": "youssef@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045N0Wi7-1165G7",
@@ -72,7 +72,7 @@
   {
     "id": "m45685",
     "name": "Mohamed",
-    "email": "mohamed@example.com",
+    "email": "mohamed@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MT5",
@@ -82,7 +82,7 @@
   {
     "id": "ye45686",
     "name": "Youssra EL Machraa",
-    "email": "youssra.elmachraa@example.com",
+    "email": "youssra.elmachraa@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045ND5",
@@ -92,7 +92,7 @@
   {
     "id": "ne45687",
     "name": "Nouhayla EL HADRI",
-    "email": "nouhayla.elhadri@example.com",
+    "email": "nouhayla.elhadri@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PVH",
@@ -102,7 +102,7 @@
   {
     "id": "me45688",
     "name": "Mounia E.",
-    "email": "mounia.e@example.com",
+    "email": "mounia.e@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PMR",
@@ -112,7 +112,7 @@
   {
     "id": "aa45689",
     "name": "Anouar AIT ABDELMALEK",
-    "email": "anouar.aitabdelmalek@example.com",
+    "email": "anouar.aitabdelmalek@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2045MV4",
@@ -122,7 +122,7 @@
   {
     "id": "im45690",
     "name": "Ismail mountasser",
-    "email": "ismail.mountasser@example.com",
+    "email": "ismail.mountasser@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PYC",
@@ -132,7 +132,7 @@
   {
     "id": "l45691",
     "name": "Loubna",
-    "email": "loubna@example.com",
+    "email": "loubna@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PHL",
@@ -142,7 +142,7 @@
   {
     "id": "sz45692",
     "name": "Safaa Zakine",
-    "email": "safaa.zakine@example.com",
+    "email": "safaa.zakine@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PHZ",
@@ -152,7 +152,7 @@
   {
     "id": "yh45693",
     "name": "Yassmine Hsaini",
-    "email": "yassmine.hsaini@example.com",
+    "email": "yassmine.hsaini@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "5CD2042PSK",
@@ -162,7 +162,7 @@
   {
     "id": "g45694",
     "name": "Ghada",
-    "email": "ghada@example.com",
+    "email": "ghada@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "",
@@ -172,7 +172,7 @@
   {
     "id": "bz45695",
     "name": "Benhebibi Ziad",
-    "email": "benhebibi.ziad@example.com",
+    "email": "benhebibi.ziad@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "",
@@ -182,41 +182,11 @@
   {
     "id": "a45697",
     "name": "Abdelhay",
-    "email": "abdelhay@example.com",
+    "email": "abdelhay@reetain.com",
     "department": "IT",
     "position": "Consultant",
     "pcReference": "",
     "createdAt": "2024-04-15T09:19:00Z",
     "updatedAt": "2024-04-15T09:19:00Z"
-  },
-  {
-    "id": "sb45698",
-    "name": "Slim BALTI",
-    "email": "slim.balti@example.com",
-    "department": "IT",
-    "position": "Consultant",
-    "pcReference": "",
-    "createdAt": "2024-04-15T09:20:00Z",
-    "updatedAt": "2024-04-15T09:20:00Z"
-  },
-  {
-    "id": "i45699",
-    "name": "Imane",
-    "email": "imane@example.com",
-    "department": "IT",
-    "position": "Consultant",
-    "pcReference": "",
-    "createdAt": "2024-04-15T09:21:00Z",
-    "updatedAt": "2024-04-15T09:21:00Z"
-  },
-  {
-    "id": "p45700",
-    "name": "Peter",
-    "email": "peter@example.com",
-    "department": "IT",
-    "position": "Consultant",
-    "pcReference": "",
-    "createdAt": "2024-04-15T09:22:00Z",
-    "updatedAt": "2024-04-15T09:22:00Z"
   }
 ]
