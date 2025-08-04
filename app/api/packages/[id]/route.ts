@@ -12,7 +12,11 @@ export async function GET(
     const pkg = await prisma.package.findUnique({
       where: { id },
       include: {
-        laptop: true,
+        laptop: {
+          include: {
+            supportedProfiles: true
+          }
+        },
         accessories: {
           include: {
             accessory: true
@@ -117,7 +121,11 @@ export async function PUT(
     const refreshedPackage = await prisma.package.findUnique({
       where: { id },
       include: {
-        laptop: true,
+        laptop: {
+          include: {
+            supportedProfiles: true
+          }
+        },
         accessories: {
           include: {
             accessory: true

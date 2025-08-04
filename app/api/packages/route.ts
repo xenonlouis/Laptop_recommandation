@@ -6,7 +6,11 @@ export async function GET(req: NextRequest) {
   try {
     const packages = await prisma.package.findMany({
       include: {
-        laptop: true,
+        laptop: {
+          include: {
+            supportedProfiles: true
+          }
+        },
         accessories: {
           include: {
             accessory: true
@@ -67,7 +71,11 @@ export async function POST(req: NextRequest) {
         } : undefined
       },
       include: {
-        laptop: true,
+        laptop: {
+          include: {
+            supportedProfiles: true
+          }
+        },
         accessories: {
           include: {
             accessory: true

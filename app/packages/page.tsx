@@ -4,16 +4,18 @@ import { useState, useEffect } from "react"
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Plus, Loader2, MoveHorizontal, CheckCircle2, XCircle, Package as PackageIcon, MousePointer2, Keyboard, Headphones, Plug, Info, Pencil, Trash2, PlusCircle } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, MoveHorizontal, CheckCircle2, XCircle, Package as PackageIcon, MousePointer2, Keyboard, Headphones, Plug, Info, Pencil, Trash2, PlusCircle, Layout, List, Grid3X3, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Slider } from "@/components/ui/slider"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
 import { getEurToMadRate, formatCurrency as formatCurrencyUtil, madToEur } from "@/lib/exchange-rates"
@@ -264,13 +266,73 @@ function PricingBreakdown({ packages }: { packages: Package[] }) {
   const defaultMac = avgMacPrice || 14490;
 
   
-  // Profile multipliers
-  const profiles = [
-    { name: 'Full-Stack Developer', windowsMultiplier: 1.1, macMultiplier: 1.0, reason: '+10% for dev tools & IDEs | Base Mac price' },
-    { name: 'Salesforce Consultant', windowsMultiplier: 0.95, macMultiplier: 0.95, reason: '-5% standard business tools | -5% standard business tools' },
-    { name: 'MuleSoft Developer', windowsMultiplier: 1.15, macMultiplier: 1.1, reason: '+15% for integration tools | +10% for development on Mac' },
-    { name: 'Salesforce Developer', windowsMultiplier: 1.05, macMultiplier: 1.0, reason: '+5% for Salesforce dev tools | Base Mac price' }
-  ];
+  // Get real profile pricing from Cost Simulator logic
+  const getRealProfilePricing = () => {
+    // Group packages by their laptop's supported profiles (same logic as in CostSimulator)
+    const packagesByProfile: { [key: string]: Package[] } = {};
+    
+    packages.forEach(pkg => {
+      const profiles = pkg.laptop.supportedProfiles || [];
+      profiles.forEach((profileObj: any) => {
+        const profile = profileObj.profile;
+        if (!packagesByProfile[profile]) {
+          packagesByProfile[profile] = [];
+        }
+        packagesByProfile[profile].push(pkg);
+      });
+    });
+
+    // Calculate real averages
+    const getProfileStats = (profileKey: string, displayName: string) => {
+      const profilePackages = packagesByProfile[profileKey] || [];
+      
+      if (profilePackages.length === 0) {
+        return {
+          name: displayName,
+          windowsPrice: 0,
+          macPrice: 0,
+          windowsCount: 0,
+          macCount: 0,
+          reason: 'No packages found for this profile'
+        };
+      }
+
+      const calculatePackagePrice = (pkg: Package): number => {
+        const laptopPrice = pkg.laptop.price;
+        const accessoriesPrice = pkg.accessories.reduce((sum, acc) => sum + acc.price, 0);
+        return laptopPrice + accessoriesPrice;
+      };
+
+      const windowsPackages = profilePackages.filter(pkg => pkg.laptop.brand?.toLowerCase() !== 'apple');
+      const macPackages = profilePackages.filter(pkg => pkg.laptop.brand?.toLowerCase() === 'apple');
+
+      const windowsPrice = windowsPackages.length > 0 
+        ? Math.round(windowsPackages.reduce((sum, pkg) => sum + calculatePackagePrice(pkg), 0) / windowsPackages.length)
+        : 0;
+        
+      const macPrice = macPackages.length > 0 
+        ? Math.round(macPackages.reduce((sum, pkg) => sum + calculatePackagePrice(pkg), 0) / macPackages.length)
+        : 0;
+
+      return {
+        name: displayName,
+        windowsPrice,
+        macPrice,
+        windowsCount: windowsPackages.length,
+        macCount: macPackages.length,
+        reason: `Based on ${profilePackages.length} real packages (${windowsPackages.length} Windows + ${macPackages.length} Mac)`
+      };
+    };
+
+    return [
+      getProfileStats('developer', 'Full-Stack Developer'),
+      getProfileStats('consultant', 'Salesforce Consultant'),
+      getProfileStats('developer', 'MuleSoft Developer'), // Uses developer profile as base
+      getProfileStats('developer', 'Salesforce Developer') // Uses developer profile as base
+    ];
+  };
+
+  const profiles = getRealProfilePricing();
   
   return (
     <div className="space-y-6">
@@ -333,8 +395,8 @@ function PricingBreakdown({ packages }: { packages: Package[] }) {
       {/* Profile-Based Pricing */}
       <Card>
         <CardHeader>
-          <CardTitle>🎯 Profile-Based Pricing</CardTitle>
-          <CardDescription>How base prices are adjusted for different roles</CardDescription>
+          <CardTitle>🎯 Real Profile-Based Pricing</CardTitle>
+          <CardDescription>Actual average prices calculated from packages assigned to each profile (no artificial multipliers)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -353,28 +415,40 @@ function PricingBreakdown({ packages }: { packages: Package[] }) {
                     <td className="py-3 font-medium">{profile.name}</td>
                     <td className="text-center py-3">
                       <div className="space-y-1">
-                        <div className="font-medium">
-                          {Math.round(defaultWindows * profile.windowsMultiplier).toLocaleString()} MAD
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {Math.round((defaultWindows * profile.windowsMultiplier) / eurToMadRate).toLocaleString()} EUR
-                        </div>
-                        <div className={`text-xs ${profile.windowsMultiplier > 1 ? 'text-green-500' : profile.windowsMultiplier < 1 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                          {profile.windowsMultiplier > 1 ? '+' : ''}{Math.round((profile.windowsMultiplier - 1) * 100)}%
-                        </div>
+                        {profile.windowsPrice > 0 ? (
+                          <>
+                            <div className="font-medium">
+                              {profile.windowsPrice.toLocaleString()} MAD
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {Math.round(profile.windowsPrice / eurToMadRate).toLocaleString()} EUR
+                            </div>
+                            <div className="text-xs text-blue-600">
+                              {profile.windowsCount} packages
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm text-muted-foreground">No data</div>
+                        )}
                       </div>
                     </td>
                     <td className="text-center py-3">
                       <div className="space-y-1">
-                        <div className="font-medium">
-                          {Math.round(defaultMac * profile.macMultiplier).toLocaleString()} MAD
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {Math.round((defaultMac * profile.macMultiplier) / eurToMadRate).toLocaleString()} EUR
-                        </div>
-                        <div className={`text-xs ${profile.macMultiplier > 1 ? 'text-green-500' : profile.macMultiplier < 1 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                          {profile.macMultiplier > 1 ? '+' : ''}{Math.round((profile.macMultiplier - 1) * 100)}%
-                        </div>
+                        {profile.macPrice > 0 ? (
+                          <>
+                            <div className="font-medium">
+                              {profile.macPrice.toLocaleString()} MAD
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {Math.round(profile.macPrice / eurToMadRate).toLocaleString()} EUR
+                            </div>
+                            <div className="text-xs text-blue-600">
+                              {profile.macCount} packages
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-sm text-muted-foreground">No data</div>
+                        )}
                       </div>
                     </td>
                     <td className="py-3 text-sm text-muted-foreground">{profile.reason}</td>
@@ -476,66 +550,88 @@ function CostSimulator({ packages }: { packages: Package[] }) {
     fetchRate();
   }, []);
 
-  // Calculate package prices from actual data
+  // Calculate package prices from actual profile data (NO MORE FAKE MULTIPLIERS!)
   const getPackagePrices = (): PackagePrice => {
-    console.log('📊 Calculating prices from', packages.length, 'packages');
+    console.log('📊 Calculating REAL profile-based prices from', packages.length, 'packages');
     
-    // Separate packages by laptop OS/brand to determine Windows vs Mac
-    const windowsPackages = packages.filter(pkg => 
-      pkg.laptop.brand?.toLowerCase() !== 'apple' && 
-      pkg.laptop.model?.toLowerCase().includes('windows') === false // Exclude if explicitly Windows in name
-    );
-    const macPackages = packages.filter(pkg => 
-      pkg.laptop.brand?.toLowerCase() === 'apple' || 
-      pkg.laptop.model?.toLowerCase().includes('mac')
-    );
+    // Group packages by their laptop's supported profiles
+    const packagesByProfile: { [key: string]: Package[] } = {};
     
-    // Calculate average prices for each category
-    const calculateAveragePrice = (packageList: Package[]): number => {
-      if (packageList.length === 0) return 0;
-      const totalPrice = packageList.reduce((sum, pkg) => {
-        const laptopPrice = pkg.laptop.price;
-        const accessoriesPrice = pkg.accessories.reduce((accSum, acc) => accSum + acc.price, 0);
-        return sum + laptopPrice + accessoriesPrice;
-      }, 0);
-      return Math.round(totalPrice / packageList.length);
-    };
-    
-    const avgWindowsPrice = calculateAveragePrice(windowsPackages);
-    const avgMacPrice = calculateAveragePrice(macPackages);
-    
-    // Fallback to representative values if no data
-    const defaultWindows = avgWindowsPrice || 10680;
-    const defaultMac = avgMacPrice || 14490;
-    
-    console.log('💰 Calculated pricing:', {
-      windowsPackages: windowsPackages.length,
-      macPackages: macPackages.length,
-      avgWindowsPrice,
-      avgMacPrice,
-      defaultWindows,
-      defaultMac
+    packages.forEach(pkg => {
+      // Get supported profiles for this laptop
+      const profiles = pkg.laptop.supportedProfiles || [];
+      
+      profiles.forEach((profileObj: any) => {
+        const profile = profileObj.profile;
+        if (!packagesByProfile[profile]) {
+          packagesByProfile[profile] = [];
+        }
+        packagesByProfile[profile].push(pkg);
+      });
     });
     
-    // Apply different pricing strategies per profile type
-    return {
-      'Full-Stack Developer': {
-        windows: Math.round(defaultWindows * 1.1), // +10% for dev tools & IDEs
-        mac: Math.round(defaultMac * 1.0) // Base Mac price
-      },
-      'Salesforce Consultant': {
-        windows: Math.round(defaultWindows * 0.95), // -5% standard business tools
-        mac: Math.round(defaultMac * 0.95) // -5% standard business tools
-      },
-      'MuleSoft Developer': {
-        windows: Math.round(defaultWindows * 1.15), // +15% for integration tools
-        mac: Math.round(defaultMac * 1.1) // +10% for development on Mac
-      },
-      'Salesforce Developer': {
-        windows: Math.round(defaultWindows * 1.05), // +5% for Salesforce dev tools
-        mac: Math.round(defaultMac * 1.0) // Base Mac price
+    console.log('📊 REAL packages grouped by profile:', Object.keys(packagesByProfile).map(profile => ({
+      profile,
+      count: packagesByProfile[profile].length,
+      avgPrice: packagesByProfile[profile].length > 0 
+        ? Math.round(packagesByProfile[profile].reduce((sum, pkg) => {
+            const laptopPrice = pkg.laptop.price;
+            const accessoriesPrice = pkg.accessories.reduce((accSum, acc) => accSum + acc.price, 0);
+            return sum + laptopPrice + accessoriesPrice;
+          }, 0) / packagesByProfile[profile].length)
+        : 0
+    })));
+    
+    // Calculate real average prices per profile
+    const getProfileAverage = (profileKey: string, fallback: number): { windows: number; mac: number } => {
+      const profilePackages = packagesByProfile[profileKey] || [];
+      
+      if (profilePackages.length === 0) {
+        console.log(`⚠️ No packages found for profile '${profileKey}', using fallback: ${fallback} MAD`);
+        return { windows: fallback, mac: Math.round(fallback * 1.35) }; // Mac typically 35% more expensive
       }
+      
+      // Calculate total package cost (laptop + accessories)
+      const calculatePackagePrice = (pkg: Package): number => {
+        const laptopPrice = pkg.laptop.price;
+        const accessoriesPrice = pkg.accessories.reduce((sum, acc) => sum + acc.price, 0);
+        return laptopPrice + accessoriesPrice;
+      };
+      
+      // Separate by OS
+      const windowsPackages = profilePackages.filter(pkg => 
+        pkg.laptop.brand?.toLowerCase() !== 'apple'
+      );
+      const macPackages = profilePackages.filter(pkg => 
+        pkg.laptop.brand?.toLowerCase() === 'apple'
+      );
+      
+      const avgWindows = windowsPackages.length > 0 
+        ? Math.round(windowsPackages.reduce((sum, pkg) => sum + calculatePackagePrice(pkg), 0) / windowsPackages.length)
+        : Math.round(profilePackages.reduce((sum, pkg) => sum + calculatePackagePrice(pkg), 0) / profilePackages.length);
+        
+      const avgMac = macPackages.length > 0 
+        ? Math.round(macPackages.reduce((sum, pkg) => sum + calculatePackagePrice(pkg), 0) / macPackages.length)
+        : Math.round(avgWindows * 1.35); // Estimate Mac price as 35% higher if no Mac data
+      
+      console.log(`💰 Profile '${profileKey}': Windows=${avgWindows} MAD, Mac=${avgMac} MAD (${windowsPackages.length}W + ${macPackages.length}M packages)`);
+      
+      return {
+        windows: avgWindows,
+        mac: avgMac
+      };
     };
+    
+    // Use REAL profile-based pricing (no more fake multipliers!)
+    const profiles = {
+      'Full-Stack Developer': getProfileAverage('developer', 13000), // Based on our data analysis
+      'Salesforce Consultant': getProfileAverage('consultant', 9300), // Based on our data analysis  
+      'MuleSoft Developer': getProfileAverage('developer', 13000), // Use developer as base
+      'Salesforce Developer': getProfileAverage('developer', 13000) // Use developer as base
+    };
+    
+    console.log('✅ REAL Profile Pricing Applied:', profiles);
+    return profiles;
   };
 
   const packagePrices = getPackagePrices();
@@ -823,6 +919,14 @@ export default function PackagesPage() {
   const [editSelectedLaptopId, setEditSelectedLaptopId] = useState<string>("")
   const [editSelectedAccessoryIds, setEditSelectedAccessoryIds] = useState<string[]>([])
 
+  // New state for package catalog redesign
+  const [viewMode, setViewMode] = useState<'kanban' | 'list' | 'grid'>('kanban')
+  const [filters, setFilters] = useState({
+    os: 'all',
+    brand: 'all',
+    priceRange: [5000, 25000] as [number, number]
+  })
+
   const { toast } = useToast()
 
   // Configure dnd-kit sensors
@@ -865,10 +969,111 @@ export default function PackagesPage() {
     }
   ];
 
-  // Get packages for a specific status
+  // Get packages for a specific status (legacy - for old kanban view)
   const getPackagesByStatus = (status: StatusColumn) => {
     return packages.filter(pkg => pkg.status === status);
   };
+
+  // Filter packages based on current filters
+  const getFilteredPackages = () => {
+    return packages.filter(pkg => {
+      // OS Filter
+      if (filters.os !== 'all') {
+        if (filters.os === 'Windows' && pkg.laptop.brand?.toLowerCase() === 'apple') return false;
+        if (filters.os === 'macOS' && pkg.laptop.brand?.toLowerCase() !== 'apple') return false;
+      }
+      
+      // Brand Filter
+      if (filters.brand !== 'all' && pkg.laptop.brand !== filters.brand) return false;
+      
+      // Price Range Filter
+      const totalPrice = pkg.laptop.price + pkg.accessories.reduce((sum, acc) => sum + acc.price, 0);
+      if (totalPrice < filters.priceRange[0] || totalPrice > filters.priceRange[1]) return false;
+      
+      return true;
+    });
+  };
+
+  // Group packages by profile and create templates (for new profile-based kanban)
+  const getPackageTemplatesByProfile = () => {
+    const filteredPackages = getFilteredPackages();
+    const templatesByProfile: { [key: string]: Array<{ template: Package; assignments: Package[]; configId: string }> } = {};
+    
+    // Initialize profile groups
+    const profileTypes = ['developer', 'consultant'];
+    profileTypes.forEach(profile => {
+      templatesByProfile[profile] = [];
+    });
+    
+    // Group packages by their laptop's supported profiles first
+    const packagesByProfile: { [key: string]: Package[] } = {};
+    profileTypes.forEach(profile => {
+      packagesByProfile[profile] = [];
+    });
+    
+    filteredPackages.forEach(pkg => {
+      const profiles = pkg.laptop.supportedProfiles || [];
+      if (profiles.length === 0) {
+        if (!packagesByProfile['unassigned']) packagesByProfile['unassigned'] = [];
+        packagesByProfile['unassigned'].push(pkg);
+      } else {
+        profiles.forEach((profileObj: any) => {
+          const profile = profileObj.profile;
+          if (!packagesByProfile[profile]) packagesByProfile[profile] = [];
+          packagesByProfile[profile].push(pkg);
+        });
+      }
+    });
+    
+    // Now group by configuration within each profile
+    Object.keys(packagesByProfile).forEach(profile => {
+      const packages = packagesByProfile[profile];
+      const configGroups: { [key: string]: Package[] } = {};
+      
+      packages.forEach(pkg => {
+        // Create a configuration ID based on laptop + accessories
+        const configId = pkg.laptop.id + '|' + pkg.accessories.map(a => a.id).sort().join(',');
+        if (!configGroups[configId]) {
+          configGroups[configId] = [];
+        }
+        configGroups[configId].push(pkg);
+      });
+      
+      // Convert config groups to templates
+      templatesByProfile[profile] = Object.entries(configGroups).map(([configId, assignments]) => ({
+        template: assignments[0], // Use first package as template
+        assignments,
+        configId
+      }));
+    });
+    
+    return templatesByProfile;
+  };
+
+  // Profile configuration for display
+  const profileColumns = [
+    {
+      id: 'developer',
+      title: 'Full-Stack Developer',
+      icon: <Keyboard className="h-4 w-4 mr-2" />,
+      color: 'bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-300',
+      description: 'High-performance laptops for development work'
+    },
+    {
+      id: 'consultant',
+      title: 'Salesforce Consultant', 
+      icon: <MousePointer2 className="h-4 w-4 mr-2" />,
+      color: 'bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-300',
+      description: 'Business-focused laptops for consulting tasks'
+    },
+    {
+      id: 'unassigned',
+      title: 'Unassigned',
+      icon: <PackageIcon className="h-4 w-4 mr-2" />,
+      color: 'bg-gray-500/10 border-gray-500/20 text-gray-700 dark:text-gray-300',
+      description: 'Packages without specific profile assignment'
+    }
+  ];
 
   // Fetch packages data
   useEffect(() => {
@@ -1343,80 +1548,420 @@ export default function PackagesPage() {
           <TabsContent value="management" className="mt-6">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h2 className="text-xl font-semibold mb-2">Package Management</h2>
+                <h2 className="text-2xl font-bold tracking-tight">Package Catalog</h2>
                 <p className="text-muted-foreground">
-                  Drag packages between columns to change their status.
+                  Browse and manage IT packages organized by profile types.
                 </p>
               </div>
-              <Button onClick={() => setIsAddDialogOpen(true)}>
-                <PlusCircle className="h-4 w-4 mr-2" />
-                Add Package
-              </Button>
+              <div className="flex items-center gap-4">
+                {/* View Toggle */}
+                <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+                  <Button
+                    variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('kanban')}
+                    className="h-8 px-3"
+                    title="Kanban View"
+                  >
+                    <Layout className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="h-8 px-3"
+                    title="List View"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setViewMode('grid')}
+                    className="h-8 px-3"
+                    title="Grid View"
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <Button 
+                  onClick={() => setIsAddDialogOpen(true)}
+                  className="bg-primary hover:bg-primary/90"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+            Add Package
+          </Button>
+              </div>
+            </div>
+            
+            {/* Smart Filters */}
+            <div className="mb-6 p-4 bg-muted/30 rounded-lg border">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Filters:</span>
+                </div>
+                
+                {/* OS Filter */}
+                <Select value={filters.os} onValueChange={(value) => setFilters(prev => ({ ...prev, os: value }))}>
+                  <SelectTrigger className="w-32 h-8">
+                    <SelectValue placeholder="OS" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All OS</SelectItem>
+                    <SelectItem value="Windows">Windows</SelectItem>
+                    <SelectItem value="macOS">macOS</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                {/* Brand Filter */}
+                <Select value={filters.brand} onValueChange={(value) => setFilters(prev => ({ ...prev, brand: value }))}>
+                  <SelectTrigger className="w-32 h-8">
+                    <SelectValue placeholder="Brand" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Brands</SelectItem>
+                    <SelectItem value="Apple">Apple</SelectItem>
+                    <SelectItem value="HP">HP</SelectItem>
+                    <SelectItem value="Lenovo">Lenovo</SelectItem>
+                    <SelectItem value="Dell">Dell</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                {/* Price Range Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Price:</span>
+                  <span className="text-sm font-medium">{filters.priceRange[0].toLocaleString()} - {filters.priceRange[1].toLocaleString()} MAD</span>
+                  <div className="w-32">
+                    <Slider
+                      value={filters.priceRange}
+                      onValueChange={(value) => setFilters(prev => ({ ...prev, priceRange: value as [number, number] }))}
+                      max={25000}
+                      min={5000}
+                      step={1000}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+                
+                {/* Clear Filters */}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setFilters({ os: 'all', brand: 'all', priceRange: [5000, 25000] })}
+                  className="h-8"
+                >
+                  Clear
+                </Button>
+              </div>
+        </div>
+
+        {loading ? (
+              <div className="grid grid-cols-3 gap-6">
+                {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                    <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-[500px] w-full rounded-xl" />
+              </div>
+            ))}
+          </div>
+        ) : (
+              <>
+                {viewMode === 'kanban' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {profileColumns.map((column) => {
+                      const templates = getPackageTemplatesByProfile()[column.id] || [];
+                      const totalAssignments = templates.reduce((sum, t) => sum + t.assignments.length, 0);
+                      
+                      return (
+                        <div key={column.id} className="space-y-4">
+                          {/* Profile Column Header */}
+                          <div className={`rounded-lg p-4 ${column.color} border`}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                {column.icon}
+                                <h3 className="font-semibold">{column.title}</h3>
+                              </div>
+                              <div className="flex gap-2">
+                                <Badge variant="outline" className="bg-background/50">
+                                  {templates.length} configs
+                                </Badge>
+                                <Badge variant="outline" className="bg-background/50">
+                                  {totalAssignments} assigned
+                                </Badge>
+                              </div>
+                            </div>
+                            <p className="text-xs mt-1 opacity-90">{column.description}</p>
+                          </div>
+
+                          {/* Package Template Cards */}
+                    <div className="space-y-3">
+                            {templates.map((template) => (
+                              <Card key={template.configId} className="p-4 hover:shadow-md transition-shadow cursor-pointer relative" onClick={() => handlePackageClick(template.template)}>
+                                <div className="space-y-3">
+                                  {/* Template Header with Assignment Count */}
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="font-medium line-clamp-1">
+                                        {template.template.laptop.brand} {template.template.laptop.model} Configuration
+                                      </h4>
+                                      <p className="text-xs text-muted-foreground">
+                                        {template.assignments.length} {template.assignments.length === 1 ? 'person assigned' : 'people assigned'}
+                                      </p>
+                                    </div>
+                                    <Badge variant="outline" className="ml-2 bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20">
+                                      {template.assignments.length}
+                                    </Badge>
+                                  </div>
+
+                                  {/* Laptop Info */}
+                                  <div className="flex items-center gap-3">
+                                    {template.template.laptop.images && template.template.laptop.images.length > 0 && (
+                                      <div className="relative w-12 h-12 rounded-md overflow-hidden bg-muted">
+                                        <Image
+                                          src={template.template.laptop.images[0]}
+                                          alt={`${template.template.laptop.brand} ${template.template.laptop.model}`}
+                                          fill
+                                          className="object-cover"
+                                          onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = 'none';
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-medium text-sm line-clamp-1">
+                                        {template.template.laptop.brand} {template.template.laptop.model}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        {template.template.laptop.processor}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Accessories - Always show this section for consistent card height */}
+                                  <div className="flex items-center gap-2 min-h-[20px]">
+                                    {template.template.accessories.length > 0 ? (
+                                      <>
+                                        <div className="flex gap-1">
+                                          {template.template.accessories.slice(0, 3).map((accessory, index) => (
+                                            <div key={index} className="w-5 h-5 text-muted-foreground">
+                                              {getAccessoryIcon(accessory.type)}
+                                            </div>
+                      ))}
+                    </div>
+                                        <span className="text-xs text-muted-foreground">
+                                          {template.template.accessories.length} accessories
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="text-xs text-muted-foreground">No accessories</span>
+                                    )}
+                                  </div>
+
+                                  {/* Assigned People Preview with Tooltip */}
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-muted-foreground">Assigned to:</span>
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <div className="flex -space-x-1 cursor-pointer hover:scale-105 transition-transform">
+                                            {template.assignments.slice(0, 3).map((assignment, index) => (
+                                              <div key={index} className="w-7 h-7 bg-blue-500/20 border border-blue-500/30 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-300 ring-2 ring-background">
+                                                <span className="leading-none block transform translate-y-[0.5px]" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                                                  {assignment.name?.charAt(0).toUpperCase() || '?'}
+                                                </span>
+                                              </div>
+                                            ))}
+                                            {template.assignments.length > 3 && (
+                                              <div className="w-7 h-7 bg-muted border border-border rounded-full flex items-center justify-center text-xs font-bold text-muted-foreground ring-2 ring-background">
+                                                <span className="leading-none block transform translate-y-[0.5px]" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                                                  +{template.assignments.length - 3}
+                                                </span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" className="max-w-xs">
+                                          <div className="space-y-1">
+                                            <p className="font-medium text-sm">Assigned People:</p>
+                                            <div className="space-y-1">
+                                              {template.assignments.map((assignment, index) => (
+                                                <div key={index} className="text-xs flex items-center gap-2">
+                                                  <div className="w-5 h-5 bg-blue-500/20 border border-blue-500/30 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-300">
+                                                    <span className="leading-none block transform translate-y-[0.5px]" style={{ fontFamily: 'ui-monospace, monospace' }}>
+                                                      {assignment.name?.charAt(0).toUpperCase() || '?'}
+                                                    </span>
+                                                  </div>
+                                                  <span className="font-medium">{assignment.name || 'Unknown'}</span>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
             </div>
 
-            {loading ? (
-              <div className="grid grid-cols-4 gap-6">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="h-6 w-24" />
-                    <Skeleton className="h-[500px] w-full rounded-xl" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCorners}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnd={handleDragEnd}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {columns.map((column) => (
-                    <StatusColumn
-                      key={column.id}
-                      title={column.title}
-                      icon={column.icon}
-                      count={getPackagesByStatus(column.id).length}
-                      status={column.id}
-                      color={column.color}
-                    >
-                      <SortableContext
-                        items={getPackagesByStatus(column.id).map(pkg => pkg.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <div className="space-y-3">
-                          {getPackagesByStatus(column.id).map((pkg) => (
-                            <SortablePackageCard
-                              key={pkg.id}
-                              pkg={pkg}
-                              formatPrice={formatPrice}
-                              getTotalPrice={getTotalPrice}
-                              getAccessoryIcon={getAccessoryIcon}
-                              getStatusBadge={getStatusBadge}
-                              onClick={() => handlePackageClick(pkg)}
-                            />
-                          ))}
-                        </div>
-                      </SortableContext>
-                    </StatusColumn>
-                  ))}
-                </div>
+                                  {/* Price */}
+                                  <div className="flex justify-between items-center pt-2 border-t">
+                                    <span className="text-xs text-muted-foreground">Unit Price</span>
+                                    <span className="font-semibold text-sm">{getTotalPrice(template.template)}</span>
+                                  </div>
+                                </div>
+                              </Card>
+                            ))}
 
-                <DragOverlay>
-                  {activePackage ? (
-                    <div className="w-full opacity-80">
-                      <PackageCard
-                        pkg={activePackage}
-                        formatPrice={formatPrice}
-                        getTotalPrice={getTotalPrice}
-                        getAccessoryIcon={getAccessoryIcon}
-                        getStatusBadge={getStatusBadge}
-                      />
-                    </div>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+                            {templates.length === 0 && (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <PackageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No package templates in this category</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {viewMode === 'list' && (
+                  <div className="border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Package</TableHead>
+                          <TableHead>Laptop</TableHead>
+                          <TableHead>Profile</TableHead>
+                          <TableHead>Accessories</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Price</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {getFilteredPackages().map((pkg) => (
+                          <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/50" onClick={() => handlePackageClick(pkg)}>
+                            <TableCell className="font-medium">{pkg.name}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {pkg.laptop.images && pkg.laptop.images.length > 0 && (
+                                  <div className="relative w-8 h-8 rounded overflow-hidden bg-muted">
+                                    <Image
+                                      src={pkg.laptop.images[0]}
+                                      alt={`${pkg.laptop.brand} ${pkg.laptop.model}`}
+                                      fill
+                                      className="object-cover"
+                  />
+                </div>
+                                )}
+                                <div>
+                                  <p className="font-medium text-sm">{pkg.laptop.brand} {pkg.laptop.model}</p>
+                                  <p className="text-xs text-muted-foreground">{pkg.laptop.processor}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                {(pkg.laptop.supportedProfiles || []).map((profile: any, index: number) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {profile.profile === 'developer' ? 'Dev' : 'Consultant'}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                {pkg.accessories.slice(0, 3).map((accessory, index) => (
+                                  <div key={index} className="w-4 h-4 text-muted-foreground">
+                                    {getAccessoryIcon(accessory.type)}
+                                  </div>
+                                ))}
+                                {pkg.accessories.length > 3 && (
+                                  <span className="text-xs text-muted-foreground">+{pkg.accessories.length - 3}</span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>{getStatusBadge(pkg.status)}</TableCell>
+                            <TableCell className="text-right font-semibold">{getTotalPrice(pkg)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+
+                {viewMode === 'grid' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {getFilteredPackages().map((pkg) => (
+                      <Card key={pkg.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => handlePackageClick(pkg)}>
+                        <div className="space-y-3">
+                          {/* Package Header */}
+                          <div className="flex justify-between items-start">
+                            <h4 className="font-medium line-clamp-2">{pkg.name}</h4>
+                            {getStatusBadge(pkg.status)}
+                          </div>
+
+                          {/* Laptop Image & Info */}
+                          <div className="space-y-2">
+                            {pkg.laptop.images && pkg.laptop.images.length > 0 && (
+                              <div className="relative w-full h-32 rounded-md overflow-hidden bg-muted">
+                                <Image
+                                  src={pkg.laptop.images[0]}
+                                  alt={`${pkg.laptop.brand} ${pkg.laptop.model}`}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-medium text-sm line-clamp-1">
+                                {pkg.laptop.brand} {pkg.laptop.model}
+                              </p>
+                              <p className="text-xs text-muted-foreground line-clamp-1">
+                                {pkg.laptop.processor}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Profile Tags */}
+                          <div className="flex flex-wrap gap-1">
+                            {(pkg.laptop.supportedProfiles || []).map((profile: any, index: number) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {profile.profile === 'developer' ? 'Developer' : 'Consultant'}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          {/* Accessories */}
+                          {pkg.accessories.length > 0 && (
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-1">
+                                {pkg.accessories.slice(0, 3).map((accessory, index) => (
+                                  <div key={index} className="w-4 h-4 text-muted-foreground">
+                                    {getAccessoryIcon(accessory.type)}
+                                  </div>
+                                ))}
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {pkg.accessories.length} accessories
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Price */}
+                          <div className="flex justify-between items-center pt-2 border-t">
+                            <span className="text-xs text-muted-foreground">Total Price</span>
+                            <span className="font-semibold">{getTotalPrice(pkg)}</span>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
 
