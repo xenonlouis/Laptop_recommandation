@@ -39,6 +39,21 @@ export type LaptopOS = $Result.DefaultSelection<Prisma.$LaptopOSPayload>
  */
 export type Accessory = $Result.DefaultSelection<Prisma.$AccessoryPayload>
 /**
+ * Model PackageTemplate
+ * 
+ */
+export type PackageTemplate = $Result.DefaultSelection<Prisma.$PackageTemplatePayload>
+/**
+ * Model TemplateAccessory
+ * 
+ */
+export type TemplateAccessory = $Result.DefaultSelection<Prisma.$TemplateAccessoryPayload>
+/**
+ * Model PersonAssignment
+ * 
+ */
+export type PersonAssignment = $Result.DefaultSelection<Prisma.$PersonAssignmentPayload>
+/**
  * Model Package
  * 
  */
@@ -253,6 +268,36 @@ export class PrismaClient<
     * ```
     */
   get accessory(): Prisma.AccessoryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.packageTemplate`: Exposes CRUD operations for the **PackageTemplate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PackageTemplates
+    * const packageTemplates = await prisma.packageTemplate.findMany()
+    * ```
+    */
+  get packageTemplate(): Prisma.PackageTemplateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.templateAccessory`: Exposes CRUD operations for the **TemplateAccessory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TemplateAccessories
+    * const templateAccessories = await prisma.templateAccessory.findMany()
+    * ```
+    */
+  get templateAccessory(): Prisma.TemplateAccessoryDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.personAssignment`: Exposes CRUD operations for the **PersonAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PersonAssignments
+    * const personAssignments = await prisma.personAssignment.findMany()
+    * ```
+    */
+  get personAssignment(): Prisma.PersonAssignmentDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.package`: Exposes CRUD operations for the **Package** model.
@@ -778,6 +823,9 @@ export namespace Prisma {
     LaptopProfile: 'LaptopProfile',
     LaptopOS: 'LaptopOS',
     Accessory: 'Accessory',
+    PackageTemplate: 'PackageTemplate',
+    TemplateAccessory: 'TemplateAccessory',
+    PersonAssignment: 'PersonAssignment',
     Package: 'Package',
     PackageAccessory: 'PackageAccessory',
     PackageAssignment: 'PackageAssignment',
@@ -804,7 +852,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "person" | "laptop" | "laptopProfile" | "laptopOS" | "accessory" | "package" | "packageAccessory" | "packageAssignment" | "tool" | "toolAlternative" | "toolkit" | "toolkitTool" | "surveyResponse"
+      modelProps: "person" | "laptop" | "laptopProfile" | "laptopOS" | "accessory" | "packageTemplate" | "templateAccessory" | "personAssignment" | "package" | "packageAccessory" | "packageAssignment" | "tool" | "toolAlternative" | "toolkit" | "toolkitTool" | "surveyResponse"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1175,6 +1223,228 @@ export namespace Prisma {
           count: {
             args: Prisma.AccessoryCountArgs<ExtArgs>
             result: $Utils.Optional<AccessoryCountAggregateOutputType> | number
+          }
+        }
+      }
+      PackageTemplate: {
+        payload: Prisma.$PackageTemplatePayload<ExtArgs>
+        fields: Prisma.PackageTemplateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PackageTemplateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PackageTemplateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          findFirst: {
+            args: Prisma.PackageTemplateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PackageTemplateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          findMany: {
+            args: Prisma.PackageTemplateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>[]
+          }
+          create: {
+            args: Prisma.PackageTemplateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          createMany: {
+            args: Prisma.PackageTemplateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PackageTemplateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>[]
+          }
+          delete: {
+            args: Prisma.PackageTemplateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          update: {
+            args: Prisma.PackageTemplateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          deleteMany: {
+            args: Prisma.PackageTemplateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PackageTemplateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PackageTemplateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>[]
+          }
+          upsert: {
+            args: Prisma.PackageTemplateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PackageTemplatePayload>
+          }
+          aggregate: {
+            args: Prisma.PackageTemplateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePackageTemplate>
+          }
+          groupBy: {
+            args: Prisma.PackageTemplateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PackageTemplateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PackageTemplateCountArgs<ExtArgs>
+            result: $Utils.Optional<PackageTemplateCountAggregateOutputType> | number
+          }
+        }
+      }
+      TemplateAccessory: {
+        payload: Prisma.$TemplateAccessoryPayload<ExtArgs>
+        fields: Prisma.TemplateAccessoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TemplateAccessoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TemplateAccessoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          findFirst: {
+            args: Prisma.TemplateAccessoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TemplateAccessoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          findMany: {
+            args: Prisma.TemplateAccessoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>[]
+          }
+          create: {
+            args: Prisma.TemplateAccessoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          createMany: {
+            args: Prisma.TemplateAccessoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TemplateAccessoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>[]
+          }
+          delete: {
+            args: Prisma.TemplateAccessoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          update: {
+            args: Prisma.TemplateAccessoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.TemplateAccessoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TemplateAccessoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TemplateAccessoryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>[]
+          }
+          upsert: {
+            args: Prisma.TemplateAccessoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TemplateAccessoryPayload>
+          }
+          aggregate: {
+            args: Prisma.TemplateAccessoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTemplateAccessory>
+          }
+          groupBy: {
+            args: Prisma.TemplateAccessoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TemplateAccessoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TemplateAccessoryCountArgs<ExtArgs>
+            result: $Utils.Optional<TemplateAccessoryCountAggregateOutputType> | number
+          }
+        }
+      }
+      PersonAssignment: {
+        payload: Prisma.$PersonAssignmentPayload<ExtArgs>
+        fields: Prisma.PersonAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PersonAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PersonAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.PersonAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PersonAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.PersonAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.PersonAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.PersonAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PersonAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.PersonAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          update: {
+            args: Prisma.PersonAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.PersonAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PersonAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PersonAssignmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.PersonAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PersonAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.PersonAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePersonAssignment>
+          }
+          groupBy: {
+            args: Prisma.PersonAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PersonAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PersonAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<PersonAssignmentCountAggregateOutputType> | number
           }
         }
       }
@@ -1859,6 +2129,9 @@ export namespace Prisma {
     laptopProfile?: LaptopProfileOmit
     laptopOS?: LaptopOSOmit
     accessory?: AccessoryOmit
+    packageTemplate?: PackageTemplateOmit
+    templateAccessory?: TemplateAccessoryOmit
+    personAssignment?: PersonAssignmentOmit
     package?: PackageOmit
     packageAccessory?: PackageAccessoryOmit
     packageAssignment?: PackageAssignmentOmit
@@ -1962,10 +2235,12 @@ export namespace Prisma {
 
   export type PersonCountOutputType = {
     packageAssignments: number
+    personAssignments: number
   }
 
   export type PersonCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     packageAssignments?: boolean | PersonCountOutputTypeCountPackageAssignmentsArgs
+    personAssignments?: boolean | PersonCountOutputTypeCountPersonAssignmentsArgs
   }
 
   // Custom InputTypes
@@ -1986,6 +2261,13 @@ export namespace Prisma {
     where?: PackageAssignmentWhereInput
   }
 
+  /**
+   * PersonCountOutputType without action
+   */
+  export type PersonCountOutputTypeCountPersonAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PersonAssignmentWhereInput
+  }
+
 
   /**
    * Count Type LaptopCountOutputType
@@ -1995,12 +2277,14 @@ export namespace Prisma {
     supportedProfiles: number
     supportedOS: number
     packages: number
+    packageTemplates: number
   }
 
   export type LaptopCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     supportedProfiles?: boolean | LaptopCountOutputTypeCountSupportedProfilesArgs
     supportedOS?: boolean | LaptopCountOutputTypeCountSupportedOSArgs
     packages?: boolean | LaptopCountOutputTypeCountPackagesArgs
+    packageTemplates?: boolean | LaptopCountOutputTypeCountPackageTemplatesArgs
   }
 
   // Custom InputTypes
@@ -2035,6 +2319,13 @@ export namespace Prisma {
     where?: PackageWhereInput
   }
 
+  /**
+   * LaptopCountOutputType without action
+   */
+  export type LaptopCountOutputTypeCountPackageTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PackageTemplateWhereInput
+  }
+
 
   /**
    * Count Type AccessoryCountOutputType
@@ -2042,10 +2333,12 @@ export namespace Prisma {
 
   export type AccessoryCountOutputType = {
     packageAccessories: number
+    templateAccessories: number
   }
 
   export type AccessoryCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     packageAccessories?: boolean | AccessoryCountOutputTypeCountPackageAccessoriesArgs
+    templateAccessories?: boolean | AccessoryCountOutputTypeCountTemplateAccessoriesArgs
   }
 
   // Custom InputTypes
@@ -2064,6 +2357,53 @@ export namespace Prisma {
    */
   export type AccessoryCountOutputTypeCountPackageAccessoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PackageAccessoryWhereInput
+  }
+
+  /**
+   * AccessoryCountOutputType without action
+   */
+  export type AccessoryCountOutputTypeCountTemplateAccessoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TemplateAccessoryWhereInput
+  }
+
+
+  /**
+   * Count Type PackageTemplateCountOutputType
+   */
+
+  export type PackageTemplateCountOutputType = {
+    accessories: number
+    assignments: number
+  }
+
+  export type PackageTemplateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    accessories?: boolean | PackageTemplateCountOutputTypeCountAccessoriesArgs
+    assignments?: boolean | PackageTemplateCountOutputTypeCountAssignmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PackageTemplateCountOutputType without action
+   */
+  export type PackageTemplateCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplateCountOutputType
+     */
+    select?: PackageTemplateCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PackageTemplateCountOutputType without action
+   */
+  export type PackageTemplateCountOutputTypeCountAccessoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TemplateAccessoryWhereInput
+  }
+
+  /**
+   * PackageTemplateCountOutputType without action
+   */
+  export type PackageTemplateCountOutputTypeCountAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PersonAssignmentWhereInput
   }
 
 
@@ -2380,6 +2720,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     packageAssignments?: boolean | Person$packageAssignmentsArgs<ExtArgs>
+    personAssignments?: boolean | Person$personAssignmentsArgs<ExtArgs>
     _count?: boolean | PersonCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["person"]>
 
@@ -2419,6 +2760,7 @@ export namespace Prisma {
   export type PersonOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "department" | "position" | "pcReference" | "createdAt" | "updatedAt", ExtArgs["result"]["person"]>
   export type PersonInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     packageAssignments?: boolean | Person$packageAssignmentsArgs<ExtArgs>
+    personAssignments?: boolean | Person$personAssignmentsArgs<ExtArgs>
     _count?: boolean | PersonCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type PersonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2428,6 +2770,7 @@ export namespace Prisma {
     name: "Person"
     objects: {
       packageAssignments: Prisma.$PackageAssignmentPayload<ExtArgs>[]
+      personAssignments: Prisma.$PersonAssignmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2833,6 +3176,7 @@ export namespace Prisma {
   export interface Prisma__PersonClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     packageAssignments<T extends Person$packageAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Person$packageAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    personAssignments<T extends Person$personAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, Person$personAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3282,6 +3626,30 @@ export namespace Prisma {
   }
 
   /**
+   * Person.personAssignments
+   */
+  export type Person$personAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    where?: PersonAssignmentWhereInput
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    cursor?: PersonAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PersonAssignmentScalarFieldEnum | PersonAssignmentScalarFieldEnum[]
+  }
+
+  /**
    * Person without action
    */
   export type PersonDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3577,6 +3945,7 @@ export namespace Prisma {
     supportedProfiles?: boolean | Laptop$supportedProfilesArgs<ExtArgs>
     supportedOS?: boolean | Laptop$supportedOSArgs<ExtArgs>
     packages?: boolean | Laptop$packagesArgs<ExtArgs>
+    packageTemplates?: boolean | Laptop$packageTemplatesArgs<ExtArgs>
     _count?: boolean | LaptopCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["laptop"]>
 
@@ -3636,6 +4005,7 @@ export namespace Prisma {
     supportedProfiles?: boolean | Laptop$supportedProfilesArgs<ExtArgs>
     supportedOS?: boolean | Laptop$supportedOSArgs<ExtArgs>
     packages?: boolean | Laptop$packagesArgs<ExtArgs>
+    packageTemplates?: boolean | Laptop$packageTemplatesArgs<ExtArgs>
     _count?: boolean | LaptopCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type LaptopIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3647,6 +4017,7 @@ export namespace Prisma {
       supportedProfiles: Prisma.$LaptopProfilePayload<ExtArgs>[]
       supportedOS: Prisma.$LaptopOSPayload<ExtArgs>[]
       packages: Prisma.$PackagePayload<ExtArgs>[]
+      packageTemplates: Prisma.$PackageTemplatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4060,6 +4431,7 @@ export namespace Prisma {
     supportedProfiles<T extends Laptop$supportedProfilesArgs<ExtArgs> = {}>(args?: Subset<T, Laptop$supportedProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LaptopProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     supportedOS<T extends Laptop$supportedOSArgs<ExtArgs> = {}>(args?: Subset<T, Laptop$supportedOSArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LaptopOSPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     packages<T extends Laptop$packagesArgs<ExtArgs> = {}>(args?: Subset<T, Laptop$packagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    packageTemplates<T extends Laptop$packageTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Laptop$packageTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4560,6 +4932,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PackageScalarFieldEnum | PackageScalarFieldEnum[]
+  }
+
+  /**
+   * Laptop.packageTemplates
+   */
+  export type Laptop$packageTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    where?: PackageTemplateWhereInput
+    orderBy?: PackageTemplateOrderByWithRelationInput | PackageTemplateOrderByWithRelationInput[]
+    cursor?: PackageTemplateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PackageTemplateScalarFieldEnum | PackageTemplateScalarFieldEnum[]
   }
 
   /**
@@ -6858,6 +7254,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     packageAccessories?: boolean | Accessory$packageAccessoriesArgs<ExtArgs>
+    templateAccessories?: boolean | Accessory$templateAccessoriesArgs<ExtArgs>
     _count?: boolean | AccessoryCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["accessory"]>
 
@@ -6903,6 +7300,7 @@ export namespace Prisma {
   export type AccessoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "type" | "brand" | "price" | "priceType" | "image" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["accessory"]>
   export type AccessoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     packageAccessories?: boolean | Accessory$packageAccessoriesArgs<ExtArgs>
+    templateAccessories?: boolean | Accessory$templateAccessoriesArgs<ExtArgs>
     _count?: boolean | AccessoryCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AccessoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6912,6 +7310,7 @@ export namespace Prisma {
     name: "Accessory"
     objects: {
       packageAccessories: Prisma.$PackageAccessoryPayload<ExtArgs>[]
+      templateAccessories: Prisma.$TemplateAccessoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7319,6 +7718,7 @@ export namespace Prisma {
   export interface Prisma__AccessoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     packageAccessories<T extends Accessory$packageAccessoriesArgs<ExtArgs> = {}>(args?: Subset<T, Accessory$packageAccessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    templateAccessories<T extends Accessory$templateAccessoriesArgs<ExtArgs> = {}>(args?: Subset<T, Accessory$templateAccessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7770,6 +8170,30 @@ export namespace Prisma {
   }
 
   /**
+   * Accessory.templateAccessories
+   */
+  export type Accessory$templateAccessoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    where?: TemplateAccessoryWhereInput
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    cursor?: TemplateAccessoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TemplateAccessoryScalarFieldEnum | TemplateAccessoryScalarFieldEnum[]
+  }
+
+  /**
    * Accessory without action
    */
   export type AccessoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7785,6 +8209,3319 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: AccessoryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PackageTemplate
+   */
+
+  export type AggregatePackageTemplate = {
+    _count: PackageTemplateCountAggregateOutputType | null
+    _min: PackageTemplateMinAggregateOutputType | null
+    _max: PackageTemplateMaxAggregateOutputType | null
+  }
+
+  export type PackageTemplateMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    profileType: string | null
+    laptopId: string | null
+    priceType: string | null
+    isActive: boolean | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PackageTemplateMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    profileType: string | null
+    laptopId: string | null
+    priceType: string | null
+    isActive: boolean | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PackageTemplateCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    profileType: number
+    laptopId: number
+    priceType: number
+    isActive: number
+    notes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PackageTemplateMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    profileType?: true
+    laptopId?: true
+    priceType?: true
+    isActive?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PackageTemplateMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    profileType?: true
+    laptopId?: true
+    priceType?: true
+    isActive?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PackageTemplateCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    profileType?: true
+    laptopId?: true
+    priceType?: true
+    isActive?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PackageTemplateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PackageTemplate to aggregate.
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PackageTemplates to fetch.
+     */
+    orderBy?: PackageTemplateOrderByWithRelationInput | PackageTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PackageTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PackageTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PackageTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PackageTemplates
+    **/
+    _count?: true | PackageTemplateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PackageTemplateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PackageTemplateMaxAggregateInputType
+  }
+
+  export type GetPackageTemplateAggregateType<T extends PackageTemplateAggregateArgs> = {
+        [P in keyof T & keyof AggregatePackageTemplate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePackageTemplate[P]>
+      : GetScalarType<T[P], AggregatePackageTemplate[P]>
+  }
+
+
+
+
+  export type PackageTemplateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PackageTemplateWhereInput
+    orderBy?: PackageTemplateOrderByWithAggregationInput | PackageTemplateOrderByWithAggregationInput[]
+    by: PackageTemplateScalarFieldEnum[] | PackageTemplateScalarFieldEnum
+    having?: PackageTemplateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PackageTemplateCountAggregateInputType | true
+    _min?: PackageTemplateMinAggregateInputType
+    _max?: PackageTemplateMaxAggregateInputType
+  }
+
+  export type PackageTemplateGroupByOutputType = {
+    id: string
+    name: string
+    description: string | null
+    profileType: string
+    laptopId: string
+    priceType: string
+    isActive: boolean
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PackageTemplateCountAggregateOutputType | null
+    _min: PackageTemplateMinAggregateOutputType | null
+    _max: PackageTemplateMaxAggregateOutputType | null
+  }
+
+  type GetPackageTemplateGroupByPayload<T extends PackageTemplateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PackageTemplateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PackageTemplateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PackageTemplateGroupByOutputType[P]>
+            : GetScalarType<T[P], PackageTemplateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PackageTemplateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    profileType?: boolean
+    laptopId?: boolean
+    priceType?: boolean
+    isActive?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+    accessories?: boolean | PackageTemplate$accessoriesArgs<ExtArgs>
+    assignments?: boolean | PackageTemplate$assignmentsArgs<ExtArgs>
+    _count?: boolean | PackageTemplateCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["packageTemplate"]>
+
+  export type PackageTemplateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    profileType?: boolean
+    laptopId?: boolean
+    priceType?: boolean
+    isActive?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["packageTemplate"]>
+
+  export type PackageTemplateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    profileType?: boolean
+    laptopId?: boolean
+    priceType?: boolean
+    isActive?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["packageTemplate"]>
+
+  export type PackageTemplateSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    profileType?: boolean
+    laptopId?: boolean
+    priceType?: boolean
+    isActive?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PackageTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "profileType" | "laptopId" | "priceType" | "isActive" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["packageTemplate"]>
+  export type PackageTemplateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+    accessories?: boolean | PackageTemplate$accessoriesArgs<ExtArgs>
+    assignments?: boolean | PackageTemplate$assignmentsArgs<ExtArgs>
+    _count?: boolean | PackageTemplateCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PackageTemplateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+  }
+  export type PackageTemplateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    laptop?: boolean | LaptopDefaultArgs<ExtArgs>
+  }
+
+  export type $PackageTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PackageTemplate"
+    objects: {
+      laptop: Prisma.$LaptopPayload<ExtArgs>
+      accessories: Prisma.$TemplateAccessoryPayload<ExtArgs>[]
+      assignments: Prisma.$PersonAssignmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string | null
+      profileType: string
+      laptopId: string
+      priceType: string
+      isActive: boolean
+      notes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["packageTemplate"]>
+    composites: {}
+  }
+
+  type PackageTemplateGetPayload<S extends boolean | null | undefined | PackageTemplateDefaultArgs> = $Result.GetResult<Prisma.$PackageTemplatePayload, S>
+
+  type PackageTemplateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PackageTemplateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PackageTemplateCountAggregateInputType | true
+    }
+
+  export interface PackageTemplateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PackageTemplate'], meta: { name: 'PackageTemplate' } }
+    /**
+     * Find zero or one PackageTemplate that matches the filter.
+     * @param {PackageTemplateFindUniqueArgs} args - Arguments to find a PackageTemplate
+     * @example
+     * // Get one PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PackageTemplateFindUniqueArgs>(args: SelectSubset<T, PackageTemplateFindUniqueArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PackageTemplate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PackageTemplateFindUniqueOrThrowArgs} args - Arguments to find a PackageTemplate
+     * @example
+     * // Get one PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PackageTemplateFindUniqueOrThrowArgs>(args: SelectSubset<T, PackageTemplateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PackageTemplate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateFindFirstArgs} args - Arguments to find a PackageTemplate
+     * @example
+     * // Get one PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PackageTemplateFindFirstArgs>(args?: SelectSubset<T, PackageTemplateFindFirstArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PackageTemplate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateFindFirstOrThrowArgs} args - Arguments to find a PackageTemplate
+     * @example
+     * // Get one PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PackageTemplateFindFirstOrThrowArgs>(args?: SelectSubset<T, PackageTemplateFindFirstOrThrowArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PackageTemplates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PackageTemplates
+     * const packageTemplates = await prisma.packageTemplate.findMany()
+     * 
+     * // Get first 10 PackageTemplates
+     * const packageTemplates = await prisma.packageTemplate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const packageTemplateWithIdOnly = await prisma.packageTemplate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PackageTemplateFindManyArgs>(args?: SelectSubset<T, PackageTemplateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PackageTemplate.
+     * @param {PackageTemplateCreateArgs} args - Arguments to create a PackageTemplate.
+     * @example
+     * // Create one PackageTemplate
+     * const PackageTemplate = await prisma.packageTemplate.create({
+     *   data: {
+     *     // ... data to create a PackageTemplate
+     *   }
+     * })
+     * 
+     */
+    create<T extends PackageTemplateCreateArgs>(args: SelectSubset<T, PackageTemplateCreateArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PackageTemplates.
+     * @param {PackageTemplateCreateManyArgs} args - Arguments to create many PackageTemplates.
+     * @example
+     * // Create many PackageTemplates
+     * const packageTemplate = await prisma.packageTemplate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PackageTemplateCreateManyArgs>(args?: SelectSubset<T, PackageTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PackageTemplates and returns the data saved in the database.
+     * @param {PackageTemplateCreateManyAndReturnArgs} args - Arguments to create many PackageTemplates.
+     * @example
+     * // Create many PackageTemplates
+     * const packageTemplate = await prisma.packageTemplate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PackageTemplates and only return the `id`
+     * const packageTemplateWithIdOnly = await prisma.packageTemplate.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PackageTemplateCreateManyAndReturnArgs>(args?: SelectSubset<T, PackageTemplateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PackageTemplate.
+     * @param {PackageTemplateDeleteArgs} args - Arguments to delete one PackageTemplate.
+     * @example
+     * // Delete one PackageTemplate
+     * const PackageTemplate = await prisma.packageTemplate.delete({
+     *   where: {
+     *     // ... filter to delete one PackageTemplate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PackageTemplateDeleteArgs>(args: SelectSubset<T, PackageTemplateDeleteArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PackageTemplate.
+     * @param {PackageTemplateUpdateArgs} args - Arguments to update one PackageTemplate.
+     * @example
+     * // Update one PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PackageTemplateUpdateArgs>(args: SelectSubset<T, PackageTemplateUpdateArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PackageTemplates.
+     * @param {PackageTemplateDeleteManyArgs} args - Arguments to filter PackageTemplates to delete.
+     * @example
+     * // Delete a few PackageTemplates
+     * const { count } = await prisma.packageTemplate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PackageTemplateDeleteManyArgs>(args?: SelectSubset<T, PackageTemplateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PackageTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PackageTemplates
+     * const packageTemplate = await prisma.packageTemplate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PackageTemplateUpdateManyArgs>(args: SelectSubset<T, PackageTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PackageTemplates and returns the data updated in the database.
+     * @param {PackageTemplateUpdateManyAndReturnArgs} args - Arguments to update many PackageTemplates.
+     * @example
+     * // Update many PackageTemplates
+     * const packageTemplate = await prisma.packageTemplate.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PackageTemplates and only return the `id`
+     * const packageTemplateWithIdOnly = await prisma.packageTemplate.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PackageTemplateUpdateManyAndReturnArgs>(args: SelectSubset<T, PackageTemplateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PackageTemplate.
+     * @param {PackageTemplateUpsertArgs} args - Arguments to update or create a PackageTemplate.
+     * @example
+     * // Update or create a PackageTemplate
+     * const packageTemplate = await prisma.packageTemplate.upsert({
+     *   create: {
+     *     // ... data to create a PackageTemplate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PackageTemplate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PackageTemplateUpsertArgs>(args: SelectSubset<T, PackageTemplateUpsertArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PackageTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateCountArgs} args - Arguments to filter PackageTemplates to count.
+     * @example
+     * // Count the number of PackageTemplates
+     * const count = await prisma.packageTemplate.count({
+     *   where: {
+     *     // ... the filter for the PackageTemplates we want to count
+     *   }
+     * })
+    **/
+    count<T extends PackageTemplateCountArgs>(
+      args?: Subset<T, PackageTemplateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PackageTemplateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PackageTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PackageTemplateAggregateArgs>(args: Subset<T, PackageTemplateAggregateArgs>): Prisma.PrismaPromise<GetPackageTemplateAggregateType<T>>
+
+    /**
+     * Group by PackageTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PackageTemplateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PackageTemplateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PackageTemplateGroupByArgs['orderBy'] }
+        : { orderBy?: PackageTemplateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PackageTemplateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPackageTemplateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PackageTemplate model
+   */
+  readonly fields: PackageTemplateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PackageTemplate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PackageTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    laptop<T extends LaptopDefaultArgs<ExtArgs> = {}>(args?: Subset<T, LaptopDefaultArgs<ExtArgs>>): Prisma__LaptopClient<$Result.GetResult<Prisma.$LaptopPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    accessories<T extends PackageTemplate$accessoriesArgs<ExtArgs> = {}>(args?: Subset<T, PackageTemplate$accessoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    assignments<T extends PackageTemplate$assignmentsArgs<ExtArgs> = {}>(args?: Subset<T, PackageTemplate$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PackageTemplate model
+   */
+  interface PackageTemplateFieldRefs {
+    readonly id: FieldRef<"PackageTemplate", 'String'>
+    readonly name: FieldRef<"PackageTemplate", 'String'>
+    readonly description: FieldRef<"PackageTemplate", 'String'>
+    readonly profileType: FieldRef<"PackageTemplate", 'String'>
+    readonly laptopId: FieldRef<"PackageTemplate", 'String'>
+    readonly priceType: FieldRef<"PackageTemplate", 'String'>
+    readonly isActive: FieldRef<"PackageTemplate", 'Boolean'>
+    readonly notes: FieldRef<"PackageTemplate", 'String'>
+    readonly createdAt: FieldRef<"PackageTemplate", 'DateTime'>
+    readonly updatedAt: FieldRef<"PackageTemplate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PackageTemplate findUnique
+   */
+  export type PackageTemplateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which PackageTemplate to fetch.
+     */
+    where: PackageTemplateWhereUniqueInput
+  }
+
+  /**
+   * PackageTemplate findUniqueOrThrow
+   */
+  export type PackageTemplateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which PackageTemplate to fetch.
+     */
+    where: PackageTemplateWhereUniqueInput
+  }
+
+  /**
+   * PackageTemplate findFirst
+   */
+  export type PackageTemplateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which PackageTemplate to fetch.
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PackageTemplates to fetch.
+     */
+    orderBy?: PackageTemplateOrderByWithRelationInput | PackageTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PackageTemplates.
+     */
+    cursor?: PackageTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PackageTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PackageTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PackageTemplates.
+     */
+    distinct?: PackageTemplateScalarFieldEnum | PackageTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * PackageTemplate findFirstOrThrow
+   */
+  export type PackageTemplateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which PackageTemplate to fetch.
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PackageTemplates to fetch.
+     */
+    orderBy?: PackageTemplateOrderByWithRelationInput | PackageTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PackageTemplates.
+     */
+    cursor?: PackageTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PackageTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PackageTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PackageTemplates.
+     */
+    distinct?: PackageTemplateScalarFieldEnum | PackageTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * PackageTemplate findMany
+   */
+  export type PackageTemplateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which PackageTemplates to fetch.
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PackageTemplates to fetch.
+     */
+    orderBy?: PackageTemplateOrderByWithRelationInput | PackageTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PackageTemplates.
+     */
+    cursor?: PackageTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PackageTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PackageTemplates.
+     */
+    skip?: number
+    distinct?: PackageTemplateScalarFieldEnum | PackageTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * PackageTemplate create
+   */
+  export type PackageTemplateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PackageTemplate.
+     */
+    data: XOR<PackageTemplateCreateInput, PackageTemplateUncheckedCreateInput>
+  }
+
+  /**
+   * PackageTemplate createMany
+   */
+  export type PackageTemplateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PackageTemplates.
+     */
+    data: PackageTemplateCreateManyInput | PackageTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PackageTemplate createManyAndReturn
+   */
+  export type PackageTemplateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to create many PackageTemplates.
+     */
+    data: PackageTemplateCreateManyInput | PackageTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PackageTemplate update
+   */
+  export type PackageTemplateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PackageTemplate.
+     */
+    data: XOR<PackageTemplateUpdateInput, PackageTemplateUncheckedUpdateInput>
+    /**
+     * Choose, which PackageTemplate to update.
+     */
+    where: PackageTemplateWhereUniqueInput
+  }
+
+  /**
+   * PackageTemplate updateMany
+   */
+  export type PackageTemplateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PackageTemplates.
+     */
+    data: XOR<PackageTemplateUpdateManyMutationInput, PackageTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which PackageTemplates to update
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * Limit how many PackageTemplates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PackageTemplate updateManyAndReturn
+   */
+  export type PackageTemplateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * The data used to update PackageTemplates.
+     */
+    data: XOR<PackageTemplateUpdateManyMutationInput, PackageTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which PackageTemplates to update
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * Limit how many PackageTemplates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PackageTemplate upsert
+   */
+  export type PackageTemplateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PackageTemplate to update in case it exists.
+     */
+    where: PackageTemplateWhereUniqueInput
+    /**
+     * In case the PackageTemplate found by the `where` argument doesn't exist, create a new PackageTemplate with this data.
+     */
+    create: XOR<PackageTemplateCreateInput, PackageTemplateUncheckedCreateInput>
+    /**
+     * In case the PackageTemplate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PackageTemplateUpdateInput, PackageTemplateUncheckedUpdateInput>
+  }
+
+  /**
+   * PackageTemplate delete
+   */
+  export type PackageTemplateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+    /**
+     * Filter which PackageTemplate to delete.
+     */
+    where: PackageTemplateWhereUniqueInput
+  }
+
+  /**
+   * PackageTemplate deleteMany
+   */
+  export type PackageTemplateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PackageTemplates to delete
+     */
+    where?: PackageTemplateWhereInput
+    /**
+     * Limit how many PackageTemplates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PackageTemplate.accessories
+   */
+  export type PackageTemplate$accessoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    where?: TemplateAccessoryWhereInput
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    cursor?: TemplateAccessoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TemplateAccessoryScalarFieldEnum | TemplateAccessoryScalarFieldEnum[]
+  }
+
+  /**
+   * PackageTemplate.assignments
+   */
+  export type PackageTemplate$assignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    where?: PersonAssignmentWhereInput
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    cursor?: PersonAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PersonAssignmentScalarFieldEnum | PersonAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * PackageTemplate without action
+   */
+  export type PackageTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PackageTemplate
+     */
+    select?: PackageTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PackageTemplate
+     */
+    omit?: PackageTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PackageTemplateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TemplateAccessory
+   */
+
+  export type AggregateTemplateAccessory = {
+    _count: TemplateAccessoryCountAggregateOutputType | null
+    _min: TemplateAccessoryMinAggregateOutputType | null
+    _max: TemplateAccessoryMaxAggregateOutputType | null
+  }
+
+  export type TemplateAccessoryMinAggregateOutputType = {
+    templateId: string | null
+    accessoryId: string | null
+  }
+
+  export type TemplateAccessoryMaxAggregateOutputType = {
+    templateId: string | null
+    accessoryId: string | null
+  }
+
+  export type TemplateAccessoryCountAggregateOutputType = {
+    templateId: number
+    accessoryId: number
+    _all: number
+  }
+
+
+  export type TemplateAccessoryMinAggregateInputType = {
+    templateId?: true
+    accessoryId?: true
+  }
+
+  export type TemplateAccessoryMaxAggregateInputType = {
+    templateId?: true
+    accessoryId?: true
+  }
+
+  export type TemplateAccessoryCountAggregateInputType = {
+    templateId?: true
+    accessoryId?: true
+    _all?: true
+  }
+
+  export type TemplateAccessoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TemplateAccessory to aggregate.
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateAccessories to fetch.
+     */
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TemplateAccessoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateAccessories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateAccessories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TemplateAccessories
+    **/
+    _count?: true | TemplateAccessoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TemplateAccessoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TemplateAccessoryMaxAggregateInputType
+  }
+
+  export type GetTemplateAccessoryAggregateType<T extends TemplateAccessoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateTemplateAccessory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTemplateAccessory[P]>
+      : GetScalarType<T[P], AggregateTemplateAccessory[P]>
+  }
+
+
+
+
+  export type TemplateAccessoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TemplateAccessoryWhereInput
+    orderBy?: TemplateAccessoryOrderByWithAggregationInput | TemplateAccessoryOrderByWithAggregationInput[]
+    by: TemplateAccessoryScalarFieldEnum[] | TemplateAccessoryScalarFieldEnum
+    having?: TemplateAccessoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TemplateAccessoryCountAggregateInputType | true
+    _min?: TemplateAccessoryMinAggregateInputType
+    _max?: TemplateAccessoryMaxAggregateInputType
+  }
+
+  export type TemplateAccessoryGroupByOutputType = {
+    templateId: string
+    accessoryId: string
+    _count: TemplateAccessoryCountAggregateOutputType | null
+    _min: TemplateAccessoryMinAggregateOutputType | null
+    _max: TemplateAccessoryMaxAggregateOutputType | null
+  }
+
+  type GetTemplateAccessoryGroupByPayload<T extends TemplateAccessoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TemplateAccessoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TemplateAccessoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TemplateAccessoryGroupByOutputType[P]>
+            : GetScalarType<T[P], TemplateAccessoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TemplateAccessorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    templateId?: boolean
+    accessoryId?: boolean
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["templateAccessory"]>
+
+  export type TemplateAccessorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    templateId?: boolean
+    accessoryId?: boolean
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["templateAccessory"]>
+
+  export type TemplateAccessorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    templateId?: boolean
+    accessoryId?: boolean
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["templateAccessory"]>
+
+  export type TemplateAccessorySelectScalar = {
+    templateId?: boolean
+    accessoryId?: boolean
+  }
+
+  export type TemplateAccessoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"templateId" | "accessoryId", ExtArgs["result"]["templateAccessory"]>
+  export type TemplateAccessoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }
+  export type TemplateAccessoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }
+  export type TemplateAccessoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+    accessory?: boolean | AccessoryDefaultArgs<ExtArgs>
+  }
+
+  export type $TemplateAccessoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TemplateAccessory"
+    objects: {
+      template: Prisma.$PackageTemplatePayload<ExtArgs>
+      accessory: Prisma.$AccessoryPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      templateId: string
+      accessoryId: string
+    }, ExtArgs["result"]["templateAccessory"]>
+    composites: {}
+  }
+
+  type TemplateAccessoryGetPayload<S extends boolean | null | undefined | TemplateAccessoryDefaultArgs> = $Result.GetResult<Prisma.$TemplateAccessoryPayload, S>
+
+  type TemplateAccessoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TemplateAccessoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TemplateAccessoryCountAggregateInputType | true
+    }
+
+  export interface TemplateAccessoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TemplateAccessory'], meta: { name: 'TemplateAccessory' } }
+    /**
+     * Find zero or one TemplateAccessory that matches the filter.
+     * @param {TemplateAccessoryFindUniqueArgs} args - Arguments to find a TemplateAccessory
+     * @example
+     * // Get one TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TemplateAccessoryFindUniqueArgs>(args: SelectSubset<T, TemplateAccessoryFindUniqueArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TemplateAccessory that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TemplateAccessoryFindUniqueOrThrowArgs} args - Arguments to find a TemplateAccessory
+     * @example
+     * // Get one TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TemplateAccessoryFindUniqueOrThrowArgs>(args: SelectSubset<T, TemplateAccessoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TemplateAccessory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryFindFirstArgs} args - Arguments to find a TemplateAccessory
+     * @example
+     * // Get one TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TemplateAccessoryFindFirstArgs>(args?: SelectSubset<T, TemplateAccessoryFindFirstArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TemplateAccessory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryFindFirstOrThrowArgs} args - Arguments to find a TemplateAccessory
+     * @example
+     * // Get one TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TemplateAccessoryFindFirstOrThrowArgs>(args?: SelectSubset<T, TemplateAccessoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TemplateAccessories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TemplateAccessories
+     * const templateAccessories = await prisma.templateAccessory.findMany()
+     * 
+     * // Get first 10 TemplateAccessories
+     * const templateAccessories = await prisma.templateAccessory.findMany({ take: 10 })
+     * 
+     * // Only select the `templateId`
+     * const templateAccessoryWithTemplateIdOnly = await prisma.templateAccessory.findMany({ select: { templateId: true } })
+     * 
+     */
+    findMany<T extends TemplateAccessoryFindManyArgs>(args?: SelectSubset<T, TemplateAccessoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TemplateAccessory.
+     * @param {TemplateAccessoryCreateArgs} args - Arguments to create a TemplateAccessory.
+     * @example
+     * // Create one TemplateAccessory
+     * const TemplateAccessory = await prisma.templateAccessory.create({
+     *   data: {
+     *     // ... data to create a TemplateAccessory
+     *   }
+     * })
+     * 
+     */
+    create<T extends TemplateAccessoryCreateArgs>(args: SelectSubset<T, TemplateAccessoryCreateArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TemplateAccessories.
+     * @param {TemplateAccessoryCreateManyArgs} args - Arguments to create many TemplateAccessories.
+     * @example
+     * // Create many TemplateAccessories
+     * const templateAccessory = await prisma.templateAccessory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TemplateAccessoryCreateManyArgs>(args?: SelectSubset<T, TemplateAccessoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TemplateAccessories and returns the data saved in the database.
+     * @param {TemplateAccessoryCreateManyAndReturnArgs} args - Arguments to create many TemplateAccessories.
+     * @example
+     * // Create many TemplateAccessories
+     * const templateAccessory = await prisma.templateAccessory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TemplateAccessories and only return the `templateId`
+     * const templateAccessoryWithTemplateIdOnly = await prisma.templateAccessory.createManyAndReturn({
+     *   select: { templateId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TemplateAccessoryCreateManyAndReturnArgs>(args?: SelectSubset<T, TemplateAccessoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TemplateAccessory.
+     * @param {TemplateAccessoryDeleteArgs} args - Arguments to delete one TemplateAccessory.
+     * @example
+     * // Delete one TemplateAccessory
+     * const TemplateAccessory = await prisma.templateAccessory.delete({
+     *   where: {
+     *     // ... filter to delete one TemplateAccessory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TemplateAccessoryDeleteArgs>(args: SelectSubset<T, TemplateAccessoryDeleteArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TemplateAccessory.
+     * @param {TemplateAccessoryUpdateArgs} args - Arguments to update one TemplateAccessory.
+     * @example
+     * // Update one TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TemplateAccessoryUpdateArgs>(args: SelectSubset<T, TemplateAccessoryUpdateArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TemplateAccessories.
+     * @param {TemplateAccessoryDeleteManyArgs} args - Arguments to filter TemplateAccessories to delete.
+     * @example
+     * // Delete a few TemplateAccessories
+     * const { count } = await prisma.templateAccessory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TemplateAccessoryDeleteManyArgs>(args?: SelectSubset<T, TemplateAccessoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TemplateAccessories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TemplateAccessories
+     * const templateAccessory = await prisma.templateAccessory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TemplateAccessoryUpdateManyArgs>(args: SelectSubset<T, TemplateAccessoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TemplateAccessories and returns the data updated in the database.
+     * @param {TemplateAccessoryUpdateManyAndReturnArgs} args - Arguments to update many TemplateAccessories.
+     * @example
+     * // Update many TemplateAccessories
+     * const templateAccessory = await prisma.templateAccessory.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TemplateAccessories and only return the `templateId`
+     * const templateAccessoryWithTemplateIdOnly = await prisma.templateAccessory.updateManyAndReturn({
+     *   select: { templateId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TemplateAccessoryUpdateManyAndReturnArgs>(args: SelectSubset<T, TemplateAccessoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TemplateAccessory.
+     * @param {TemplateAccessoryUpsertArgs} args - Arguments to update or create a TemplateAccessory.
+     * @example
+     * // Update or create a TemplateAccessory
+     * const templateAccessory = await prisma.templateAccessory.upsert({
+     *   create: {
+     *     // ... data to create a TemplateAccessory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TemplateAccessory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TemplateAccessoryUpsertArgs>(args: SelectSubset<T, TemplateAccessoryUpsertArgs<ExtArgs>>): Prisma__TemplateAccessoryClient<$Result.GetResult<Prisma.$TemplateAccessoryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TemplateAccessories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryCountArgs} args - Arguments to filter TemplateAccessories to count.
+     * @example
+     * // Count the number of TemplateAccessories
+     * const count = await prisma.templateAccessory.count({
+     *   where: {
+     *     // ... the filter for the TemplateAccessories we want to count
+     *   }
+     * })
+    **/
+    count<T extends TemplateAccessoryCountArgs>(
+      args?: Subset<T, TemplateAccessoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TemplateAccessoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TemplateAccessory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TemplateAccessoryAggregateArgs>(args: Subset<T, TemplateAccessoryAggregateArgs>): Prisma.PrismaPromise<GetTemplateAccessoryAggregateType<T>>
+
+    /**
+     * Group by TemplateAccessory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TemplateAccessoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TemplateAccessoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TemplateAccessoryGroupByArgs['orderBy'] }
+        : { orderBy?: TemplateAccessoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TemplateAccessoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTemplateAccessoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TemplateAccessory model
+   */
+  readonly fields: TemplateAccessoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TemplateAccessory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TemplateAccessoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    template<T extends PackageTemplateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PackageTemplateDefaultArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    accessory<T extends AccessoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AccessoryDefaultArgs<ExtArgs>>): Prisma__AccessoryClient<$Result.GetResult<Prisma.$AccessoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TemplateAccessory model
+   */
+  interface TemplateAccessoryFieldRefs {
+    readonly templateId: FieldRef<"TemplateAccessory", 'String'>
+    readonly accessoryId: FieldRef<"TemplateAccessory", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TemplateAccessory findUnique
+   */
+  export type TemplateAccessoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter, which TemplateAccessory to fetch.
+     */
+    where: TemplateAccessoryWhereUniqueInput
+  }
+
+  /**
+   * TemplateAccessory findUniqueOrThrow
+   */
+  export type TemplateAccessoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter, which TemplateAccessory to fetch.
+     */
+    where: TemplateAccessoryWhereUniqueInput
+  }
+
+  /**
+   * TemplateAccessory findFirst
+   */
+  export type TemplateAccessoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter, which TemplateAccessory to fetch.
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateAccessories to fetch.
+     */
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TemplateAccessories.
+     */
+    cursor?: TemplateAccessoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateAccessories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateAccessories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TemplateAccessories.
+     */
+    distinct?: TemplateAccessoryScalarFieldEnum | TemplateAccessoryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateAccessory findFirstOrThrow
+   */
+  export type TemplateAccessoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter, which TemplateAccessory to fetch.
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateAccessories to fetch.
+     */
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TemplateAccessories.
+     */
+    cursor?: TemplateAccessoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateAccessories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateAccessories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TemplateAccessories.
+     */
+    distinct?: TemplateAccessoryScalarFieldEnum | TemplateAccessoryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateAccessory findMany
+   */
+  export type TemplateAccessoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter, which TemplateAccessories to fetch.
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TemplateAccessories to fetch.
+     */
+    orderBy?: TemplateAccessoryOrderByWithRelationInput | TemplateAccessoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TemplateAccessories.
+     */
+    cursor?: TemplateAccessoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TemplateAccessories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TemplateAccessories.
+     */
+    skip?: number
+    distinct?: TemplateAccessoryScalarFieldEnum | TemplateAccessoryScalarFieldEnum[]
+  }
+
+  /**
+   * TemplateAccessory create
+   */
+  export type TemplateAccessoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TemplateAccessory.
+     */
+    data: XOR<TemplateAccessoryCreateInput, TemplateAccessoryUncheckedCreateInput>
+  }
+
+  /**
+   * TemplateAccessory createMany
+   */
+  export type TemplateAccessoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TemplateAccessories.
+     */
+    data: TemplateAccessoryCreateManyInput | TemplateAccessoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TemplateAccessory createManyAndReturn
+   */
+  export type TemplateAccessoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * The data used to create many TemplateAccessories.
+     */
+    data: TemplateAccessoryCreateManyInput | TemplateAccessoryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TemplateAccessory update
+   */
+  export type TemplateAccessoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TemplateAccessory.
+     */
+    data: XOR<TemplateAccessoryUpdateInput, TemplateAccessoryUncheckedUpdateInput>
+    /**
+     * Choose, which TemplateAccessory to update.
+     */
+    where: TemplateAccessoryWhereUniqueInput
+  }
+
+  /**
+   * TemplateAccessory updateMany
+   */
+  export type TemplateAccessoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TemplateAccessories.
+     */
+    data: XOR<TemplateAccessoryUpdateManyMutationInput, TemplateAccessoryUncheckedUpdateManyInput>
+    /**
+     * Filter which TemplateAccessories to update
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * Limit how many TemplateAccessories to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TemplateAccessory updateManyAndReturn
+   */
+  export type TemplateAccessoryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * The data used to update TemplateAccessories.
+     */
+    data: XOR<TemplateAccessoryUpdateManyMutationInput, TemplateAccessoryUncheckedUpdateManyInput>
+    /**
+     * Filter which TemplateAccessories to update
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * Limit how many TemplateAccessories to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TemplateAccessory upsert
+   */
+  export type TemplateAccessoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TemplateAccessory to update in case it exists.
+     */
+    where: TemplateAccessoryWhereUniqueInput
+    /**
+     * In case the TemplateAccessory found by the `where` argument doesn't exist, create a new TemplateAccessory with this data.
+     */
+    create: XOR<TemplateAccessoryCreateInput, TemplateAccessoryUncheckedCreateInput>
+    /**
+     * In case the TemplateAccessory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TemplateAccessoryUpdateInput, TemplateAccessoryUncheckedUpdateInput>
+  }
+
+  /**
+   * TemplateAccessory delete
+   */
+  export type TemplateAccessoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+    /**
+     * Filter which TemplateAccessory to delete.
+     */
+    where: TemplateAccessoryWhereUniqueInput
+  }
+
+  /**
+   * TemplateAccessory deleteMany
+   */
+  export type TemplateAccessoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TemplateAccessories to delete
+     */
+    where?: TemplateAccessoryWhereInput
+    /**
+     * Limit how many TemplateAccessories to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TemplateAccessory without action
+   */
+  export type TemplateAccessoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TemplateAccessory
+     */
+    select?: TemplateAccessorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TemplateAccessory
+     */
+    omit?: TemplateAccessoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TemplateAccessoryInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PersonAssignment
+   */
+
+  export type AggregatePersonAssignment = {
+    _count: PersonAssignmentCountAggregateOutputType | null
+    _min: PersonAssignmentMinAggregateOutputType | null
+    _max: PersonAssignmentMaxAggregateOutputType | null
+  }
+
+  export type PersonAssignmentMinAggregateOutputType = {
+    id: string | null
+    personId: string | null
+    templateId: string | null
+    status: string | null
+    pcReference: string | null
+    assignedAt: Date | null
+    deliveredAt: Date | null
+    notes: string | null
+  }
+
+  export type PersonAssignmentMaxAggregateOutputType = {
+    id: string | null
+    personId: string | null
+    templateId: string | null
+    status: string | null
+    pcReference: string | null
+    assignedAt: Date | null
+    deliveredAt: Date | null
+    notes: string | null
+  }
+
+  export type PersonAssignmentCountAggregateOutputType = {
+    id: number
+    personId: number
+    templateId: number
+    status: number
+    pcReference: number
+    assignedAt: number
+    deliveredAt: number
+    notes: number
+    _all: number
+  }
+
+
+  export type PersonAssignmentMinAggregateInputType = {
+    id?: true
+    personId?: true
+    templateId?: true
+    status?: true
+    pcReference?: true
+    assignedAt?: true
+    deliveredAt?: true
+    notes?: true
+  }
+
+  export type PersonAssignmentMaxAggregateInputType = {
+    id?: true
+    personId?: true
+    templateId?: true
+    status?: true
+    pcReference?: true
+    assignedAt?: true
+    deliveredAt?: true
+    notes?: true
+  }
+
+  export type PersonAssignmentCountAggregateInputType = {
+    id?: true
+    personId?: true
+    templateId?: true
+    status?: true
+    pcReference?: true
+    assignedAt?: true
+    deliveredAt?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type PersonAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PersonAssignment to aggregate.
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PersonAssignments to fetch.
+     */
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PersonAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PersonAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PersonAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PersonAssignments
+    **/
+    _count?: true | PersonAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PersonAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PersonAssignmentMaxAggregateInputType
+  }
+
+  export type GetPersonAssignmentAggregateType<T extends PersonAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregatePersonAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePersonAssignment[P]>
+      : GetScalarType<T[P], AggregatePersonAssignment[P]>
+  }
+
+
+
+
+  export type PersonAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PersonAssignmentWhereInput
+    orderBy?: PersonAssignmentOrderByWithAggregationInput | PersonAssignmentOrderByWithAggregationInput[]
+    by: PersonAssignmentScalarFieldEnum[] | PersonAssignmentScalarFieldEnum
+    having?: PersonAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PersonAssignmentCountAggregateInputType | true
+    _min?: PersonAssignmentMinAggregateInputType
+    _max?: PersonAssignmentMaxAggregateInputType
+  }
+
+  export type PersonAssignmentGroupByOutputType = {
+    id: string
+    personId: string
+    templateId: string
+    status: string
+    pcReference: string | null
+    assignedAt: Date
+    deliveredAt: Date | null
+    notes: string | null
+    _count: PersonAssignmentCountAggregateOutputType | null
+    _min: PersonAssignmentMinAggregateOutputType | null
+    _max: PersonAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetPersonAssignmentGroupByPayload<T extends PersonAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PersonAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PersonAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PersonAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], PersonAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PersonAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    personId?: boolean
+    templateId?: boolean
+    status?: boolean
+    pcReference?: boolean
+    assignedAt?: boolean
+    deliveredAt?: boolean
+    notes?: boolean
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["personAssignment"]>
+
+  export type PersonAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    personId?: boolean
+    templateId?: boolean
+    status?: boolean
+    pcReference?: boolean
+    assignedAt?: boolean
+    deliveredAt?: boolean
+    notes?: boolean
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["personAssignment"]>
+
+  export type PersonAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    personId?: boolean
+    templateId?: boolean
+    status?: boolean
+    pcReference?: boolean
+    assignedAt?: boolean
+    deliveredAt?: boolean
+    notes?: boolean
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["personAssignment"]>
+
+  export type PersonAssignmentSelectScalar = {
+    id?: boolean
+    personId?: boolean
+    templateId?: boolean
+    status?: boolean
+    pcReference?: boolean
+    assignedAt?: boolean
+    deliveredAt?: boolean
+    notes?: boolean
+  }
+
+  export type PersonAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "personId" | "templateId" | "status" | "pcReference" | "assignedAt" | "deliveredAt" | "notes", ExtArgs["result"]["personAssignment"]>
+  export type PersonAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }
+  export type PersonAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }
+  export type PersonAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    person?: boolean | PersonDefaultArgs<ExtArgs>
+    template?: boolean | PackageTemplateDefaultArgs<ExtArgs>
+  }
+
+  export type $PersonAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PersonAssignment"
+    objects: {
+      person: Prisma.$PersonPayload<ExtArgs>
+      template: Prisma.$PackageTemplatePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      personId: string
+      templateId: string
+      status: string
+      pcReference: string | null
+      assignedAt: Date
+      deliveredAt: Date | null
+      notes: string | null
+    }, ExtArgs["result"]["personAssignment"]>
+    composites: {}
+  }
+
+  type PersonAssignmentGetPayload<S extends boolean | null | undefined | PersonAssignmentDefaultArgs> = $Result.GetResult<Prisma.$PersonAssignmentPayload, S>
+
+  type PersonAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PersonAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PersonAssignmentCountAggregateInputType | true
+    }
+
+  export interface PersonAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PersonAssignment'], meta: { name: 'PersonAssignment' } }
+    /**
+     * Find zero or one PersonAssignment that matches the filter.
+     * @param {PersonAssignmentFindUniqueArgs} args - Arguments to find a PersonAssignment
+     * @example
+     * // Get one PersonAssignment
+     * const personAssignment = await prisma.personAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PersonAssignmentFindUniqueArgs>(args: SelectSubset<T, PersonAssignmentFindUniqueArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PersonAssignment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PersonAssignmentFindUniqueOrThrowArgs} args - Arguments to find a PersonAssignment
+     * @example
+     * // Get one PersonAssignment
+     * const personAssignment = await prisma.personAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PersonAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, PersonAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PersonAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentFindFirstArgs} args - Arguments to find a PersonAssignment
+     * @example
+     * // Get one PersonAssignment
+     * const personAssignment = await prisma.personAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PersonAssignmentFindFirstArgs>(args?: SelectSubset<T, PersonAssignmentFindFirstArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PersonAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentFindFirstOrThrowArgs} args - Arguments to find a PersonAssignment
+     * @example
+     * // Get one PersonAssignment
+     * const personAssignment = await prisma.personAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PersonAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, PersonAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PersonAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PersonAssignments
+     * const personAssignments = await prisma.personAssignment.findMany()
+     * 
+     * // Get first 10 PersonAssignments
+     * const personAssignments = await prisma.personAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const personAssignmentWithIdOnly = await prisma.personAssignment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PersonAssignmentFindManyArgs>(args?: SelectSubset<T, PersonAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PersonAssignment.
+     * @param {PersonAssignmentCreateArgs} args - Arguments to create a PersonAssignment.
+     * @example
+     * // Create one PersonAssignment
+     * const PersonAssignment = await prisma.personAssignment.create({
+     *   data: {
+     *     // ... data to create a PersonAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends PersonAssignmentCreateArgs>(args: SelectSubset<T, PersonAssignmentCreateArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PersonAssignments.
+     * @param {PersonAssignmentCreateManyArgs} args - Arguments to create many PersonAssignments.
+     * @example
+     * // Create many PersonAssignments
+     * const personAssignment = await prisma.personAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PersonAssignmentCreateManyArgs>(args?: SelectSubset<T, PersonAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PersonAssignments and returns the data saved in the database.
+     * @param {PersonAssignmentCreateManyAndReturnArgs} args - Arguments to create many PersonAssignments.
+     * @example
+     * // Create many PersonAssignments
+     * const personAssignment = await prisma.personAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PersonAssignments and only return the `id`
+     * const personAssignmentWithIdOnly = await prisma.personAssignment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PersonAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, PersonAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PersonAssignment.
+     * @param {PersonAssignmentDeleteArgs} args - Arguments to delete one PersonAssignment.
+     * @example
+     * // Delete one PersonAssignment
+     * const PersonAssignment = await prisma.personAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one PersonAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PersonAssignmentDeleteArgs>(args: SelectSubset<T, PersonAssignmentDeleteArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PersonAssignment.
+     * @param {PersonAssignmentUpdateArgs} args - Arguments to update one PersonAssignment.
+     * @example
+     * // Update one PersonAssignment
+     * const personAssignment = await prisma.personAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PersonAssignmentUpdateArgs>(args: SelectSubset<T, PersonAssignmentUpdateArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PersonAssignments.
+     * @param {PersonAssignmentDeleteManyArgs} args - Arguments to filter PersonAssignments to delete.
+     * @example
+     * // Delete a few PersonAssignments
+     * const { count } = await prisma.personAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PersonAssignmentDeleteManyArgs>(args?: SelectSubset<T, PersonAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PersonAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PersonAssignments
+     * const personAssignment = await prisma.personAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PersonAssignmentUpdateManyArgs>(args: SelectSubset<T, PersonAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PersonAssignments and returns the data updated in the database.
+     * @param {PersonAssignmentUpdateManyAndReturnArgs} args - Arguments to update many PersonAssignments.
+     * @example
+     * // Update many PersonAssignments
+     * const personAssignment = await prisma.personAssignment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PersonAssignments and only return the `id`
+     * const personAssignmentWithIdOnly = await prisma.personAssignment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PersonAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, PersonAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PersonAssignment.
+     * @param {PersonAssignmentUpsertArgs} args - Arguments to update or create a PersonAssignment.
+     * @example
+     * // Update or create a PersonAssignment
+     * const personAssignment = await prisma.personAssignment.upsert({
+     *   create: {
+     *     // ... data to create a PersonAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PersonAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PersonAssignmentUpsertArgs>(args: SelectSubset<T, PersonAssignmentUpsertArgs<ExtArgs>>): Prisma__PersonAssignmentClient<$Result.GetResult<Prisma.$PersonAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PersonAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentCountArgs} args - Arguments to filter PersonAssignments to count.
+     * @example
+     * // Count the number of PersonAssignments
+     * const count = await prisma.personAssignment.count({
+     *   where: {
+     *     // ... the filter for the PersonAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends PersonAssignmentCountArgs>(
+      args?: Subset<T, PersonAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PersonAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PersonAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PersonAssignmentAggregateArgs>(args: Subset<T, PersonAssignmentAggregateArgs>): Prisma.PrismaPromise<GetPersonAssignmentAggregateType<T>>
+
+    /**
+     * Group by PersonAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PersonAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PersonAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PersonAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: PersonAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PersonAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPersonAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PersonAssignment model
+   */
+  readonly fields: PersonAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PersonAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PersonAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    person<T extends PersonDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PersonDefaultArgs<ExtArgs>>): Prisma__PersonClient<$Result.GetResult<Prisma.$PersonPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    template<T extends PackageTemplateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PackageTemplateDefaultArgs<ExtArgs>>): Prisma__PackageTemplateClient<$Result.GetResult<Prisma.$PackageTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PersonAssignment model
+   */
+  interface PersonAssignmentFieldRefs {
+    readonly id: FieldRef<"PersonAssignment", 'String'>
+    readonly personId: FieldRef<"PersonAssignment", 'String'>
+    readonly templateId: FieldRef<"PersonAssignment", 'String'>
+    readonly status: FieldRef<"PersonAssignment", 'String'>
+    readonly pcReference: FieldRef<"PersonAssignment", 'String'>
+    readonly assignedAt: FieldRef<"PersonAssignment", 'DateTime'>
+    readonly deliveredAt: FieldRef<"PersonAssignment", 'DateTime'>
+    readonly notes: FieldRef<"PersonAssignment", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PersonAssignment findUnique
+   */
+  export type PersonAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which PersonAssignment to fetch.
+     */
+    where: PersonAssignmentWhereUniqueInput
+  }
+
+  /**
+   * PersonAssignment findUniqueOrThrow
+   */
+  export type PersonAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which PersonAssignment to fetch.
+     */
+    where: PersonAssignmentWhereUniqueInput
+  }
+
+  /**
+   * PersonAssignment findFirst
+   */
+  export type PersonAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which PersonAssignment to fetch.
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PersonAssignments to fetch.
+     */
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PersonAssignments.
+     */
+    cursor?: PersonAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PersonAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PersonAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PersonAssignments.
+     */
+    distinct?: PersonAssignmentScalarFieldEnum | PersonAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * PersonAssignment findFirstOrThrow
+   */
+  export type PersonAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which PersonAssignment to fetch.
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PersonAssignments to fetch.
+     */
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PersonAssignments.
+     */
+    cursor?: PersonAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PersonAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PersonAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PersonAssignments.
+     */
+    distinct?: PersonAssignmentScalarFieldEnum | PersonAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * PersonAssignment findMany
+   */
+  export type PersonAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which PersonAssignments to fetch.
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PersonAssignments to fetch.
+     */
+    orderBy?: PersonAssignmentOrderByWithRelationInput | PersonAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PersonAssignments.
+     */
+    cursor?: PersonAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PersonAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PersonAssignments.
+     */
+    skip?: number
+    distinct?: PersonAssignmentScalarFieldEnum | PersonAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * PersonAssignment create
+   */
+  export type PersonAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PersonAssignment.
+     */
+    data: XOR<PersonAssignmentCreateInput, PersonAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * PersonAssignment createMany
+   */
+  export type PersonAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PersonAssignments.
+     */
+    data: PersonAssignmentCreateManyInput | PersonAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PersonAssignment createManyAndReturn
+   */
+  export type PersonAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many PersonAssignments.
+     */
+    data: PersonAssignmentCreateManyInput | PersonAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PersonAssignment update
+   */
+  export type PersonAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PersonAssignment.
+     */
+    data: XOR<PersonAssignmentUpdateInput, PersonAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which PersonAssignment to update.
+     */
+    where: PersonAssignmentWhereUniqueInput
+  }
+
+  /**
+   * PersonAssignment updateMany
+   */
+  export type PersonAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PersonAssignments.
+     */
+    data: XOR<PersonAssignmentUpdateManyMutationInput, PersonAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which PersonAssignments to update
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * Limit how many PersonAssignments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PersonAssignment updateManyAndReturn
+   */
+  export type PersonAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to update PersonAssignments.
+     */
+    data: XOR<PersonAssignmentUpdateManyMutationInput, PersonAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which PersonAssignments to update
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * Limit how many PersonAssignments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PersonAssignment upsert
+   */
+  export type PersonAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PersonAssignment to update in case it exists.
+     */
+    where: PersonAssignmentWhereUniqueInput
+    /**
+     * In case the PersonAssignment found by the `where` argument doesn't exist, create a new PersonAssignment with this data.
+     */
+    create: XOR<PersonAssignmentCreateInput, PersonAssignmentUncheckedCreateInput>
+    /**
+     * In case the PersonAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PersonAssignmentUpdateInput, PersonAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * PersonAssignment delete
+   */
+  export type PersonAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which PersonAssignment to delete.
+     */
+    where: PersonAssignmentWhereUniqueInput
+  }
+
+  /**
+   * PersonAssignment deleteMany
+   */
+  export type PersonAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PersonAssignments to delete
+     */
+    where?: PersonAssignmentWhereInput
+    /**
+     * Limit how many PersonAssignments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PersonAssignment without action
+   */
+  export type PersonAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PersonAssignment
+     */
+    select?: PersonAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PersonAssignment
+     */
+    omit?: PersonAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PersonAssignmentInclude<ExtArgs> | null
   }
 
 
@@ -17010,6 +20747,44 @@ export namespace Prisma {
   export type AccessoryScalarFieldEnum = (typeof AccessoryScalarFieldEnum)[keyof typeof AccessoryScalarFieldEnum]
 
 
+  export const PackageTemplateScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    profileType: 'profileType',
+    laptopId: 'laptopId',
+    priceType: 'priceType',
+    isActive: 'isActive',
+    notes: 'notes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PackageTemplateScalarFieldEnum = (typeof PackageTemplateScalarFieldEnum)[keyof typeof PackageTemplateScalarFieldEnum]
+
+
+  export const TemplateAccessoryScalarFieldEnum: {
+    templateId: 'templateId',
+    accessoryId: 'accessoryId'
+  };
+
+  export type TemplateAccessoryScalarFieldEnum = (typeof TemplateAccessoryScalarFieldEnum)[keyof typeof TemplateAccessoryScalarFieldEnum]
+
+
+  export const PersonAssignmentScalarFieldEnum: {
+    id: 'id',
+    personId: 'personId',
+    templateId: 'templateId',
+    status: 'status',
+    pcReference: 'pcReference',
+    assignedAt: 'assignedAt',
+    deliveredAt: 'deliveredAt',
+    notes: 'notes'
+  };
+
+  export type PersonAssignmentScalarFieldEnum = (typeof PersonAssignmentScalarFieldEnum)[keyof typeof PersonAssignmentScalarFieldEnum]
+
+
   export const PackageScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -17253,6 +21028,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Person"> | Date | string
     updatedAt?: DateTimeFilter<"Person"> | Date | string
     packageAssignments?: PackageAssignmentListRelationFilter
+    personAssignments?: PersonAssignmentListRelationFilter
   }
 
   export type PersonOrderByWithRelationInput = {
@@ -17265,6 +21041,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     packageAssignments?: PackageAssignmentOrderByRelationAggregateInput
+    personAssignments?: PersonAssignmentOrderByRelationAggregateInput
   }
 
   export type PersonWhereUniqueInput = Prisma.AtLeast<{
@@ -17280,6 +21057,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Person"> | Date | string
     updatedAt?: DateTimeFilter<"Person"> | Date | string
     packageAssignments?: PackageAssignmentListRelationFilter
+    personAssignments?: PersonAssignmentListRelationFilter
   }, "id" | "email">
 
   export type PersonOrderByWithAggregationInput = {
@@ -17331,6 +21109,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileListRelationFilter
     supportedOS?: LaptopOSListRelationFilter
     packages?: PackageListRelationFilter
+    packageTemplates?: PackageTemplateListRelationFilter
   }
 
   export type LaptopOrderByWithRelationInput = {
@@ -17351,6 +21130,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileOrderByRelationAggregateInput
     supportedOS?: LaptopOSOrderByRelationAggregateInput
     packages?: PackageOrderByRelationAggregateInput
+    packageTemplates?: PackageTemplateOrderByRelationAggregateInput
   }
 
   export type LaptopWhereUniqueInput = Prisma.AtLeast<{
@@ -17374,6 +21154,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileListRelationFilter
     supportedOS?: LaptopOSListRelationFilter
     packages?: PackageListRelationFilter
+    packageTemplates?: PackageTemplateListRelationFilter
   }, "id">
 
   export type LaptopOrderByWithAggregationInput = {
@@ -17515,6 +21296,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Accessory"> | Date | string
     updatedAt?: DateTimeFilter<"Accessory"> | Date | string
     packageAccessories?: PackageAccessoryListRelationFilter
+    templateAccessories?: TemplateAccessoryListRelationFilter
   }
 
   export type AccessoryOrderByWithRelationInput = {
@@ -17529,6 +21311,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     packageAccessories?: PackageAccessoryOrderByRelationAggregateInput
+    templateAccessories?: TemplateAccessoryOrderByRelationAggregateInput
   }
 
   export type AccessoryWhereUniqueInput = Prisma.AtLeast<{
@@ -17546,6 +21329,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Accessory"> | Date | string
     updatedAt?: DateTimeFilter<"Accessory"> | Date | string
     packageAccessories?: PackageAccessoryListRelationFilter
+    templateAccessories?: TemplateAccessoryListRelationFilter
   }, "id">
 
   export type AccessoryOrderByWithAggregationInput = {
@@ -17580,6 +21364,210 @@ export namespace Prisma {
     notes?: StringNullableWithAggregatesFilter<"Accessory"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Accessory"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Accessory"> | Date | string
+  }
+
+  export type PackageTemplateWhereInput = {
+    AND?: PackageTemplateWhereInput | PackageTemplateWhereInput[]
+    OR?: PackageTemplateWhereInput[]
+    NOT?: PackageTemplateWhereInput | PackageTemplateWhereInput[]
+    id?: StringFilter<"PackageTemplate"> | string
+    name?: StringFilter<"PackageTemplate"> | string
+    description?: StringNullableFilter<"PackageTemplate"> | string | null
+    profileType?: StringFilter<"PackageTemplate"> | string
+    laptopId?: StringFilter<"PackageTemplate"> | string
+    priceType?: StringFilter<"PackageTemplate"> | string
+    isActive?: BoolFilter<"PackageTemplate"> | boolean
+    notes?: StringNullableFilter<"PackageTemplate"> | string | null
+    createdAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+    laptop?: XOR<LaptopScalarRelationFilter, LaptopWhereInput>
+    accessories?: TemplateAccessoryListRelationFilter
+    assignments?: PersonAssignmentListRelationFilter
+  }
+
+  export type PackageTemplateOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    profileType?: SortOrder
+    laptopId?: SortOrder
+    priceType?: SortOrder
+    isActive?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    laptop?: LaptopOrderByWithRelationInput
+    accessories?: TemplateAccessoryOrderByRelationAggregateInput
+    assignments?: PersonAssignmentOrderByRelationAggregateInput
+  }
+
+  export type PackageTemplateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PackageTemplateWhereInput | PackageTemplateWhereInput[]
+    OR?: PackageTemplateWhereInput[]
+    NOT?: PackageTemplateWhereInput | PackageTemplateWhereInput[]
+    name?: StringFilter<"PackageTemplate"> | string
+    description?: StringNullableFilter<"PackageTemplate"> | string | null
+    profileType?: StringFilter<"PackageTemplate"> | string
+    laptopId?: StringFilter<"PackageTemplate"> | string
+    priceType?: StringFilter<"PackageTemplate"> | string
+    isActive?: BoolFilter<"PackageTemplate"> | boolean
+    notes?: StringNullableFilter<"PackageTemplate"> | string | null
+    createdAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+    laptop?: XOR<LaptopScalarRelationFilter, LaptopWhereInput>
+    accessories?: TemplateAccessoryListRelationFilter
+    assignments?: PersonAssignmentListRelationFilter
+  }, "id">
+
+  export type PackageTemplateOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    profileType?: SortOrder
+    laptopId?: SortOrder
+    priceType?: SortOrder
+    isActive?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PackageTemplateCountOrderByAggregateInput
+    _max?: PackageTemplateMaxOrderByAggregateInput
+    _min?: PackageTemplateMinOrderByAggregateInput
+  }
+
+  export type PackageTemplateScalarWhereWithAggregatesInput = {
+    AND?: PackageTemplateScalarWhereWithAggregatesInput | PackageTemplateScalarWhereWithAggregatesInput[]
+    OR?: PackageTemplateScalarWhereWithAggregatesInput[]
+    NOT?: PackageTemplateScalarWhereWithAggregatesInput | PackageTemplateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PackageTemplate"> | string
+    name?: StringWithAggregatesFilter<"PackageTemplate"> | string
+    description?: StringNullableWithAggregatesFilter<"PackageTemplate"> | string | null
+    profileType?: StringWithAggregatesFilter<"PackageTemplate"> | string
+    laptopId?: StringWithAggregatesFilter<"PackageTemplate"> | string
+    priceType?: StringWithAggregatesFilter<"PackageTemplate"> | string
+    isActive?: BoolWithAggregatesFilter<"PackageTemplate"> | boolean
+    notes?: StringNullableWithAggregatesFilter<"PackageTemplate"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PackageTemplate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PackageTemplate"> | Date | string
+  }
+
+  export type TemplateAccessoryWhereInput = {
+    AND?: TemplateAccessoryWhereInput | TemplateAccessoryWhereInput[]
+    OR?: TemplateAccessoryWhereInput[]
+    NOT?: TemplateAccessoryWhereInput | TemplateAccessoryWhereInput[]
+    templateId?: StringFilter<"TemplateAccessory"> | string
+    accessoryId?: StringFilter<"TemplateAccessory"> | string
+    template?: XOR<PackageTemplateScalarRelationFilter, PackageTemplateWhereInput>
+    accessory?: XOR<AccessoryScalarRelationFilter, AccessoryWhereInput>
+  }
+
+  export type TemplateAccessoryOrderByWithRelationInput = {
+    templateId?: SortOrder
+    accessoryId?: SortOrder
+    template?: PackageTemplateOrderByWithRelationInput
+    accessory?: AccessoryOrderByWithRelationInput
+  }
+
+  export type TemplateAccessoryWhereUniqueInput = Prisma.AtLeast<{
+    templateId_accessoryId?: TemplateAccessoryTemplateIdAccessoryIdCompoundUniqueInput
+    AND?: TemplateAccessoryWhereInput | TemplateAccessoryWhereInput[]
+    OR?: TemplateAccessoryWhereInput[]
+    NOT?: TemplateAccessoryWhereInput | TemplateAccessoryWhereInput[]
+    templateId?: StringFilter<"TemplateAccessory"> | string
+    accessoryId?: StringFilter<"TemplateAccessory"> | string
+    template?: XOR<PackageTemplateScalarRelationFilter, PackageTemplateWhereInput>
+    accessory?: XOR<AccessoryScalarRelationFilter, AccessoryWhereInput>
+  }, "templateId_accessoryId">
+
+  export type TemplateAccessoryOrderByWithAggregationInput = {
+    templateId?: SortOrder
+    accessoryId?: SortOrder
+    _count?: TemplateAccessoryCountOrderByAggregateInput
+    _max?: TemplateAccessoryMaxOrderByAggregateInput
+    _min?: TemplateAccessoryMinOrderByAggregateInput
+  }
+
+  export type TemplateAccessoryScalarWhereWithAggregatesInput = {
+    AND?: TemplateAccessoryScalarWhereWithAggregatesInput | TemplateAccessoryScalarWhereWithAggregatesInput[]
+    OR?: TemplateAccessoryScalarWhereWithAggregatesInput[]
+    NOT?: TemplateAccessoryScalarWhereWithAggregatesInput | TemplateAccessoryScalarWhereWithAggregatesInput[]
+    templateId?: StringWithAggregatesFilter<"TemplateAccessory"> | string
+    accessoryId?: StringWithAggregatesFilter<"TemplateAccessory"> | string
+  }
+
+  export type PersonAssignmentWhereInput = {
+    AND?: PersonAssignmentWhereInput | PersonAssignmentWhereInput[]
+    OR?: PersonAssignmentWhereInput[]
+    NOT?: PersonAssignmentWhereInput | PersonAssignmentWhereInput[]
+    id?: StringFilter<"PersonAssignment"> | string
+    personId?: StringFilter<"PersonAssignment"> | string
+    templateId?: StringFilter<"PersonAssignment"> | string
+    status?: StringFilter<"PersonAssignment"> | string
+    pcReference?: StringNullableFilter<"PersonAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"PersonAssignment"> | Date | string
+    deliveredAt?: DateTimeNullableFilter<"PersonAssignment"> | Date | string | null
+    notes?: StringNullableFilter<"PersonAssignment"> | string | null
+    person?: XOR<PersonScalarRelationFilter, PersonWhereInput>
+    template?: XOR<PackageTemplateScalarRelationFilter, PackageTemplateWhereInput>
+  }
+
+  export type PersonAssignmentOrderByWithRelationInput = {
+    id?: SortOrder
+    personId?: SortOrder
+    templateId?: SortOrder
+    status?: SortOrder
+    pcReference?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    deliveredAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    person?: PersonOrderByWithRelationInput
+    template?: PackageTemplateOrderByWithRelationInput
+  }
+
+  export type PersonAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    personId_templateId?: PersonAssignmentPersonIdTemplateIdCompoundUniqueInput
+    AND?: PersonAssignmentWhereInput | PersonAssignmentWhereInput[]
+    OR?: PersonAssignmentWhereInput[]
+    NOT?: PersonAssignmentWhereInput | PersonAssignmentWhereInput[]
+    personId?: StringFilter<"PersonAssignment"> | string
+    templateId?: StringFilter<"PersonAssignment"> | string
+    status?: StringFilter<"PersonAssignment"> | string
+    pcReference?: StringNullableFilter<"PersonAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"PersonAssignment"> | Date | string
+    deliveredAt?: DateTimeNullableFilter<"PersonAssignment"> | Date | string | null
+    notes?: StringNullableFilter<"PersonAssignment"> | string | null
+    person?: XOR<PersonScalarRelationFilter, PersonWhereInput>
+    template?: XOR<PackageTemplateScalarRelationFilter, PackageTemplateWhereInput>
+  }, "id" | "personId_templateId">
+
+  export type PersonAssignmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    personId?: SortOrder
+    templateId?: SortOrder
+    status?: SortOrder
+    pcReference?: SortOrderInput | SortOrder
+    assignedAt?: SortOrder
+    deliveredAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: PersonAssignmentCountOrderByAggregateInput
+    _max?: PersonAssignmentMaxOrderByAggregateInput
+    _min?: PersonAssignmentMinOrderByAggregateInput
+  }
+
+  export type PersonAssignmentScalarWhereWithAggregatesInput = {
+    AND?: PersonAssignmentScalarWhereWithAggregatesInput | PersonAssignmentScalarWhereWithAggregatesInput[]
+    OR?: PersonAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: PersonAssignmentScalarWhereWithAggregatesInput | PersonAssignmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PersonAssignment"> | string
+    personId?: StringWithAggregatesFilter<"PersonAssignment"> | string
+    templateId?: StringWithAggregatesFilter<"PersonAssignment"> | string
+    status?: StringWithAggregatesFilter<"PersonAssignment"> | string
+    pcReference?: StringNullableWithAggregatesFilter<"PersonAssignment"> | string | null
+    assignedAt?: DateTimeWithAggregatesFilter<"PersonAssignment"> | Date | string
+    deliveredAt?: DateTimeNullableWithAggregatesFilter<"PersonAssignment"> | Date | string | null
+    notes?: StringNullableWithAggregatesFilter<"PersonAssignment"> | string | null
   }
 
   export type PackageWhereInput = {
@@ -18226,6 +22214,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     packageAssignments?: PackageAssignmentCreateNestedManyWithoutPersonInput
+    personAssignments?: PersonAssignmentCreateNestedManyWithoutPersonInput
   }
 
   export type PersonUncheckedCreateInput = {
@@ -18238,6 +22227,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     packageAssignments?: PackageAssignmentUncheckedCreateNestedManyWithoutPersonInput
+    personAssignments?: PersonAssignmentUncheckedCreateNestedManyWithoutPersonInput
   }
 
   export type PersonUpdateInput = {
@@ -18250,6 +22240,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     packageAssignments?: PackageAssignmentUpdateManyWithoutPersonNestedInput
+    personAssignments?: PersonAssignmentUpdateManyWithoutPersonNestedInput
   }
 
   export type PersonUncheckedUpdateInput = {
@@ -18262,6 +22253,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     packageAssignments?: PackageAssignmentUncheckedUpdateManyWithoutPersonNestedInput
+    personAssignments?: PersonAssignmentUncheckedUpdateManyWithoutPersonNestedInput
   }
 
   export type PersonCreateManyInput = {
@@ -18315,6 +22307,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
     supportedOS?: LaptopOSCreateNestedManyWithoutLaptopInput
     packages?: PackageCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopUncheckedCreateInput = {
@@ -18335,6 +22328,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
     supportedOS?: LaptopOSUncheckedCreateNestedManyWithoutLaptopInput
     packages?: PackageUncheckedCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateUncheckedCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopUpdateInput = {
@@ -18355,6 +22349,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
     supportedOS?: LaptopOSUpdateManyWithoutLaptopNestedInput
     packages?: PackageUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopUncheckedUpdateInput = {
@@ -18375,6 +22370,7 @@ export namespace Prisma {
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
     supportedOS?: LaptopOSUncheckedUpdateManyWithoutLaptopNestedInput
     packages?: PackageUncheckedUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUncheckedUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopCreateManyInput = {
@@ -18508,6 +22504,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     packageAccessories?: PackageAccessoryCreateNestedManyWithoutAccessoryInput
+    templateAccessories?: TemplateAccessoryCreateNestedManyWithoutAccessoryInput
   }
 
   export type AccessoryUncheckedCreateInput = {
@@ -18522,6 +22519,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     packageAccessories?: PackageAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
+    templateAccessories?: TemplateAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
   }
 
   export type AccessoryUpdateInput = {
@@ -18536,6 +22534,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     packageAccessories?: PackageAccessoryUpdateManyWithoutAccessoryNestedInput
+    templateAccessories?: TemplateAccessoryUpdateManyWithoutAccessoryNestedInput
   }
 
   export type AccessoryUncheckedUpdateInput = {
@@ -18550,6 +22549,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     packageAccessories?: PackageAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
+    templateAccessories?: TemplateAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
   }
 
   export type AccessoryCreateManyInput = {
@@ -18589,6 +22589,213 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PackageTemplateCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    laptop: LaptopCreateNestedOneWithoutPackageTemplatesInput
+    accessories?: TemplateAccessoryCreateNestedManyWithoutTemplateInput
+    assignments?: PersonAssignmentCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateUncheckedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    laptopId: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accessories?: TemplateAccessoryUncheckedCreateNestedManyWithoutTemplateInput
+    assignments?: PersonAssignmentUncheckedCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    laptop?: LaptopUpdateOneRequiredWithoutPackageTemplatesNestedInput
+    accessories?: TemplateAccessoryUpdateManyWithoutTemplateNestedInput
+    assignments?: PersonAssignmentUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    laptopId?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessories?: TemplateAccessoryUncheckedUpdateManyWithoutTemplateNestedInput
+    assignments?: PersonAssignmentUncheckedUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateCreateManyInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    laptopId: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PackageTemplateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PackageTemplateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    laptopId?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TemplateAccessoryCreateInput = {
+    template: PackageTemplateCreateNestedOneWithoutAccessoriesInput
+    accessory: AccessoryCreateNestedOneWithoutTemplateAccessoriesInput
+  }
+
+  export type TemplateAccessoryUncheckedCreateInput = {
+    templateId: string
+    accessoryId: string
+  }
+
+  export type TemplateAccessoryUpdateInput = {
+    template?: PackageTemplateUpdateOneRequiredWithoutAccessoriesNestedInput
+    accessory?: AccessoryUpdateOneRequiredWithoutTemplateAccessoriesNestedInput
+  }
+
+  export type TemplateAccessoryUncheckedUpdateInput = {
+    templateId?: StringFieldUpdateOperationsInput | string
+    accessoryId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TemplateAccessoryCreateManyInput = {
+    templateId: string
+    accessoryId: string
+  }
+
+  export type TemplateAccessoryUpdateManyMutationInput = {
+
+  }
+
+  export type TemplateAccessoryUncheckedUpdateManyInput = {
+    templateId?: StringFieldUpdateOperationsInput | string
+    accessoryId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PersonAssignmentCreateInput = {
+    id?: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+    person: PersonCreateNestedOneWithoutPersonAssignmentsInput
+    template: PackageTemplateCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type PersonAssignmentUncheckedCreateInput = {
+    id?: string
+    personId: string
+    templateId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type PersonAssignmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    person?: PersonUpdateOneRequiredWithoutPersonAssignmentsNestedInput
+    template?: PackageTemplateUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type PersonAssignmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    personId?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PersonAssignmentCreateManyInput = {
+    id?: string
+    personId: string
+    templateId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type PersonAssignmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PersonAssignmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    personId?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PackageCreateInput = {
@@ -19334,12 +23541,22 @@ export namespace Prisma {
     none?: PackageAssignmentWhereInput
   }
 
+  export type PersonAssignmentListRelationFilter = {
+    every?: PersonAssignmentWhereInput
+    some?: PersonAssignmentWhereInput
+    none?: PersonAssignmentWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type PackageAssignmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PersonAssignmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19463,6 +23680,12 @@ export namespace Prisma {
     none?: PackageWhereInput
   }
 
+  export type PackageTemplateListRelationFilter = {
+    every?: PackageTemplateWhereInput
+    some?: PackageTemplateWhereInput
+    none?: PackageTemplateWhereInput
+  }
+
   export type LaptopProfileOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -19472,6 +23695,10 @@ export namespace Prisma {
   }
 
   export type PackageOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PackageTemplateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19603,7 +23830,17 @@ export namespace Prisma {
     none?: PackageAccessoryWhereInput
   }
 
+  export type TemplateAccessoryListRelationFilter = {
+    every?: TemplateAccessoryWhereInput
+    some?: TemplateAccessoryWhereInput
+    none?: TemplateAccessoryWhereInput
+  }
+
   export type PackageAccessoryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TemplateAccessoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19654,6 +23891,156 @@ export namespace Prisma {
     price?: SortOrder
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type PackageTemplateCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    profileType?: SortOrder
+    laptopId?: SortOrder
+    priceType?: SortOrder
+    isActive?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PackageTemplateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    profileType?: SortOrder
+    laptopId?: SortOrder
+    priceType?: SortOrder
+    isActive?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PackageTemplateMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    profileType?: SortOrder
+    laptopId?: SortOrder
+    priceType?: SortOrder
+    isActive?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type PackageTemplateScalarRelationFilter = {
+    is?: PackageTemplateWhereInput
+    isNot?: PackageTemplateWhereInput
+  }
+
+  export type AccessoryScalarRelationFilter = {
+    is?: AccessoryWhereInput
+    isNot?: AccessoryWhereInput
+  }
+
+  export type TemplateAccessoryTemplateIdAccessoryIdCompoundUniqueInput = {
+    templateId: string
+    accessoryId: string
+  }
+
+  export type TemplateAccessoryCountOrderByAggregateInput = {
+    templateId?: SortOrder
+    accessoryId?: SortOrder
+  }
+
+  export type TemplateAccessoryMaxOrderByAggregateInput = {
+    templateId?: SortOrder
+    accessoryId?: SortOrder
+  }
+
+  export type TemplateAccessoryMinOrderByAggregateInput = {
+    templateId?: SortOrder
+    accessoryId?: SortOrder
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type PersonScalarRelationFilter = {
+    is?: PersonWhereInput
+    isNot?: PersonWhereInput
+  }
+
+  export type PersonAssignmentPersonIdTemplateIdCompoundUniqueInput = {
+    personId: string
+    templateId: string
+  }
+
+  export type PersonAssignmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    personId?: SortOrder
+    templateId?: SortOrder
+    status?: SortOrder
+    pcReference?: SortOrder
+    assignedAt?: SortOrder
+    deliveredAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type PersonAssignmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    personId?: SortOrder
+    templateId?: SortOrder
+    status?: SortOrder
+    pcReference?: SortOrder
+    assignedAt?: SortOrder
+    deliveredAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type PersonAssignmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    personId?: SortOrder
+    templateId?: SortOrder
+    status?: SortOrder
+    pcReference?: SortOrder
+    assignedAt?: SortOrder
+    deliveredAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type PackageCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -19695,11 +24082,6 @@ export namespace Prisma {
     isNot?: PackageWhereInput
   }
 
-  export type AccessoryScalarRelationFilter = {
-    is?: AccessoryWhereInput
-    isNot?: AccessoryWhereInput
-  }
-
   export type PackageAccessoryPackageIdAccessoryIdCompoundUniqueInput = {
     packageId: string
     accessoryId: string
@@ -19718,11 +24100,6 @@ export namespace Prisma {
   export type PackageAccessoryMinOrderByAggregateInput = {
     packageId?: SortOrder
     accessoryId?: SortOrder
-  }
-
-  export type PersonScalarRelationFilter = {
-    is?: PersonWhereInput
-    isNot?: PersonWhereInput
   }
 
   export type PackageAssignmentPackageIdPersonIdCompoundUniqueInput = {
@@ -19752,11 +24129,6 @@ export namespace Prisma {
     personId?: SortOrder
     pcReference?: SortOrder
     assignedAt?: SortOrder
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type IntNullableFilter<$PrismaModel = never> = {
@@ -19854,14 +24226,6 @@ export namespace Prisma {
   export type ToolSumOrderByAggregateInput = {
     popularity?: SortOrder
     usageCount?: SortOrder
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -20128,11 +24492,25 @@ export namespace Prisma {
     connect?: PackageAssignmentWhereUniqueInput | PackageAssignmentWhereUniqueInput[]
   }
 
+  export type PersonAssignmentCreateNestedManyWithoutPersonInput = {
+    create?: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput> | PersonAssignmentCreateWithoutPersonInput[] | PersonAssignmentUncheckedCreateWithoutPersonInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutPersonInput | PersonAssignmentCreateOrConnectWithoutPersonInput[]
+    createMany?: PersonAssignmentCreateManyPersonInputEnvelope
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+  }
+
   export type PackageAssignmentUncheckedCreateNestedManyWithoutPersonInput = {
     create?: XOR<PackageAssignmentCreateWithoutPersonInput, PackageAssignmentUncheckedCreateWithoutPersonInput> | PackageAssignmentCreateWithoutPersonInput[] | PackageAssignmentUncheckedCreateWithoutPersonInput[]
     connectOrCreate?: PackageAssignmentCreateOrConnectWithoutPersonInput | PackageAssignmentCreateOrConnectWithoutPersonInput[]
     createMany?: PackageAssignmentCreateManyPersonInputEnvelope
     connect?: PackageAssignmentWhereUniqueInput | PackageAssignmentWhereUniqueInput[]
+  }
+
+  export type PersonAssignmentUncheckedCreateNestedManyWithoutPersonInput = {
+    create?: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput> | PersonAssignmentCreateWithoutPersonInput[] | PersonAssignmentUncheckedCreateWithoutPersonInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutPersonInput | PersonAssignmentCreateOrConnectWithoutPersonInput[]
+    createMany?: PersonAssignmentCreateManyPersonInputEnvelope
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -20161,6 +24539,20 @@ export namespace Prisma {
     deleteMany?: PackageAssignmentScalarWhereInput | PackageAssignmentScalarWhereInput[]
   }
 
+  export type PersonAssignmentUpdateManyWithoutPersonNestedInput = {
+    create?: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput> | PersonAssignmentCreateWithoutPersonInput[] | PersonAssignmentUncheckedCreateWithoutPersonInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutPersonInput | PersonAssignmentCreateOrConnectWithoutPersonInput[]
+    upsert?: PersonAssignmentUpsertWithWhereUniqueWithoutPersonInput | PersonAssignmentUpsertWithWhereUniqueWithoutPersonInput[]
+    createMany?: PersonAssignmentCreateManyPersonInputEnvelope
+    set?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    disconnect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    delete?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    update?: PersonAssignmentUpdateWithWhereUniqueWithoutPersonInput | PersonAssignmentUpdateWithWhereUniqueWithoutPersonInput[]
+    updateMany?: PersonAssignmentUpdateManyWithWhereWithoutPersonInput | PersonAssignmentUpdateManyWithWhereWithoutPersonInput[]
+    deleteMany?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
+  }
+
   export type PackageAssignmentUncheckedUpdateManyWithoutPersonNestedInput = {
     create?: XOR<PackageAssignmentCreateWithoutPersonInput, PackageAssignmentUncheckedCreateWithoutPersonInput> | PackageAssignmentCreateWithoutPersonInput[] | PackageAssignmentUncheckedCreateWithoutPersonInput[]
     connectOrCreate?: PackageAssignmentCreateOrConnectWithoutPersonInput | PackageAssignmentCreateOrConnectWithoutPersonInput[]
@@ -20173,6 +24565,20 @@ export namespace Prisma {
     update?: PackageAssignmentUpdateWithWhereUniqueWithoutPersonInput | PackageAssignmentUpdateWithWhereUniqueWithoutPersonInput[]
     updateMany?: PackageAssignmentUpdateManyWithWhereWithoutPersonInput | PackageAssignmentUpdateManyWithWhereWithoutPersonInput[]
     deleteMany?: PackageAssignmentScalarWhereInput | PackageAssignmentScalarWhereInput[]
+  }
+
+  export type PersonAssignmentUncheckedUpdateManyWithoutPersonNestedInput = {
+    create?: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput> | PersonAssignmentCreateWithoutPersonInput[] | PersonAssignmentUncheckedCreateWithoutPersonInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutPersonInput | PersonAssignmentCreateOrConnectWithoutPersonInput[]
+    upsert?: PersonAssignmentUpsertWithWhereUniqueWithoutPersonInput | PersonAssignmentUpsertWithWhereUniqueWithoutPersonInput[]
+    createMany?: PersonAssignmentCreateManyPersonInputEnvelope
+    set?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    disconnect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    delete?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    update?: PersonAssignmentUpdateWithWhereUniqueWithoutPersonInput | PersonAssignmentUpdateWithWhereUniqueWithoutPersonInput[]
+    updateMany?: PersonAssignmentUpdateManyWithWhereWithoutPersonInput | PersonAssignmentUpdateManyWithWhereWithoutPersonInput[]
+    deleteMany?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
   }
 
   export type LaptopCreateimagesInput = {
@@ -20200,6 +24606,13 @@ export namespace Prisma {
     connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
   }
 
+  export type PackageTemplateCreateNestedManyWithoutLaptopInput = {
+    create?: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput> | PackageTemplateCreateWithoutLaptopInput[] | PackageTemplateUncheckedCreateWithoutLaptopInput[]
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutLaptopInput | PackageTemplateCreateOrConnectWithoutLaptopInput[]
+    createMany?: PackageTemplateCreateManyLaptopInputEnvelope
+    connect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+  }
+
   export type LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput = {
     create?: XOR<LaptopProfileCreateWithoutLaptopInput, LaptopProfileUncheckedCreateWithoutLaptopInput> | LaptopProfileCreateWithoutLaptopInput[] | LaptopProfileUncheckedCreateWithoutLaptopInput[]
     connectOrCreate?: LaptopProfileCreateOrConnectWithoutLaptopInput | LaptopProfileCreateOrConnectWithoutLaptopInput[]
@@ -20219,6 +24632,13 @@ export namespace Prisma {
     connectOrCreate?: PackageCreateOrConnectWithoutLaptopInput | PackageCreateOrConnectWithoutLaptopInput[]
     createMany?: PackageCreateManyLaptopInputEnvelope
     connect?: PackageWhereUniqueInput | PackageWhereUniqueInput[]
+  }
+
+  export type PackageTemplateUncheckedCreateNestedManyWithoutLaptopInput = {
+    create?: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput> | PackageTemplateCreateWithoutLaptopInput[] | PackageTemplateUncheckedCreateWithoutLaptopInput[]
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutLaptopInput | PackageTemplateCreateOrConnectWithoutLaptopInput[]
+    createMany?: PackageTemplateCreateManyLaptopInputEnvelope
+    connect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
   }
 
   export type DecimalFieldUpdateOperationsInput = {
@@ -20276,6 +24696,20 @@ export namespace Prisma {
     deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
   }
 
+  export type PackageTemplateUpdateManyWithoutLaptopNestedInput = {
+    create?: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput> | PackageTemplateCreateWithoutLaptopInput[] | PackageTemplateUncheckedCreateWithoutLaptopInput[]
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutLaptopInput | PackageTemplateCreateOrConnectWithoutLaptopInput[]
+    upsert?: PackageTemplateUpsertWithWhereUniqueWithoutLaptopInput | PackageTemplateUpsertWithWhereUniqueWithoutLaptopInput[]
+    createMany?: PackageTemplateCreateManyLaptopInputEnvelope
+    set?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    disconnect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    delete?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    connect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    update?: PackageTemplateUpdateWithWhereUniqueWithoutLaptopInput | PackageTemplateUpdateWithWhereUniqueWithoutLaptopInput[]
+    updateMany?: PackageTemplateUpdateManyWithWhereWithoutLaptopInput | PackageTemplateUpdateManyWithWhereWithoutLaptopInput[]
+    deleteMany?: PackageTemplateScalarWhereInput | PackageTemplateScalarWhereInput[]
+  }
+
   export type LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput = {
     create?: XOR<LaptopProfileCreateWithoutLaptopInput, LaptopProfileUncheckedCreateWithoutLaptopInput> | LaptopProfileCreateWithoutLaptopInput[] | LaptopProfileUncheckedCreateWithoutLaptopInput[]
     connectOrCreate?: LaptopProfileCreateOrConnectWithoutLaptopInput | LaptopProfileCreateOrConnectWithoutLaptopInput[]
@@ -20318,6 +24752,20 @@ export namespace Prisma {
     deleteMany?: PackageScalarWhereInput | PackageScalarWhereInput[]
   }
 
+  export type PackageTemplateUncheckedUpdateManyWithoutLaptopNestedInput = {
+    create?: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput> | PackageTemplateCreateWithoutLaptopInput[] | PackageTemplateUncheckedCreateWithoutLaptopInput[]
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutLaptopInput | PackageTemplateCreateOrConnectWithoutLaptopInput[]
+    upsert?: PackageTemplateUpsertWithWhereUniqueWithoutLaptopInput | PackageTemplateUpsertWithWhereUniqueWithoutLaptopInput[]
+    createMany?: PackageTemplateCreateManyLaptopInputEnvelope
+    set?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    disconnect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    delete?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    connect?: PackageTemplateWhereUniqueInput | PackageTemplateWhereUniqueInput[]
+    update?: PackageTemplateUpdateWithWhereUniqueWithoutLaptopInput | PackageTemplateUpdateWithWhereUniqueWithoutLaptopInput[]
+    updateMany?: PackageTemplateUpdateManyWithWhereWithoutLaptopInput | PackageTemplateUpdateManyWithWhereWithoutLaptopInput[]
+    deleteMany?: PackageTemplateScalarWhereInput | PackageTemplateScalarWhereInput[]
+  }
+
   export type LaptopCreateNestedOneWithoutSupportedProfilesInput = {
     create?: XOR<LaptopCreateWithoutSupportedProfilesInput, LaptopUncheckedCreateWithoutSupportedProfilesInput>
     connectOrCreate?: LaptopCreateOrConnectWithoutSupportedProfilesInput
@@ -20353,11 +24801,25 @@ export namespace Prisma {
     connect?: PackageAccessoryWhereUniqueInput | PackageAccessoryWhereUniqueInput[]
   }
 
+  export type TemplateAccessoryCreateNestedManyWithoutAccessoryInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput> | TemplateAccessoryCreateWithoutAccessoryInput[] | TemplateAccessoryUncheckedCreateWithoutAccessoryInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutAccessoryInput | TemplateAccessoryCreateOrConnectWithoutAccessoryInput[]
+    createMany?: TemplateAccessoryCreateManyAccessoryInputEnvelope
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+  }
+
   export type PackageAccessoryUncheckedCreateNestedManyWithoutAccessoryInput = {
     create?: XOR<PackageAccessoryCreateWithoutAccessoryInput, PackageAccessoryUncheckedCreateWithoutAccessoryInput> | PackageAccessoryCreateWithoutAccessoryInput[] | PackageAccessoryUncheckedCreateWithoutAccessoryInput[]
     connectOrCreate?: PackageAccessoryCreateOrConnectWithoutAccessoryInput | PackageAccessoryCreateOrConnectWithoutAccessoryInput[]
     createMany?: PackageAccessoryCreateManyAccessoryInputEnvelope
     connect?: PackageAccessoryWhereUniqueInput | PackageAccessoryWhereUniqueInput[]
+  }
+
+  export type TemplateAccessoryUncheckedCreateNestedManyWithoutAccessoryInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput> | TemplateAccessoryCreateWithoutAccessoryInput[] | TemplateAccessoryUncheckedCreateWithoutAccessoryInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutAccessoryInput | TemplateAccessoryCreateOrConnectWithoutAccessoryInput[]
+    createMany?: TemplateAccessoryCreateManyAccessoryInputEnvelope
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
   }
 
   export type PackageAccessoryUpdateManyWithoutAccessoryNestedInput = {
@@ -20374,6 +24836,20 @@ export namespace Prisma {
     deleteMany?: PackageAccessoryScalarWhereInput | PackageAccessoryScalarWhereInput[]
   }
 
+  export type TemplateAccessoryUpdateManyWithoutAccessoryNestedInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput> | TemplateAccessoryCreateWithoutAccessoryInput[] | TemplateAccessoryUncheckedCreateWithoutAccessoryInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutAccessoryInput | TemplateAccessoryCreateOrConnectWithoutAccessoryInput[]
+    upsert?: TemplateAccessoryUpsertWithWhereUniqueWithoutAccessoryInput | TemplateAccessoryUpsertWithWhereUniqueWithoutAccessoryInput[]
+    createMany?: TemplateAccessoryCreateManyAccessoryInputEnvelope
+    set?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    disconnect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    delete?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    update?: TemplateAccessoryUpdateWithWhereUniqueWithoutAccessoryInput | TemplateAccessoryUpdateWithWhereUniqueWithoutAccessoryInput[]
+    updateMany?: TemplateAccessoryUpdateManyWithWhereWithoutAccessoryInput | TemplateAccessoryUpdateManyWithWhereWithoutAccessoryInput[]
+    deleteMany?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+  }
+
   export type PackageAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput = {
     create?: XOR<PackageAccessoryCreateWithoutAccessoryInput, PackageAccessoryUncheckedCreateWithoutAccessoryInput> | PackageAccessoryCreateWithoutAccessoryInput[] | PackageAccessoryUncheckedCreateWithoutAccessoryInput[]
     connectOrCreate?: PackageAccessoryCreateOrConnectWithoutAccessoryInput | PackageAccessoryCreateOrConnectWithoutAccessoryInput[]
@@ -20386,6 +24862,182 @@ export namespace Prisma {
     update?: PackageAccessoryUpdateWithWhereUniqueWithoutAccessoryInput | PackageAccessoryUpdateWithWhereUniqueWithoutAccessoryInput[]
     updateMany?: PackageAccessoryUpdateManyWithWhereWithoutAccessoryInput | PackageAccessoryUpdateManyWithWhereWithoutAccessoryInput[]
     deleteMany?: PackageAccessoryScalarWhereInput | PackageAccessoryScalarWhereInput[]
+  }
+
+  export type TemplateAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput> | TemplateAccessoryCreateWithoutAccessoryInput[] | TemplateAccessoryUncheckedCreateWithoutAccessoryInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutAccessoryInput | TemplateAccessoryCreateOrConnectWithoutAccessoryInput[]
+    upsert?: TemplateAccessoryUpsertWithWhereUniqueWithoutAccessoryInput | TemplateAccessoryUpsertWithWhereUniqueWithoutAccessoryInput[]
+    createMany?: TemplateAccessoryCreateManyAccessoryInputEnvelope
+    set?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    disconnect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    delete?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    update?: TemplateAccessoryUpdateWithWhereUniqueWithoutAccessoryInput | TemplateAccessoryUpdateWithWhereUniqueWithoutAccessoryInput[]
+    updateMany?: TemplateAccessoryUpdateManyWithWhereWithoutAccessoryInput | TemplateAccessoryUpdateManyWithWhereWithoutAccessoryInput[]
+    deleteMany?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+  }
+
+  export type LaptopCreateNestedOneWithoutPackageTemplatesInput = {
+    create?: XOR<LaptopCreateWithoutPackageTemplatesInput, LaptopUncheckedCreateWithoutPackageTemplatesInput>
+    connectOrCreate?: LaptopCreateOrConnectWithoutPackageTemplatesInput
+    connect?: LaptopWhereUniqueInput
+  }
+
+  export type TemplateAccessoryCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput> | TemplateAccessoryCreateWithoutTemplateInput[] | TemplateAccessoryUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutTemplateInput | TemplateAccessoryCreateOrConnectWithoutTemplateInput[]
+    createMany?: TemplateAccessoryCreateManyTemplateInputEnvelope
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+  }
+
+  export type PersonAssignmentCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput> | PersonAssignmentCreateWithoutTemplateInput[] | PersonAssignmentUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutTemplateInput | PersonAssignmentCreateOrConnectWithoutTemplateInput[]
+    createMany?: PersonAssignmentCreateManyTemplateInputEnvelope
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+  }
+
+  export type TemplateAccessoryUncheckedCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput> | TemplateAccessoryCreateWithoutTemplateInput[] | TemplateAccessoryUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutTemplateInput | TemplateAccessoryCreateOrConnectWithoutTemplateInput[]
+    createMany?: TemplateAccessoryCreateManyTemplateInputEnvelope
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+  }
+
+  export type PersonAssignmentUncheckedCreateNestedManyWithoutTemplateInput = {
+    create?: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput> | PersonAssignmentCreateWithoutTemplateInput[] | PersonAssignmentUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutTemplateInput | PersonAssignmentCreateOrConnectWithoutTemplateInput[]
+    createMany?: PersonAssignmentCreateManyTemplateInputEnvelope
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type LaptopUpdateOneRequiredWithoutPackageTemplatesNestedInput = {
+    create?: XOR<LaptopCreateWithoutPackageTemplatesInput, LaptopUncheckedCreateWithoutPackageTemplatesInput>
+    connectOrCreate?: LaptopCreateOrConnectWithoutPackageTemplatesInput
+    upsert?: LaptopUpsertWithoutPackageTemplatesInput
+    connect?: LaptopWhereUniqueInput
+    update?: XOR<XOR<LaptopUpdateToOneWithWhereWithoutPackageTemplatesInput, LaptopUpdateWithoutPackageTemplatesInput>, LaptopUncheckedUpdateWithoutPackageTemplatesInput>
+  }
+
+  export type TemplateAccessoryUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput> | TemplateAccessoryCreateWithoutTemplateInput[] | TemplateAccessoryUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutTemplateInput | TemplateAccessoryCreateOrConnectWithoutTemplateInput[]
+    upsert?: TemplateAccessoryUpsertWithWhereUniqueWithoutTemplateInput | TemplateAccessoryUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: TemplateAccessoryCreateManyTemplateInputEnvelope
+    set?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    disconnect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    delete?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    update?: TemplateAccessoryUpdateWithWhereUniqueWithoutTemplateInput | TemplateAccessoryUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: TemplateAccessoryUpdateManyWithWhereWithoutTemplateInput | TemplateAccessoryUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+  }
+
+  export type PersonAssignmentUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput> | PersonAssignmentCreateWithoutTemplateInput[] | PersonAssignmentUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutTemplateInput | PersonAssignmentCreateOrConnectWithoutTemplateInput[]
+    upsert?: PersonAssignmentUpsertWithWhereUniqueWithoutTemplateInput | PersonAssignmentUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: PersonAssignmentCreateManyTemplateInputEnvelope
+    set?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    disconnect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    delete?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    update?: PersonAssignmentUpdateWithWhereUniqueWithoutTemplateInput | PersonAssignmentUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: PersonAssignmentUpdateManyWithWhereWithoutTemplateInput | PersonAssignmentUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
+  }
+
+  export type TemplateAccessoryUncheckedUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput> | TemplateAccessoryCreateWithoutTemplateInput[] | TemplateAccessoryUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: TemplateAccessoryCreateOrConnectWithoutTemplateInput | TemplateAccessoryCreateOrConnectWithoutTemplateInput[]
+    upsert?: TemplateAccessoryUpsertWithWhereUniqueWithoutTemplateInput | TemplateAccessoryUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: TemplateAccessoryCreateManyTemplateInputEnvelope
+    set?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    disconnect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    delete?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    connect?: TemplateAccessoryWhereUniqueInput | TemplateAccessoryWhereUniqueInput[]
+    update?: TemplateAccessoryUpdateWithWhereUniqueWithoutTemplateInput | TemplateAccessoryUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: TemplateAccessoryUpdateManyWithWhereWithoutTemplateInput | TemplateAccessoryUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+  }
+
+  export type PersonAssignmentUncheckedUpdateManyWithoutTemplateNestedInput = {
+    create?: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput> | PersonAssignmentCreateWithoutTemplateInput[] | PersonAssignmentUncheckedCreateWithoutTemplateInput[]
+    connectOrCreate?: PersonAssignmentCreateOrConnectWithoutTemplateInput | PersonAssignmentCreateOrConnectWithoutTemplateInput[]
+    upsert?: PersonAssignmentUpsertWithWhereUniqueWithoutTemplateInput | PersonAssignmentUpsertWithWhereUniqueWithoutTemplateInput[]
+    createMany?: PersonAssignmentCreateManyTemplateInputEnvelope
+    set?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    disconnect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    delete?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    connect?: PersonAssignmentWhereUniqueInput | PersonAssignmentWhereUniqueInput[]
+    update?: PersonAssignmentUpdateWithWhereUniqueWithoutTemplateInput | PersonAssignmentUpdateWithWhereUniqueWithoutTemplateInput[]
+    updateMany?: PersonAssignmentUpdateManyWithWhereWithoutTemplateInput | PersonAssignmentUpdateManyWithWhereWithoutTemplateInput[]
+    deleteMany?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
+  }
+
+  export type PackageTemplateCreateNestedOneWithoutAccessoriesInput = {
+    create?: XOR<PackageTemplateCreateWithoutAccessoriesInput, PackageTemplateUncheckedCreateWithoutAccessoriesInput>
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutAccessoriesInput
+    connect?: PackageTemplateWhereUniqueInput
+  }
+
+  export type AccessoryCreateNestedOneWithoutTemplateAccessoriesInput = {
+    create?: XOR<AccessoryCreateWithoutTemplateAccessoriesInput, AccessoryUncheckedCreateWithoutTemplateAccessoriesInput>
+    connectOrCreate?: AccessoryCreateOrConnectWithoutTemplateAccessoriesInput
+    connect?: AccessoryWhereUniqueInput
+  }
+
+  export type PackageTemplateUpdateOneRequiredWithoutAccessoriesNestedInput = {
+    create?: XOR<PackageTemplateCreateWithoutAccessoriesInput, PackageTemplateUncheckedCreateWithoutAccessoriesInput>
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutAccessoriesInput
+    upsert?: PackageTemplateUpsertWithoutAccessoriesInput
+    connect?: PackageTemplateWhereUniqueInput
+    update?: XOR<XOR<PackageTemplateUpdateToOneWithWhereWithoutAccessoriesInput, PackageTemplateUpdateWithoutAccessoriesInput>, PackageTemplateUncheckedUpdateWithoutAccessoriesInput>
+  }
+
+  export type AccessoryUpdateOneRequiredWithoutTemplateAccessoriesNestedInput = {
+    create?: XOR<AccessoryCreateWithoutTemplateAccessoriesInput, AccessoryUncheckedCreateWithoutTemplateAccessoriesInput>
+    connectOrCreate?: AccessoryCreateOrConnectWithoutTemplateAccessoriesInput
+    upsert?: AccessoryUpsertWithoutTemplateAccessoriesInput
+    connect?: AccessoryWhereUniqueInput
+    update?: XOR<XOR<AccessoryUpdateToOneWithWhereWithoutTemplateAccessoriesInput, AccessoryUpdateWithoutTemplateAccessoriesInput>, AccessoryUncheckedUpdateWithoutTemplateAccessoriesInput>
+  }
+
+  export type PersonCreateNestedOneWithoutPersonAssignmentsInput = {
+    create?: XOR<PersonCreateWithoutPersonAssignmentsInput, PersonUncheckedCreateWithoutPersonAssignmentsInput>
+    connectOrCreate?: PersonCreateOrConnectWithoutPersonAssignmentsInput
+    connect?: PersonWhereUniqueInput
+  }
+
+  export type PackageTemplateCreateNestedOneWithoutAssignmentsInput = {
+    create?: XOR<PackageTemplateCreateWithoutAssignmentsInput, PackageTemplateUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutAssignmentsInput
+    connect?: PackageTemplateWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type PersonUpdateOneRequiredWithoutPersonAssignmentsNestedInput = {
+    create?: XOR<PersonCreateWithoutPersonAssignmentsInput, PersonUncheckedCreateWithoutPersonAssignmentsInput>
+    connectOrCreate?: PersonCreateOrConnectWithoutPersonAssignmentsInput
+    upsert?: PersonUpsertWithoutPersonAssignmentsInput
+    connect?: PersonWhereUniqueInput
+    update?: XOR<XOR<PersonUpdateToOneWithWhereWithoutPersonAssignmentsInput, PersonUpdateWithoutPersonAssignmentsInput>, PersonUncheckedUpdateWithoutPersonAssignmentsInput>
+  }
+
+  export type PackageTemplateUpdateOneRequiredWithoutAssignmentsNestedInput = {
+    create?: XOR<PackageTemplateCreateWithoutAssignmentsInput, PackageTemplateUncheckedCreateWithoutAssignmentsInput>
+    connectOrCreate?: PackageTemplateCreateOrConnectWithoutAssignmentsInput
+    upsert?: PackageTemplateUpsertWithoutAssignmentsInput
+    connect?: PackageTemplateWhereUniqueInput
+    update?: XOR<XOR<PackageTemplateUpdateToOneWithWhereWithoutAssignmentsInput, PackageTemplateUpdateWithoutAssignmentsInput>, PackageTemplateUncheckedUpdateWithoutAssignmentsInput>
   }
 
   export type LaptopCreateNestedOneWithoutPackagesInput = {
@@ -20568,10 +25220,6 @@ export namespace Prisma {
     connectOrCreate?: ToolkitToolCreateOrConnectWithoutToolInput | ToolkitToolCreateOrConnectWithoutToolInput[]
     createMany?: ToolkitToolCreateManyToolInputEnvelope
     connect?: ToolkitToolWhereUniqueInput | ToolkitToolWhereUniqueInput[]
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -20977,6 +25625,31 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
@@ -21068,6 +25741,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PersonAssignmentCreateWithoutPersonInput = {
+    id?: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+    template: PackageTemplateCreateNestedOneWithoutAssignmentsInput
+  }
+
+  export type PersonAssignmentUncheckedCreateWithoutPersonInput = {
+    id?: string
+    templateId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type PersonAssignmentCreateOrConnectWithoutPersonInput = {
+    where: PersonAssignmentWhereUniqueInput
+    create: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput>
+  }
+
+  export type PersonAssignmentCreateManyPersonInputEnvelope = {
+    data: PersonAssignmentCreateManyPersonInput | PersonAssignmentCreateManyPersonInput[]
+    skipDuplicates?: boolean
+  }
+
   export type PackageAssignmentUpsertWithWhereUniqueWithoutPersonInput = {
     where: PackageAssignmentWhereUniqueInput
     update: XOR<PackageAssignmentUpdateWithoutPersonInput, PackageAssignmentUncheckedUpdateWithoutPersonInput>
@@ -21093,6 +25796,36 @@ export namespace Prisma {
     personId?: StringFilter<"PackageAssignment"> | string
     pcReference?: StringNullableFilter<"PackageAssignment"> | string | null
     assignedAt?: DateTimeFilter<"PackageAssignment"> | Date | string
+  }
+
+  export type PersonAssignmentUpsertWithWhereUniqueWithoutPersonInput = {
+    where: PersonAssignmentWhereUniqueInput
+    update: XOR<PersonAssignmentUpdateWithoutPersonInput, PersonAssignmentUncheckedUpdateWithoutPersonInput>
+    create: XOR<PersonAssignmentCreateWithoutPersonInput, PersonAssignmentUncheckedCreateWithoutPersonInput>
+  }
+
+  export type PersonAssignmentUpdateWithWhereUniqueWithoutPersonInput = {
+    where: PersonAssignmentWhereUniqueInput
+    data: XOR<PersonAssignmentUpdateWithoutPersonInput, PersonAssignmentUncheckedUpdateWithoutPersonInput>
+  }
+
+  export type PersonAssignmentUpdateManyWithWhereWithoutPersonInput = {
+    where: PersonAssignmentScalarWhereInput
+    data: XOR<PersonAssignmentUpdateManyMutationInput, PersonAssignmentUncheckedUpdateManyWithoutPersonInput>
+  }
+
+  export type PersonAssignmentScalarWhereInput = {
+    AND?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
+    OR?: PersonAssignmentScalarWhereInput[]
+    NOT?: PersonAssignmentScalarWhereInput | PersonAssignmentScalarWhereInput[]
+    id?: StringFilter<"PersonAssignment"> | string
+    personId?: StringFilter<"PersonAssignment"> | string
+    templateId?: StringFilter<"PersonAssignment"> | string
+    status?: StringFilter<"PersonAssignment"> | string
+    pcReference?: StringNullableFilter<"PersonAssignment"> | string | null
+    assignedAt?: DateTimeFilter<"PersonAssignment"> | Date | string
+    deliveredAt?: DateTimeNullableFilter<"PersonAssignment"> | Date | string | null
+    notes?: StringNullableFilter<"PersonAssignment"> | string | null
   }
 
   export type LaptopProfileCreateWithoutLaptopInput = {
@@ -21164,6 +25897,44 @@ export namespace Prisma {
 
   export type PackageCreateManyLaptopInputEnvelope = {
     data: PackageCreateManyLaptopInput | PackageCreateManyLaptopInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PackageTemplateCreateWithoutLaptopInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accessories?: TemplateAccessoryCreateNestedManyWithoutTemplateInput
+    assignments?: PersonAssignmentCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateUncheckedCreateWithoutLaptopInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accessories?: TemplateAccessoryUncheckedCreateNestedManyWithoutTemplateInput
+    assignments?: PersonAssignmentUncheckedCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateCreateOrConnectWithoutLaptopInput = {
+    where: PackageTemplateWhereUniqueInput
+    create: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput>
+  }
+
+  export type PackageTemplateCreateManyLaptopInputEnvelope = {
+    data: PackageTemplateCreateManyLaptopInput | PackageTemplateCreateManyLaptopInput[]
     skipDuplicates?: boolean
   }
 
@@ -21246,6 +26017,38 @@ export namespace Prisma {
     assignedTo?: StringNullableFilter<"Package"> | string | null
   }
 
+  export type PackageTemplateUpsertWithWhereUniqueWithoutLaptopInput = {
+    where: PackageTemplateWhereUniqueInput
+    update: XOR<PackageTemplateUpdateWithoutLaptopInput, PackageTemplateUncheckedUpdateWithoutLaptopInput>
+    create: XOR<PackageTemplateCreateWithoutLaptopInput, PackageTemplateUncheckedCreateWithoutLaptopInput>
+  }
+
+  export type PackageTemplateUpdateWithWhereUniqueWithoutLaptopInput = {
+    where: PackageTemplateWhereUniqueInput
+    data: XOR<PackageTemplateUpdateWithoutLaptopInput, PackageTemplateUncheckedUpdateWithoutLaptopInput>
+  }
+
+  export type PackageTemplateUpdateManyWithWhereWithoutLaptopInput = {
+    where: PackageTemplateScalarWhereInput
+    data: XOR<PackageTemplateUpdateManyMutationInput, PackageTemplateUncheckedUpdateManyWithoutLaptopInput>
+  }
+
+  export type PackageTemplateScalarWhereInput = {
+    AND?: PackageTemplateScalarWhereInput | PackageTemplateScalarWhereInput[]
+    OR?: PackageTemplateScalarWhereInput[]
+    NOT?: PackageTemplateScalarWhereInput | PackageTemplateScalarWhereInput[]
+    id?: StringFilter<"PackageTemplate"> | string
+    name?: StringFilter<"PackageTemplate"> | string
+    description?: StringNullableFilter<"PackageTemplate"> | string | null
+    profileType?: StringFilter<"PackageTemplate"> | string
+    laptopId?: StringFilter<"PackageTemplate"> | string
+    priceType?: StringFilter<"PackageTemplate"> | string
+    isActive?: BoolFilter<"PackageTemplate"> | boolean
+    notes?: StringNullableFilter<"PackageTemplate"> | string | null
+    createdAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"PackageTemplate"> | Date | string
+  }
+
   export type LaptopCreateWithoutSupportedProfilesInput = {
     id?: string
     brand: string
@@ -21263,6 +26066,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedOS?: LaptopOSCreateNestedManyWithoutLaptopInput
     packages?: PackageCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopUncheckedCreateWithoutSupportedProfilesInput = {
@@ -21282,6 +26086,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedOS?: LaptopOSUncheckedCreateNestedManyWithoutLaptopInput
     packages?: PackageUncheckedCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateUncheckedCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopCreateOrConnectWithoutSupportedProfilesInput = {
@@ -21317,6 +26122,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedOS?: LaptopOSUpdateManyWithoutLaptopNestedInput
     packages?: PackageUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopUncheckedUpdateWithoutSupportedProfilesInput = {
@@ -21336,6 +26142,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedOS?: LaptopOSUncheckedUpdateManyWithoutLaptopNestedInput
     packages?: PackageUncheckedUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUncheckedUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopCreateWithoutSupportedOSInput = {
@@ -21355,6 +26162,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
     packages?: PackageCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopUncheckedCreateWithoutSupportedOSInput = {
@@ -21374,6 +26182,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
     packages?: PackageUncheckedCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateUncheckedCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopCreateOrConnectWithoutSupportedOSInput = {
@@ -21409,6 +26218,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
     packages?: PackageUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopUncheckedUpdateWithoutSupportedOSInput = {
@@ -21428,6 +26238,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
     packages?: PackageUncheckedUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUncheckedUpdateManyWithoutLaptopNestedInput
   }
 
   export type PackageAccessoryCreateWithoutAccessoryInput = {
@@ -21445,6 +26256,24 @@ export namespace Prisma {
 
   export type PackageAccessoryCreateManyAccessoryInputEnvelope = {
     data: PackageAccessoryCreateManyAccessoryInput | PackageAccessoryCreateManyAccessoryInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TemplateAccessoryCreateWithoutAccessoryInput = {
+    template: PackageTemplateCreateNestedOneWithoutAccessoriesInput
+  }
+
+  export type TemplateAccessoryUncheckedCreateWithoutAccessoryInput = {
+    templateId: string
+  }
+
+  export type TemplateAccessoryCreateOrConnectWithoutAccessoryInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    create: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput>
+  }
+
+  export type TemplateAccessoryCreateManyAccessoryInputEnvelope = {
+    data: TemplateAccessoryCreateManyAccessoryInput | TemplateAccessoryCreateManyAccessoryInput[]
     skipDuplicates?: boolean
   }
 
@@ -21472,6 +26301,486 @@ export namespace Prisma {
     accessoryId?: StringFilter<"PackageAccessory"> | string
   }
 
+  export type TemplateAccessoryUpsertWithWhereUniqueWithoutAccessoryInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    update: XOR<TemplateAccessoryUpdateWithoutAccessoryInput, TemplateAccessoryUncheckedUpdateWithoutAccessoryInput>
+    create: XOR<TemplateAccessoryCreateWithoutAccessoryInput, TemplateAccessoryUncheckedCreateWithoutAccessoryInput>
+  }
+
+  export type TemplateAccessoryUpdateWithWhereUniqueWithoutAccessoryInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    data: XOR<TemplateAccessoryUpdateWithoutAccessoryInput, TemplateAccessoryUncheckedUpdateWithoutAccessoryInput>
+  }
+
+  export type TemplateAccessoryUpdateManyWithWhereWithoutAccessoryInput = {
+    where: TemplateAccessoryScalarWhereInput
+    data: XOR<TemplateAccessoryUpdateManyMutationInput, TemplateAccessoryUncheckedUpdateManyWithoutAccessoryInput>
+  }
+
+  export type TemplateAccessoryScalarWhereInput = {
+    AND?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+    OR?: TemplateAccessoryScalarWhereInput[]
+    NOT?: TemplateAccessoryScalarWhereInput | TemplateAccessoryScalarWhereInput[]
+    templateId?: StringFilter<"TemplateAccessory"> | string
+    accessoryId?: StringFilter<"TemplateAccessory"> | string
+  }
+
+  export type LaptopCreateWithoutPackageTemplatesInput = {
+    id?: string
+    brand: string
+    model: string
+    price: Decimal | DecimalJsLike | number | string
+    priceType: string
+    processor: string
+    ram: string
+    storage: string
+    batteryLife: Decimal | DecimalJsLike | number | string
+    performanceScore: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
+    supportedOS?: LaptopOSCreateNestedManyWithoutLaptopInput
+    packages?: PackageCreateNestedManyWithoutLaptopInput
+  }
+
+  export type LaptopUncheckedCreateWithoutPackageTemplatesInput = {
+    id?: string
+    brand: string
+    model: string
+    price: Decimal | DecimalJsLike | number | string
+    priceType: string
+    processor: string
+    ram: string
+    storage: string
+    batteryLife: Decimal | DecimalJsLike | number | string
+    performanceScore: Decimal | DecimalJsLike | number | string
+    notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
+    supportedOS?: LaptopOSUncheckedCreateNestedManyWithoutLaptopInput
+    packages?: PackageUncheckedCreateNestedManyWithoutLaptopInput
+  }
+
+  export type LaptopCreateOrConnectWithoutPackageTemplatesInput = {
+    where: LaptopWhereUniqueInput
+    create: XOR<LaptopCreateWithoutPackageTemplatesInput, LaptopUncheckedCreateWithoutPackageTemplatesInput>
+  }
+
+  export type TemplateAccessoryCreateWithoutTemplateInput = {
+    accessory: AccessoryCreateNestedOneWithoutTemplateAccessoriesInput
+  }
+
+  export type TemplateAccessoryUncheckedCreateWithoutTemplateInput = {
+    accessoryId: string
+  }
+
+  export type TemplateAccessoryCreateOrConnectWithoutTemplateInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    create: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type TemplateAccessoryCreateManyTemplateInputEnvelope = {
+    data: TemplateAccessoryCreateManyTemplateInput | TemplateAccessoryCreateManyTemplateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PersonAssignmentCreateWithoutTemplateInput = {
+    id?: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+    person: PersonCreateNestedOneWithoutPersonAssignmentsInput
+  }
+
+  export type PersonAssignmentUncheckedCreateWithoutTemplateInput = {
+    id?: string
+    personId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type PersonAssignmentCreateOrConnectWithoutTemplateInput = {
+    where: PersonAssignmentWhereUniqueInput
+    create: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type PersonAssignmentCreateManyTemplateInputEnvelope = {
+    data: PersonAssignmentCreateManyTemplateInput | PersonAssignmentCreateManyTemplateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type LaptopUpsertWithoutPackageTemplatesInput = {
+    update: XOR<LaptopUpdateWithoutPackageTemplatesInput, LaptopUncheckedUpdateWithoutPackageTemplatesInput>
+    create: XOR<LaptopCreateWithoutPackageTemplatesInput, LaptopUncheckedCreateWithoutPackageTemplatesInput>
+    where?: LaptopWhereInput
+  }
+
+  export type LaptopUpdateToOneWithWhereWithoutPackageTemplatesInput = {
+    where?: LaptopWhereInput
+    data: XOR<LaptopUpdateWithoutPackageTemplatesInput, LaptopUncheckedUpdateWithoutPackageTemplatesInput>
+  }
+
+  export type LaptopUpdateWithoutPackageTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    processor?: StringFieldUpdateOperationsInput | string
+    ram?: StringFieldUpdateOperationsInput | string
+    storage?: StringFieldUpdateOperationsInput | string
+    batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
+    supportedOS?: LaptopOSUpdateManyWithoutLaptopNestedInput
+    packages?: PackageUpdateManyWithoutLaptopNestedInput
+  }
+
+  export type LaptopUncheckedUpdateWithoutPackageTemplatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    processor?: StringFieldUpdateOperationsInput | string
+    ram?: StringFieldUpdateOperationsInput | string
+    storage?: StringFieldUpdateOperationsInput | string
+    batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
+    supportedOS?: LaptopOSUncheckedUpdateManyWithoutLaptopNestedInput
+    packages?: PackageUncheckedUpdateManyWithoutLaptopNestedInput
+  }
+
+  export type TemplateAccessoryUpsertWithWhereUniqueWithoutTemplateInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    update: XOR<TemplateAccessoryUpdateWithoutTemplateInput, TemplateAccessoryUncheckedUpdateWithoutTemplateInput>
+    create: XOR<TemplateAccessoryCreateWithoutTemplateInput, TemplateAccessoryUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type TemplateAccessoryUpdateWithWhereUniqueWithoutTemplateInput = {
+    where: TemplateAccessoryWhereUniqueInput
+    data: XOR<TemplateAccessoryUpdateWithoutTemplateInput, TemplateAccessoryUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type TemplateAccessoryUpdateManyWithWhereWithoutTemplateInput = {
+    where: TemplateAccessoryScalarWhereInput
+    data: XOR<TemplateAccessoryUpdateManyMutationInput, TemplateAccessoryUncheckedUpdateManyWithoutTemplateInput>
+  }
+
+  export type PersonAssignmentUpsertWithWhereUniqueWithoutTemplateInput = {
+    where: PersonAssignmentWhereUniqueInput
+    update: XOR<PersonAssignmentUpdateWithoutTemplateInput, PersonAssignmentUncheckedUpdateWithoutTemplateInput>
+    create: XOR<PersonAssignmentCreateWithoutTemplateInput, PersonAssignmentUncheckedCreateWithoutTemplateInput>
+  }
+
+  export type PersonAssignmentUpdateWithWhereUniqueWithoutTemplateInput = {
+    where: PersonAssignmentWhereUniqueInput
+    data: XOR<PersonAssignmentUpdateWithoutTemplateInput, PersonAssignmentUncheckedUpdateWithoutTemplateInput>
+  }
+
+  export type PersonAssignmentUpdateManyWithWhereWithoutTemplateInput = {
+    where: PersonAssignmentScalarWhereInput
+    data: XOR<PersonAssignmentUpdateManyMutationInput, PersonAssignmentUncheckedUpdateManyWithoutTemplateInput>
+  }
+
+  export type PackageTemplateCreateWithoutAccessoriesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    laptop: LaptopCreateNestedOneWithoutPackageTemplatesInput
+    assignments?: PersonAssignmentCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateUncheckedCreateWithoutAccessoriesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    laptopId: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    assignments?: PersonAssignmentUncheckedCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateCreateOrConnectWithoutAccessoriesInput = {
+    where: PackageTemplateWhereUniqueInput
+    create: XOR<PackageTemplateCreateWithoutAccessoriesInput, PackageTemplateUncheckedCreateWithoutAccessoriesInput>
+  }
+
+  export type AccessoryCreateWithoutTemplateAccessoriesInput = {
+    id?: string
+    name: string
+    type: string
+    brand: string
+    price: Decimal | DecimalJsLike | number | string
+    priceType: string
+    image?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    packageAccessories?: PackageAccessoryCreateNestedManyWithoutAccessoryInput
+  }
+
+  export type AccessoryUncheckedCreateWithoutTemplateAccessoriesInput = {
+    id?: string
+    name: string
+    type: string
+    brand: string
+    price: Decimal | DecimalJsLike | number | string
+    priceType: string
+    image?: string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    packageAccessories?: PackageAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
+  }
+
+  export type AccessoryCreateOrConnectWithoutTemplateAccessoriesInput = {
+    where: AccessoryWhereUniqueInput
+    create: XOR<AccessoryCreateWithoutTemplateAccessoriesInput, AccessoryUncheckedCreateWithoutTemplateAccessoriesInput>
+  }
+
+  export type PackageTemplateUpsertWithoutAccessoriesInput = {
+    update: XOR<PackageTemplateUpdateWithoutAccessoriesInput, PackageTemplateUncheckedUpdateWithoutAccessoriesInput>
+    create: XOR<PackageTemplateCreateWithoutAccessoriesInput, PackageTemplateUncheckedCreateWithoutAccessoriesInput>
+    where?: PackageTemplateWhereInput
+  }
+
+  export type PackageTemplateUpdateToOneWithWhereWithoutAccessoriesInput = {
+    where?: PackageTemplateWhereInput
+    data: XOR<PackageTemplateUpdateWithoutAccessoriesInput, PackageTemplateUncheckedUpdateWithoutAccessoriesInput>
+  }
+
+  export type PackageTemplateUpdateWithoutAccessoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    laptop?: LaptopUpdateOneRequiredWithoutPackageTemplatesNestedInput
+    assignments?: PersonAssignmentUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateUncheckedUpdateWithoutAccessoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    laptopId?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    assignments?: PersonAssignmentUncheckedUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type AccessoryUpsertWithoutTemplateAccessoriesInput = {
+    update: XOR<AccessoryUpdateWithoutTemplateAccessoriesInput, AccessoryUncheckedUpdateWithoutTemplateAccessoriesInput>
+    create: XOR<AccessoryCreateWithoutTemplateAccessoriesInput, AccessoryUncheckedCreateWithoutTemplateAccessoriesInput>
+    where?: AccessoryWhereInput
+  }
+
+  export type AccessoryUpdateToOneWithWhereWithoutTemplateAccessoriesInput = {
+    where?: AccessoryWhereInput
+    data: XOR<AccessoryUpdateWithoutTemplateAccessoriesInput, AccessoryUncheckedUpdateWithoutTemplateAccessoriesInput>
+  }
+
+  export type AccessoryUpdateWithoutTemplateAccessoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    packageAccessories?: PackageAccessoryUpdateManyWithoutAccessoryNestedInput
+  }
+
+  export type AccessoryUncheckedUpdateWithoutTemplateAccessoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    brand?: StringFieldUpdateOperationsInput | string
+    price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    packageAccessories?: PackageAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
+  }
+
+  export type PersonCreateWithoutPersonAssignmentsInput = {
+    id?: string
+    name: string
+    email?: string | null
+    department?: string | null
+    position?: string | null
+    pcReference?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    packageAssignments?: PackageAssignmentCreateNestedManyWithoutPersonInput
+  }
+
+  export type PersonUncheckedCreateWithoutPersonAssignmentsInput = {
+    id?: string
+    name: string
+    email?: string | null
+    department?: string | null
+    position?: string | null
+    pcReference?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    packageAssignments?: PackageAssignmentUncheckedCreateNestedManyWithoutPersonInput
+  }
+
+  export type PersonCreateOrConnectWithoutPersonAssignmentsInput = {
+    where: PersonWhereUniqueInput
+    create: XOR<PersonCreateWithoutPersonAssignmentsInput, PersonUncheckedCreateWithoutPersonAssignmentsInput>
+  }
+
+  export type PackageTemplateCreateWithoutAssignmentsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    laptop: LaptopCreateNestedOneWithoutPackageTemplatesInput
+    accessories?: TemplateAccessoryCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateUncheckedCreateWithoutAssignmentsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    laptopId: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accessories?: TemplateAccessoryUncheckedCreateNestedManyWithoutTemplateInput
+  }
+
+  export type PackageTemplateCreateOrConnectWithoutAssignmentsInput = {
+    where: PackageTemplateWhereUniqueInput
+    create: XOR<PackageTemplateCreateWithoutAssignmentsInput, PackageTemplateUncheckedCreateWithoutAssignmentsInput>
+  }
+
+  export type PersonUpsertWithoutPersonAssignmentsInput = {
+    update: XOR<PersonUpdateWithoutPersonAssignmentsInput, PersonUncheckedUpdateWithoutPersonAssignmentsInput>
+    create: XOR<PersonCreateWithoutPersonAssignmentsInput, PersonUncheckedCreateWithoutPersonAssignmentsInput>
+    where?: PersonWhereInput
+  }
+
+  export type PersonUpdateToOneWithWhereWithoutPersonAssignmentsInput = {
+    where?: PersonWhereInput
+    data: XOR<PersonUpdateWithoutPersonAssignmentsInput, PersonUncheckedUpdateWithoutPersonAssignmentsInput>
+  }
+
+  export type PersonUpdateWithoutPersonAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    packageAssignments?: PackageAssignmentUpdateManyWithoutPersonNestedInput
+  }
+
+  export type PersonUncheckedUpdateWithoutPersonAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    packageAssignments?: PackageAssignmentUncheckedUpdateManyWithoutPersonNestedInput
+  }
+
+  export type PackageTemplateUpsertWithoutAssignmentsInput = {
+    update: XOR<PackageTemplateUpdateWithoutAssignmentsInput, PackageTemplateUncheckedUpdateWithoutAssignmentsInput>
+    create: XOR<PackageTemplateCreateWithoutAssignmentsInput, PackageTemplateUncheckedCreateWithoutAssignmentsInput>
+    where?: PackageTemplateWhereInput
+  }
+
+  export type PackageTemplateUpdateToOneWithWhereWithoutAssignmentsInput = {
+    where?: PackageTemplateWhereInput
+    data: XOR<PackageTemplateUpdateWithoutAssignmentsInput, PackageTemplateUncheckedUpdateWithoutAssignmentsInput>
+  }
+
+  export type PackageTemplateUpdateWithoutAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    laptop?: LaptopUpdateOneRequiredWithoutPackageTemplatesNestedInput
+    accessories?: TemplateAccessoryUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateUncheckedUpdateWithoutAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    laptopId?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessories?: TemplateAccessoryUncheckedUpdateManyWithoutTemplateNestedInput
+  }
+
   export type LaptopCreateWithoutPackagesInput = {
     id?: string
     brand: string
@@ -21489,6 +26798,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
     supportedOS?: LaptopOSCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopUncheckedCreateWithoutPackagesInput = {
@@ -21508,6 +26818,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
     supportedOS?: LaptopOSUncheckedCreateNestedManyWithoutLaptopInput
+    packageTemplates?: PackageTemplateUncheckedCreateNestedManyWithoutLaptopInput
   }
 
   export type LaptopCreateOrConnectWithoutPackagesInput = {
@@ -21585,6 +26896,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
     supportedOS?: LaptopOSUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUpdateManyWithoutLaptopNestedInput
   }
 
   export type LaptopUncheckedUpdateWithoutPackagesInput = {
@@ -21604,6 +26916,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
     supportedOS?: LaptopOSUncheckedUpdateManyWithoutLaptopNestedInput
+    packageTemplates?: PackageTemplateUncheckedUpdateManyWithoutLaptopNestedInput
   }
 
   export type PackageAccessoryUpsertWithWhereUniqueWithoutPackageInput = {
@@ -21680,6 +26993,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    templateAccessories?: TemplateAccessoryCreateNestedManyWithoutAccessoryInput
   }
 
   export type AccessoryUncheckedCreateWithoutPackageAccessoriesInput = {
@@ -21693,6 +27007,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    templateAccessories?: TemplateAccessoryUncheckedCreateNestedManyWithoutAccessoryInput
   }
 
   export type AccessoryCreateOrConnectWithoutPackageAccessoriesInput = {
@@ -21759,6 +27074,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    templateAccessories?: TemplateAccessoryUpdateManyWithoutAccessoryNestedInput
   }
 
   export type AccessoryUncheckedUpdateWithoutPackageAccessoriesInput = {
@@ -21772,6 +27088,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    templateAccessories?: TemplateAccessoryUncheckedUpdateManyWithoutAccessoryNestedInput
   }
 
   export type PackageCreateWithoutAssignmentsInput = {
@@ -21814,6 +27131,7 @@ export namespace Prisma {
     pcReference?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    personAssignments?: PersonAssignmentCreateNestedManyWithoutPersonInput
   }
 
   export type PersonUncheckedCreateWithoutPackageAssignmentsInput = {
@@ -21825,6 +27143,7 @@ export namespace Prisma {
     pcReference?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    personAssignments?: PersonAssignmentUncheckedCreateNestedManyWithoutPersonInput
   }
 
   export type PersonCreateOrConnectWithoutPackageAssignmentsInput = {
@@ -21889,6 +27208,7 @@ export namespace Prisma {
     pcReference?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    personAssignments?: PersonAssignmentUpdateManyWithoutPersonNestedInput
   }
 
   export type PersonUncheckedUpdateWithoutPackageAssignmentsInput = {
@@ -21900,6 +27220,7 @@ export namespace Prisma {
     pcReference?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    personAssignments?: PersonAssignmentUncheckedUpdateManyWithoutPersonNestedInput
   }
 
   export type ToolAlternativeCreateWithoutToolInput = {
@@ -22445,6 +27766,16 @@ export namespace Prisma {
     assignedAt?: Date | string
   }
 
+  export type PersonAssignmentCreateManyPersonInput = {
+    id?: string
+    templateId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
   export type PackageAssignmentUpdateWithoutPersonInput = {
     id?: StringFieldUpdateOperationsInput | string
     pcReference?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22466,6 +27797,36 @@ export namespace Prisma {
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type PersonAssignmentUpdateWithoutPersonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    template?: PackageTemplateUpdateOneRequiredWithoutAssignmentsNestedInput
+  }
+
+  export type PersonAssignmentUncheckedUpdateWithoutPersonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PersonAssignmentUncheckedUpdateManyWithoutPersonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    templateId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type LaptopProfileCreateManyLaptopInput = {
     profile: string
   }
@@ -22483,6 +27844,18 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     assignedTo?: string | null
+  }
+
+  export type PackageTemplateCreateManyLaptopInput = {
+    id?: string
+    name: string
+    description?: string | null
+    profileType: string
+    priceType: string
+    isActive?: boolean
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type LaptopProfileUpdateWithoutLaptopInput = {
@@ -22546,8 +27919,52 @@ export namespace Prisma {
     assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type PackageTemplateUpdateWithoutLaptopInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessories?: TemplateAccessoryUpdateManyWithoutTemplateNestedInput
+    assignments?: PersonAssignmentUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateUncheckedUpdateWithoutLaptopInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accessories?: TemplateAccessoryUncheckedUpdateManyWithoutTemplateNestedInput
+    assignments?: PersonAssignmentUncheckedUpdateManyWithoutTemplateNestedInput
+  }
+
+  export type PackageTemplateUncheckedUpdateManyWithoutLaptopInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    profileType?: StringFieldUpdateOperationsInput | string
+    priceType?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type PackageAccessoryCreateManyAccessoryInput = {
     packageId: string
+  }
+
+  export type TemplateAccessoryCreateManyAccessoryInput = {
+    templateId: string
   }
 
   export type PackageAccessoryUpdateWithoutAccessoryInput = {
@@ -22560,6 +27977,74 @@ export namespace Prisma {
 
   export type PackageAccessoryUncheckedUpdateManyWithoutAccessoryInput = {
     packageId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TemplateAccessoryUpdateWithoutAccessoryInput = {
+    template?: PackageTemplateUpdateOneRequiredWithoutAccessoriesNestedInput
+  }
+
+  export type TemplateAccessoryUncheckedUpdateWithoutAccessoryInput = {
+    templateId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TemplateAccessoryUncheckedUpdateManyWithoutAccessoryInput = {
+    templateId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TemplateAccessoryCreateManyTemplateInput = {
+    accessoryId: string
+  }
+
+  export type PersonAssignmentCreateManyTemplateInput = {
+    id?: string
+    personId: string
+    status?: string
+    pcReference?: string | null
+    assignedAt?: Date | string
+    deliveredAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type TemplateAccessoryUpdateWithoutTemplateInput = {
+    accessory?: AccessoryUpdateOneRequiredWithoutTemplateAccessoriesNestedInput
+  }
+
+  export type TemplateAccessoryUncheckedUpdateWithoutTemplateInput = {
+    accessoryId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TemplateAccessoryUncheckedUpdateManyWithoutTemplateInput = {
+    accessoryId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PersonAssignmentUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    person?: PersonUpdateOneRequiredWithoutPersonAssignmentsNestedInput
+  }
+
+  export type PersonAssignmentUncheckedUpdateWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    personId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PersonAssignmentUncheckedUpdateManyWithoutTemplateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    personId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    pcReference?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PackageAccessoryCreateManyPackageInput = {

@@ -1,75 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
 
 // GET /api/people - Get all people
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const people = await prisma.person.findMany({
-      include: {
-        packageAssignments: {
-          include: {
-            package: {
-              include: {
-                laptop: true,
-                accessories: {
-                  include: {
-                    accessory: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      orderBy: [
+        { name: 'asc' }
+      ]
     });
 
-    // Format the data to match the expected structure
-    const formattedPeople = people.map(person => {
-      // Get assigned packages with full details
-      const assignedPackages = person.packageAssignments.map(assignment => {
-        const pkg = assignment.package;
-        
-        // Format accessories
-        const accessories = pkg.accessories.map(pa => pa.accessory);
-        
-        return {
-          ...pkg,
-          accessories,
-        };
-      });
-      
-      return {
-        ...person,
-        assignedPackages,
-        // Remove the raw relations
-        packageAssignments: undefined
-      };
-    });
-
-    return NextResponse.json(formattedPeople);
+    return NextResponse.json(people);
   } catch (error) {
     console.error('Error fetching people:', error);
-    return NextResponse.json({ error: 'Failed to fetch people' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch people' },
+      { status: 500 }
+    );
   }
 }
 
-// POST /api/people - Add a new person
-export async function POST(req: NextRequest) {
+// POST /api/people - Create a new person
+export async function POST(request: NextRequest) {
   try {
-    const data = await req.json();
-    
+    const body = await request.json();
+    const { name, email, department, position, pcReference } = body;
+
+    // Validate required fields
+    if (!name) {
+      return NextResponse.json(
+        { error: 'Missing required field: name' },
+        { status: 400 }
+      );
+    }
+
+    // Check for duplicate email if provided
+    if (email) {
+      const existingPerson = await prisma.person.findUnique({
+        where: { email }
+      });
+
+      if (existingPerson) {
+        return NextResponse.json(
+          { error: 'Email already exists' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create the person
     const person = await prisma.person.create({
       data: {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+        name,
+        email,
+        department,
+        position,
+        pcReference
+      }
     });
-    
+
     return NextResponse.json(person);
   } catch (error) {
     console.error('Error creating person:', error);
-    return NextResponse.json({ error: 'Failed to create person' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create person' },
+      { status: 500 }
+    );
   }
-} 
+}

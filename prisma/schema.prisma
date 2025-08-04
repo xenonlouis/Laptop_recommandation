@@ -27,7 +27,8 @@ model Person {
   updatedAt     DateTime  @default(now()) @map("updated_at")
   
   // Relations
-  packageAssignments PackageAssignment[]
+  packageAssignments PackageAssignment[] // Legacy
+  personAssignments  PersonAssignment[]  // New
   
   @@map("people")
 }
@@ -51,7 +52,8 @@ model Laptop {
   // Relations
   supportedProfiles  LaptopProfile[]
   supportedOS        LaptopOS[]
-  packages           Package[]
+  packages           Package[]          // Legacy
+  packageTemplates   PackageTemplate[]  // New
   
   @@map("laptops")
 }
@@ -89,10 +91,67 @@ model Accessory {
   updatedAt   DateTime  @default(now()) @map("updated_at")
   
   // Relations
-  packageAccessories PackageAccessory[]
+  packageAccessories PackageAccessory[] // Legacy
+  templateAccessories TemplateAccessory[] // New
   
   @@map("accessories")
 }
+
+// === NEW ARCHITECTURE: Clean Separation ===
+
+// Package Catalog (Templates) - Managed by IT
+model PackageTemplate {
+  id            String    @id @default(uuid())
+  name          String    // "Developer Workstation", "Consultant Setup"
+  description   String?   // "High-performance setup for developers"
+  profileType   String    @map("profile_type") // "developer", "consultant"
+  laptopId      String    @map("laptop_id")
+  priceType     String    @map("price_type") // "HT" | "TTC"
+  isActive      Boolean   @default(true) @map("is_active")
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @map("updated_at")
+  
+  // Relations
+  laptop        Laptop    @relation(fields: [laptopId], references: [id])
+  accessories   TemplateAccessory[]
+  assignments   PersonAssignment[]
+  
+  @@map("package_templates")
+}
+
+// Template Accessories (Many-to-Many)
+model TemplateAccessory {
+  templateId   String    @map("template_id")
+  accessoryId  String    @map("accessory_id")
+  
+  template     PackageTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  accessory    Accessory       @relation(fields: [accessoryId], references: [id], onDelete: Cascade)
+  
+  @@id([templateId, accessoryId])
+  @@map("template_accessories")
+}
+
+// People Assignments - Managed by HR
+model PersonAssignment {
+  id           String    @id @default(uuid())
+  personId     String    @map("person_id")
+  templateId   String    @map("template_id")
+  status       String    @default("assigned") // "assigned", "delivered", "returned"
+  pcReference  String?   @map("pc_reference")
+  assignedAt   DateTime  @default(now()) @map("assigned_at")
+  deliveredAt  DateTime? @map("delivered_at")
+  notes        String?
+  
+  // Relations
+  person       Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  template     PackageTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  
+  @@unique([personId, templateId])
+  @@map("person_assignments")
+}
+
+// === LEGACY MODELS (To be migrated) ===
 
 model Package {
   id          String    @id @default(uuid())
