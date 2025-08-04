@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Plus, Loader2, Users, Package as PackageIcon, Calculator, UserCheck, Trash2, Edit, Eye, X, Layout, List, Grid3X3, Filter, BarChart3, Database, DollarSign, RefreshCw } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, Users, Package as PackageIcon, Calculator, UserCheck, Trash2, Edit, Eye, X, Layout, List, Grid3X3, Filter, BarChart3, Database, DollarSign, RefreshCw, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -151,6 +151,14 @@ export default function PackagesPage() {
     brand: 'all',
     priceRange: [0, 0] as [number, number] // Will be set dynamically
   })
+
+  // Assignment filtering and batch operations
+  const [assignmentFilters, setAssignmentFilters] = useState({
+    search: '',
+    status: 'all',
+    profile: 'all'
+  })
+  const [selectedAssignments, setSelectedAssignments] = useState<string[]>([])
 
   const { toast } = useToast()
 
@@ -895,6 +903,66 @@ export default function PackagesPage() {
     }
   }
 
+  // Assignment filtering and batch operations
+  const getFilteredAssignments = () => {
+    return assignments.filter(assignment => {
+      const matchesSearch = assignmentFilters.search === '' || 
+        assignment.person.name.toLowerCase().includes(assignmentFilters.search.toLowerCase()) ||
+        assignment.template?.name.toLowerCase().includes(assignmentFilters.search.toLowerCase())
+      
+      const matchesStatus = assignmentFilters.status === 'all' || 
+        assignment.status === assignmentFilters.status
+      
+      const matchesProfile = assignmentFilters.profile === 'all' || 
+        assignment.template?.profileType === assignmentFilters.profile
+      
+      return matchesSearch && matchesStatus && matchesProfile
+    })
+  }
+
+  const toggleAssignmentSelection = (assignmentId: string) => {
+    setSelectedAssignments(prev => 
+      prev.includes(assignmentId) 
+        ? prev.filter(id => id !== assignmentId)
+        : [...prev, assignmentId]
+    )
+  }
+
+  const handleBatchDeleteAssignments = async () => {
+    if (selectedAssignments.length === 0) return
+
+    try {
+      const deletePromises = selectedAssignments.map(assignmentId =>
+        fetch(`/api/assignments/${assignmentId}`, {
+          method: 'DELETE',
+        })
+      )
+
+      const results = await Promise.all(deletePromises)
+      const allSuccessful = results.every(response => response.ok)
+
+      if (allSuccessful) {
+        setAssignments(assignments.filter(a => !selectedAssignments.includes(a.id)))
+        setSelectedAssignments([])
+        toast({
+          title: "Success",
+          description: `${selectedAssignments.length} assignment(s) deleted successfully`,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Some assignments could not be deleted",
+        })
+      }
+    } catch (error) {
+      console.error('Failed to delete assignments:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete assignments",
+      })
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -1103,13 +1171,24 @@ export default function PackagesPage() {
                               <p className="text-xs opacity-80">{config.description}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-background/50">
-                              {profileTemplates.length} configs
-                            </Badge>
-                            <Badge variant="outline" className="bg-background/50">
-                              {totalAssigned} assigned
-                            </Badge>
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col items-center">
+                              <span className="text-lg font-bold text-primary">
+                                {profileTemplates.length}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {profileTemplates.length === 1 ? 'Config' : 'Configs'}
+                              </span>
+                            </div>
+                            <div className="w-px h-8 bg-border"></div>
+                            <div className="flex flex-col items-center">
+                              <span className="text-lg font-bold text-primary">
+                                {totalAssigned}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {totalAssigned === 1 ? 'Assigned' : 'Assigned'}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -1534,11 +1613,90 @@ export default function PackagesPage() {
                 </div>
               </div>
 
+              {/* Filters */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex flex-wrap gap-4 items-center">
+                    <div className="flex items-center gap-2">
+                      <Search className="w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by name..."
+                        value={assignmentFilters.search}
+                        onChange={(e) => setAssignmentFilters({...assignmentFilters, search: e.target.value})}
+                        className="w-64"
+                      />
+                    </div>
+                    
+                    <Select
+                      value={assignmentFilters.status}
+                      onValueChange={(value) => setAssignmentFilters({...assignmentFilters, status: value})}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="assigned">Assigned</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="returned">Returned</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={assignmentFilters.profile}
+                      onValueChange={(value) => setAssignmentFilters({...assignmentFilters, profile: value})}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="All Profiles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Profiles</SelectItem>
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile} value={profile}>
+                            {profile}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setAssignmentFilters({search: '', status: 'all', profile: 'all'})}
+                    >
+                      Clear Filters
+                    </Button>
+
+                    {selectedAssignments.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        onClick={handleBatchDeleteAssignments}
+                        className="ml-auto"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Selected ({selectedAssignments.length})
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Assignments Table */}
               <Card>
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedAssignments.length === getFilteredAssignments().length && getFilteredAssignments().length > 0}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedAssignments(getFilteredAssignments().map(a => a.id))
+                            } else {
+                              setSelectedAssignments([])
+                            }
+                          }}
+                        />
+                      </TableHead>
                       <TableHead>Person</TableHead>
                       <TableHead>Template</TableHead>
                       <TableHead>Profile</TableHead>
@@ -1549,15 +1707,21 @@ export default function PackagesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {assignments.map((assignment) => (
+                    {getFilteredAssignments().map((assignment) => (
                       <TableRow key={assignment.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedAssignments.includes(assignment.id)}
+                            onCheckedChange={() => toggleAssignmentSelection(assignment.id)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium">{assignment.person.name}</p>
                             <p className="text-sm text-muted-foreground">
                               {assignment.person.department}
                             </p>
-              </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div>
@@ -1565,7 +1729,7 @@ export default function PackagesPage() {
                             <p className="text-sm text-muted-foreground">
                               {assignment.template?.laptop.brand} {assignment.template?.laptop.model}
                             </p>
-              </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           {assignment.template && getProfileBadge(assignment.template.profileType)}
@@ -1581,23 +1745,23 @@ export default function PackagesPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
-                  <Select
+                            <Select
                               value={assignment.status}
                               onValueChange={(status) => handleUpdateAssignmentStatus(assignment.id, status)}
-                  >
+                            >
                               <SelectTrigger className="w-32">
                                 <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
+                              </SelectTrigger>
+                              <SelectContent>
                                 <SelectItem value="assigned">Assigned</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="delivered">Delivered</SelectItem>
                                 <SelectItem value="returned">Returned</SelectItem>
-                    </SelectContent>
-                  </Select>
+                              </SelectContent>
+                            </Select>
                             <Button variant="ghost" size="sm">
                               <Trash2 className="w-4 h-4" />
                             </Button>
-                </div>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
