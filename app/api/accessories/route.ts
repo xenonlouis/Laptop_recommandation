@@ -1,32 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server"
-import type { Accessory } from "@/types"
-import fs from "fs"
-import path from "path"
+import { PrismaClient } from "@/lib/generated/prisma"
 
-const accessoriesDataFilePath = path.join(process.cwd(), "data", "accessories.json")
-
-// Ensure the data directory exists
-const ensureDataDirectoryExists = () => {
-  const dataDir = path.join(process.cwd(), "data")
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true })
-  }
-}
-
-// Ensure the accessories file exists
-const ensureAccessoriesFileExists = () => {
-  ensureDataDirectoryExists()
-  if (!fs.existsSync(accessoriesDataFilePath)) {
-    fs.writeFileSync(accessoriesDataFilePath, JSON.stringify([], null, 2), "utf8")
-  }
-}
+const prisma = new PrismaClient()
 
 // GET /api/accessories - Get all accessories
 export async function GET() {
   try {
-    ensureAccessoriesFileExists()
-    const data = await fs.promises.readFile(accessoriesDataFilePath, "utf8")
-    return NextResponse.json(JSON.parse(data))
+    const accessories = await prisma.accessory.findMany({
+      orderBy: {
+        name: 'asc'
+      }
+    })
+
+    // Convert Decimal types to numbers for JSON serialization
+    const serializedAccessories = accessories.map(accessory => ({
+      ...accessory,
+      price: Number(accessory.price)
+    }))
+
+    return NextResponse.json(serializedAccessories)
   } catch (error) {
     console.error("Error fetching accessories:", error)
     return NextResponse.json({ error: "Failed to fetch accessories" }, { status: 500 })
@@ -36,31 +28,33 @@ export async function GET() {
 // POST /api/accessories - Add a new accessory
 export async function POST(request: NextRequest) {
   try {
-    ensureAccessoriesFileExists()
-    const accessoryData = (await request.json()) as Omit<Accessory, "id">
+    const accessoryData = await request.json()
 
     // Validate required fields
     if (!accessoryData.name || !accessoryData.type || !accessoryData.brand) {
       return NextResponse.json({ error: "Name, type, and brand are required" }, { status: 400 })
     }
 
-    // Read existing accessories
-    const data = await fs.promises.readFile(accessoriesDataFilePath, "utf8")
-    const accessories = JSON.parse(data) as Accessory[]
+    // Create new accessory in database
+    const newAccessory = await prisma.accessory.create({
+      data: {
+        name: accessoryData.name,
+        type: accessoryData.type,
+        brand: accessoryData.brand,
+        price: accessoryData.price || 0,
+        priceType: accessoryData.priceType || 'HT',
+        image: accessoryData.image || '',
+        notes: accessoryData.notes || ''
+      }
+    })
 
-    // Create a new accessory with ID
-    const newAccessory = {
-      ...accessoryData,
-      id: Math.random().toString(36).substring(2, 9)
-    }
-
-    // Add to accessories array
-    accessories.push(newAccessory)
-
-    // Save to file
-    await fs.promises.writeFile(accessoriesDataFilePath, JSON.stringify(accessories, null, 2), "utf8")
-
-    return NextResponse.json({ message: "Accessory added successfully", accessory: newAccessory }, { status: 201 })
+    return NextResponse.json({ 
+      message: "Accessory added successfully", 
+      accessory: {
+        ...newAccessory,
+        price: Number(newAccessory.price)
+      }
+    }, { status: 201 })
   } catch (error) {
     console.error("Error adding accessory:", error)
     return NextResponse.json({ error: "Failed to add accessory" }, { status: 500 })

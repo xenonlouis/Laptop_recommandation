@@ -135,13 +135,21 @@ export default function PackagesPage() {
   // Cost Simulator state
   const [teamConfig, setTeamConfig] = useState<Record<string, number>>({})
   const [simulatorPriceType, setSimulatorPriceType] = useState<'HT' | 'TTC'>('TTC')
+  
+  // Team Composition state for new layout
+  const [teamComposition, setTeamComposition] = useState<Array<{
+    id: string
+    profileType: string
+    packagePreference: 'Windows Package' | 'Mac Package'
+    quantity: number
+  }>>([])
 
   // View and Filter states
   const [viewMode, setViewMode] = useState<'kanban' | 'list' | 'grid'>('kanban')
   const [filters, setFilters] = useState({
     os: 'all',
     brand: 'all',
-    priceRange: [5000, 25000] as [number, number]
+    priceRange: [0, 0] as [number, number] // Will be set dynamically
   })
 
   const { toast } = useToast()
@@ -149,6 +157,44 @@ export default function PackagesPage() {
   // Utility function to normalize profile names
   const normalizeProfileName = (profileName: string): string => {
     return profileName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+  }
+
+  // Team Composition helper functions
+  const addTeamMember = () => {
+    const newMember = {
+      id: Math.random().toString(36).substr(2, 9),
+      profileType: profiles.length > 0 ? profiles[0] : 'General',
+      packagePreference: 'Windows Package' as 'Windows Package' | 'Mac Package',
+      quantity: 1
+    }
+    setTeamComposition([...teamComposition, newMember])
+  }
+
+  const removeTeamMember = (id: string) => {
+    setTeamComposition(teamComposition.filter(member => member.id !== id))
+  }
+
+  const updateTeamMember = (id: string, field: string, value: any) => {
+    setTeamComposition(teamComposition.map(member => 
+      member.id === id ? { ...member, [field]: value } : member
+    ))
+  }
+
+  const getTeamCompositionCosts = () => {
+    return teamComposition.map(member => {
+      const profilePricing = getProfilePricing().find(p => normalizeProfileName(p.profile) === normalizeProfileName(member.profileType))
+      const unitPrice = member.packagePreference === 'Windows Package' 
+        ? (profilePricing?.windowsPrice || 0)
+        : (profilePricing?.macPrice || 0)
+      
+      return {
+        ...member,
+        unitPriceMAD: unitPrice,
+        unitPriceEUR: unitPrice / eurToMadRate.rate,
+        totalMAD: unitPrice * member.quantity,
+        totalEUR: (unitPrice * member.quantity) / eurToMadRate.rate
+      }
+    })
   }
 
   // Load data
@@ -172,6 +218,25 @@ export default function PackagesPage() {
       if (templatesRes.ok) {
         const templatesData = await templatesRes.json()
         setTemplates(templatesData)
+        
+        // Calculate dynamic price range based on actual template prices
+        if (templatesData.length > 0) {
+          const prices = templatesData.map((t: PackageTemplate) => t.totalPrice)
+          const minPrice = Math.min(...prices)
+          const maxPrice = Math.max(...prices)
+          
+          // Add some padding to the range (10% on each side)
+          const padding = (maxPrice - minPrice) * 0.1
+          const newMinPrice = Math.max(0, Math.floor(minPrice - padding))
+          const newMaxPrice = Math.ceil(maxPrice + padding)
+          
+          setFilters(prev => ({
+            ...prev,
+            priceRange: [newMinPrice, newMaxPrice]
+          }))
+          
+          console.log(`💰 Dynamic price range set: [${newMinPrice}, ${newMaxPrice}] MAD`)
+        }
       }
 
       if (assignmentsRes.ok) {
@@ -377,27 +442,33 @@ export default function PackagesPage() {
   }
 
   const calculateTotalCost = () => {
-    const profilePricing = getProfilePricing()
-    let total = 0
+    if (teamComposition.length === 0) {
+      // Fallback to old method if no team composition
+      const profilePricing = getProfilePricing()
+      let total = 0
 
-    Object.entries(teamConfig).forEach(([profile, quantity]) => {
-      if (quantity > 0) {
-        const profileData = profilePricing.find(p => p.profile === profile)
-        if (profileData) {
-          // Use weighted average of Windows and Mac prices based on available packages
-          const totalPackages = profileData.windowsCount + profileData.macCount
-          if (totalPackages > 0) {
-            const weightedPrice = (
-              (profileData.windowsPrice * profileData.windowsCount) + 
-              (profileData.macPrice * profileData.macCount)
-            ) / totalPackages
-            total += weightedPrice * quantity
+      Object.entries(teamConfig).forEach(([profile, quantity]) => {
+        if (quantity > 0) {
+          const profileData = profilePricing.find(p => p.profile === profile)
+          if (profileData) {
+            // Use weighted average of Windows and Mac prices based on available packages
+            const totalPackages = profileData.windowsCount + profileData.macCount
+            if (totalPackages > 0) {
+              const weightedPrice = (
+                (profileData.windowsPrice * profileData.windowsCount) + 
+                (profileData.macPrice * profileData.macCount)
+              ) / totalPackages
+              total += weightedPrice * quantity
+            }
           }
         }
-      }
-    })
+      })
 
-    return total
+      return total
+    }
+
+    // Use new team composition method
+    return getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0)
   }
 
   // Template Management Functions
@@ -743,11 +814,30 @@ export default function PackagesPage() {
   }
 
   const clearFilters = () => {
-    setFilters({
-      os: 'all',
-      brand: 'all',
-      priceRange: [5000, 25000]
-    })
+    // Calculate current price range from templates
+    if (templates.length > 0) {
+      const prices = templates.map(t => t.totalPrice)
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+      
+      // Add some padding to the range (10% on each side)
+      const padding = (maxPrice - minPrice) * 0.1
+      const newMinPrice = Math.max(0, Math.floor(minPrice - padding))
+      const newMaxPrice = Math.ceil(maxPrice + padding)
+      
+      setFilters({
+        os: 'all',
+        brand: 'all',
+        priceRange: [newMinPrice, newMaxPrice]
+      })
+    } else {
+      // Fallback if no templates
+      setFilters({
+        os: 'all',
+        brand: 'all',
+        priceRange: [0, 25000]
+      })
+    }
   }
 
   // Get unique values for filter options
@@ -975,16 +1065,16 @@ export default function PackagesPage() {
               {viewMode === 'kanban' && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {Object.entries(getTemplatesByProfile()).map(([profileKey, profileTemplates]) => {
-                    // Generate dynamic profile config
+                    // Use clean dark background with off-gray borders to match package cards
                     const colors = [
-                      'bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-300',
-                      'bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-300',
-                      'bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-300',
-                      'bg-orange-500/10 border-orange-500/20 text-orange-700 dark:text-orange-300',
-                      'bg-pink-500/10 border-pink-500/20 text-pink-700 dark:text-pink-300',
-                      'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-300',
-                      'bg-teal-500/10 border-teal-500/20 text-teal-700 dark:text-teal-300',
-                      'bg-gray-500/10 border-gray-500/20 text-gray-700 dark:text-gray-300'
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Consultant: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Developer: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Unassigned: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400'  // Fallback: Clean bg, off-gray border
                     ]
                     
                     const icons = ['💻', '🎯', '⚡', '🔧', '📊', '🎨', '🚀', '📦']
@@ -1541,14 +1631,14 @@ export default function PackagesPage() {
                 </p>
               </div>
 
-              {/* Team Configuration */}
+              {/* Team Composition */}
               <Card>
                 <div className="p-6 border-b">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold">Team Configuration</h3>
+                      <h3 className="text-lg font-semibold">Team Composition</h3>
                       <p className="text-sm text-muted-foreground">
-                        Specify how many people you need for each profile type
+                        Define your team structure and package preferences
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1571,56 +1661,182 @@ export default function PackagesPage() {
                   </div>
                 </div>
                 <CardContent className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {profiles.map((profile) => (
-                      <div key={profile} className="space-y-2">
-                        <Label htmlFor={profile} className="text-sm font-medium">
-                          {profile}
-                        </Label>
-                        <Input
-                          id={profile}
-                          type="number"
-                          min="0"
-                          value={teamConfig[profile] || 0}
-                          onChange={(e) => setTeamConfig({
-                            ...teamConfig,
-                            [profile]: parseInt(e.target.value) || 0
-                          })}
-                          placeholder="0"
-                          className="w-full"
-                        />
+                  <div className="space-y-4">
+                    {teamComposition.map((member) => (
+                      <div key={member.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-sm font-medium">Profile Type</Label>
+                            <Select 
+                              value={member.profileType}
+                              onValueChange={(value) => updateTeamMember(member.id, 'profileType', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {profiles.map((profile) => (
+                                  <SelectItem key={profile} value={profile}>
+                                    {profile}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Package Preference</Label>
+                            <Select 
+                              value={member.packagePreference}
+                              onValueChange={(value: 'Windows Package' | 'Mac Package') => updateTeamMember(member.id, 'packagePreference', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Windows Package">Windows Package</SelectItem>
+                                <SelectItem value="Mac Package">Mac Package</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={member.quantity}
+                              onChange={(e) => updateTeamMember(member.id, 'quantity', parseInt(e.target.value) || 1)}
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeTeamMember(member.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     ))}
-                  </div>
-                  
-                  <div className="mt-6 p-4 bg-muted/20 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">Total Team Size</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {Object.values(teamConfig).reduce((sum, qty) => sum + qty, 0)} people
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <h4 className="font-medium">Estimated Total Cost ({simulatorPriceType})</h4>
-                        <p className="text-lg font-bold text-primary">
-                          {formatCurrency(calculateTotalCost())}
-                        </p>
-                        {simulatorPriceType === 'HT' && (
-                          <p className="text-xs text-muted-foreground">
-                            +20% VAT = {formatCurrency(calculateTotalCost() * 1.20)} TTC
-                          </p>
-                        )}
-                        {simulatorPriceType === 'TTC' && (
-                          <p className="text-xs text-muted-foreground">
-                            -20% VAT = {formatCurrency(calculateTotalCost() / 1.20)} HT
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    
+                    <Button onClick={addTeamMember} variant="outline" className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Team Member
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Cost Breakdown */}
+              {teamComposition.length > 0 && (
+                <Card>
+                  <div className="p-6 border-b">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5" />
+                      <h3 className="text-lg font-semibold">Cost Breakdown</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Detailed cost analysis for your team configuration
+                    </p>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Profile</TableHead>
+                            <TableHead>Package</TableHead>
+                            <TableHead>Quantity</TableHead>
+                            <TableHead>Unit Price (MAD {simulatorPriceType})</TableHead>
+                            <TableHead>Unit Price (EUR {simulatorPriceType})</TableHead>
+                            <TableHead>Total (MAD {simulatorPriceType})</TableHead>
+                            <TableHead>Total (EUR {simulatorPriceType})</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getTeamCompositionCosts().map((cost) => (
+                            <TableRow key={cost.id}>
+                              <TableCell className="font-medium">{cost.profileType}</TableCell>
+                              <TableCell>{cost.packagePreference}</TableCell>
+                              <TableCell>{cost.quantity}</TableCell>
+                              <TableCell>{formatCurrency(cost.unitPriceMAD)}</TableCell>
+                              <TableCell>{formatCurrencyUtil(cost.unitPriceEUR, 'EUR')}</TableCell>
+                              <TableCell className="font-medium">{formatCurrency(cost.totalMAD)}</TableCell>
+                              <TableCell className="font-medium">{formatCurrencyUtil(cost.totalEUR, 'EUR')}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Project Total */}
+              {teamComposition.length > 0 && (
+                <Card>
+                  <div className="p-6 border-b">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="w-5 h-5" />
+                      <h3 className="text-lg font-semibold">Project Total</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Complete cost estimation for your project
+                    </p>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-sm text-muted-foreground">Total Cost ({simulatorPriceType})</h4>
+                          <div className="text-3xl font-bold text-primary">
+                            {formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0))}
+                          </div>
+                          <div className="text-lg text-muted-foreground">
+                            {formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0), 'EUR')}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm text-muted-foreground">Total Cost ({simulatorPriceType === 'HT' ? 'TTC' : 'HT'})</h4>
+                          <div className="text-xl font-medium text-muted-foreground">
+                            {simulatorPriceType === 'HT' 
+                              ? formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0) * 1.20)
+                              : formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0) / 1.20)
+                            }
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {simulatorPriceType === 'HT' 
+                              ? formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0) * 1.20, 'EUR')
+                              : formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0) / 1.20, 'EUR')
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-muted/20 rounded-lg">
+                          <h4 className="font-medium mb-2">Currency Rate</h4>
+                          <div className="text-lg font-bold">
+                            1 EUR = {eurToMadRate.rate.toFixed(2)} MAD
+                          </div>
+                          {eurToMadRate.isLive && (
+                            <Badge variant="secondary" className="mt-1">Live</Badge>
+                          )}
+                        </div>
+                        <div className="p-4 bg-muted/20 rounded-lg">
+                          <h4 className="font-medium mb-2">Team Summary</h4>
+                          <div className="text-lg font-bold">
+                            {getTeamCompositionCosts().reduce((sum, cost) => sum + cost.quantity, 0)} team members
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            across {getTeamCompositionCosts().length} different configurations
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Pricing Calculation Details */}
               <Card>
