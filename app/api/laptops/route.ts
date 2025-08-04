@@ -11,9 +11,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Format the data to match the expected structure
+    // Format the data to match the expected structure and convert Decimals to numbers
     const formattedLaptops = laptops.map(laptop => ({
       ...laptop,
+      price: Number(laptop.price),
+      batteryLife: Number(laptop.batteryLife),
+      performanceScore: Number(laptop.performanceScore),
+      images: laptop.images || [], // Ensure images is always an array
       supportedProfiles: laptop.supportedProfiles.map(p => p.profile),
       supportedOS: laptop.supportedOS.map(os => os.os),
     }));
@@ -37,6 +41,7 @@ export async function POST(req: NextRequest) {
     const laptop = await prisma.laptop.create({
       data: {
         ...laptopData,
+        images: laptopData.images || [], // Ensure images is always an array
         createdAt: new Date(),
         updatedAt: new Date(),
       },

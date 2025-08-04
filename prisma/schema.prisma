@@ -44,6 +44,7 @@ model Laptop {
   batteryLife      Decimal   @map("battery_life") @db.Decimal(4, 1)
   performanceScore Decimal   @map("performance_score") @db.Decimal(3, 1)
   notes            String?
+  images           String[]  @default([]) // Array of image URLs
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @default(now()) @map("updated_at")
   

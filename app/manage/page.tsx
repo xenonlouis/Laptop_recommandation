@@ -25,6 +25,16 @@ import { ArrowLeft, Plus, Pencil, Trash2, MoreVertical, Search, Loader2, X } fro
 import { useToast } from "@/hooks/use-toast"
 import { fetchLaptops, createLaptop, updateLaptop, deleteLaptop as apiDeleteLaptop } from "@/lib/api-client"
 
+// Helper function to safely get performance score as a number
+const getPerformanceScore = (score: any): number => {
+  if (typeof score === 'number' && !isNaN(score)) return score;
+  if (typeof score === 'string') {
+    const parsed = parseFloat(score);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 0; // Default fallback
+};
+
 export default function ManageLaptops() {
   const [laptops, setLaptops] = useState<Laptop[]>([])
   const [loading, setLoading] = useState(true)
@@ -437,7 +447,10 @@ export default function ManageLaptops() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setCurrentLaptop(laptop)
+                                  setCurrentLaptop({
+                                    ...laptop,
+                                    performanceScore: getPerformanceScore(laptop.performanceScore) || 7
+                                  })
                                   setIsEditDialogOpen(true)
                                 }}
                               >
@@ -446,7 +459,10 @@ export default function ManageLaptops() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => {
-                                  setCurrentLaptop(laptop)
+                                  setCurrentLaptop({
+                                    ...laptop,
+                                    performanceScore: getPerformanceScore(laptop.performanceScore) || 7
+                                  })
                                   setIsDeleteDialogOpen(true)
                                 }}
                                 className="text-destructive focus:text-destructive"
@@ -609,11 +625,11 @@ export default function ManageLaptops() {
                     min={0}
                     max={10}
                     step={0.1}
-                    value={[newLaptop.performanceScore || 7]}
+                    value={[getPerformanceScore(newLaptop.performanceScore) || 7]}
                     onValueChange={(value) => setNewLaptop({ ...newLaptop, performanceScore: value[0] })}
                   />
                 </div>
-                <div className="text-right text-sm text-muted-foreground">{newLaptop.performanceScore?.toFixed(1)}</div>
+                <div className="text-right text-sm text-muted-foreground">{getPerformanceScore(newLaptop.performanceScore).toFixed(1)}</div>
               </div>
             </div>
 
@@ -866,12 +882,12 @@ export default function ManageLaptops() {
                       min={0}
                       max={10}
                       step={0.1}
-                      value={[currentLaptop.performanceScore]}
+                      value={[getPerformanceScore(currentLaptop.performanceScore)]}
                       onValueChange={(value) => setCurrentLaptop({ ...currentLaptop, performanceScore: value[0] })}
                     />
                   </div>
                   <div className="text-right text-sm text-muted-foreground">
-                    {currentLaptop.performanceScore.toFixed(1)}
+                    {getPerformanceScore(currentLaptop.performanceScore).toFixed(1)}
                   </div>
                 </div>
               </div>

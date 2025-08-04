@@ -3368,6 +3368,7 @@ export namespace Prisma {
     batteryLife: number
     performanceScore: number
     notes: number
+    images: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3430,6 +3431,7 @@ export namespace Prisma {
     batteryLife?: true
     performanceScore?: true
     notes?: true
+    images?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3533,6 +3535,7 @@ export namespace Prisma {
     batteryLife: Decimal
     performanceScore: Decimal
     notes: string | null
+    images: string[]
     createdAt: Date
     updatedAt: Date
     _count: LaptopCountAggregateOutputType | null
@@ -3568,6 +3571,7 @@ export namespace Prisma {
     batteryLife?: boolean
     performanceScore?: boolean
     notes?: boolean
+    images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     supportedProfiles?: boolean | Laptop$supportedProfilesArgs<ExtArgs>
@@ -3588,6 +3592,7 @@ export namespace Prisma {
     batteryLife?: boolean
     performanceScore?: boolean
     notes?: boolean
+    images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["laptop"]>
@@ -3604,6 +3609,7 @@ export namespace Prisma {
     batteryLife?: boolean
     performanceScore?: boolean
     notes?: boolean
+    images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["laptop"]>
@@ -3620,11 +3626,12 @@ export namespace Prisma {
     batteryLife?: boolean
     performanceScore?: boolean
     notes?: boolean
+    images?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type LaptopOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "brand" | "model" | "price" | "priceType" | "processor" | "ram" | "storage" | "batteryLife" | "performanceScore" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["laptop"]>
+  export type LaptopOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "brand" | "model" | "price" | "priceType" | "processor" | "ram" | "storage" | "batteryLife" | "performanceScore" | "notes" | "images" | "createdAt" | "updatedAt", ExtArgs["result"]["laptop"]>
   export type LaptopInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     supportedProfiles?: boolean | Laptop$supportedProfilesArgs<ExtArgs>
     supportedOS?: boolean | Laptop$supportedOSArgs<ExtArgs>
@@ -3653,6 +3660,7 @@ export namespace Prisma {
       batteryLife: Prisma.Decimal
       performanceScore: Prisma.Decimal
       notes: string | null
+      images: string[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["laptop"]>
@@ -4092,6 +4100,7 @@ export namespace Prisma {
     readonly batteryLife: FieldRef<"Laptop", 'Decimal'>
     readonly performanceScore: FieldRef<"Laptop", 'Decimal'>
     readonly notes: FieldRef<"Laptop", 'String'>
+    readonly images: FieldRef<"Laptop", 'String[]'>
     readonly createdAt: FieldRef<"Laptop", 'DateTime'>
     readonly updatedAt: FieldRef<"Laptop", 'DateTime'>
   }
@@ -16961,6 +16970,7 @@ export namespace Prisma {
     batteryLife: 'batteryLife',
     performanceScore: 'performanceScore',
     notes: 'notes',
+    images: 'images',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -17315,6 +17325,7 @@ export namespace Prisma {
     batteryLife?: DecimalFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableFilter<"Laptop"> | string | null
+    images?: StringNullableListFilter<"Laptop">
     createdAt?: DateTimeFilter<"Laptop"> | Date | string
     updatedAt?: DateTimeFilter<"Laptop"> | Date | string
     supportedProfiles?: LaptopProfileListRelationFilter
@@ -17334,6 +17345,7 @@ export namespace Prisma {
     batteryLife?: SortOrder
     performanceScore?: SortOrder
     notes?: SortOrderInput | SortOrder
+    images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     supportedProfiles?: LaptopProfileOrderByRelationAggregateInput
@@ -17356,6 +17368,7 @@ export namespace Prisma {
     batteryLife?: DecimalFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableFilter<"Laptop"> | string | null
+    images?: StringNullableListFilter<"Laptop">
     createdAt?: DateTimeFilter<"Laptop"> | Date | string
     updatedAt?: DateTimeFilter<"Laptop"> | Date | string
     supportedProfiles?: LaptopProfileListRelationFilter
@@ -17375,6 +17388,7 @@ export namespace Prisma {
     batteryLife?: SortOrder
     performanceScore?: SortOrder
     notes?: SortOrderInput | SortOrder
+    images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: LaptopCountOrderByAggregateInput
@@ -17399,6 +17413,7 @@ export namespace Prisma {
     batteryLife?: DecimalWithAggregatesFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalWithAggregatesFilter<"Laptop"> | Decimal | DecimalJsLike | number | string
     notes?: StringNullableWithAggregatesFilter<"Laptop"> | string | null
+    images?: StringNullableListFilter<"Laptop">
     createdAt?: DateTimeWithAggregatesFilter<"Laptop"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Laptop"> | Date | string
   }
@@ -18294,6 +18309,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
@@ -18313,6 +18329,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
@@ -18332,6 +18349,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
@@ -18351,6 +18369,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
@@ -18370,6 +18389,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -18386,6 +18406,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -18402,6 +18423,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19415,6 +19437,14 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type LaptopProfileListRelationFilter = {
     every?: LaptopProfileWhereInput
     some?: LaptopProfileWhereInput
@@ -19457,6 +19487,7 @@ export namespace Prisma {
     batteryLife?: SortOrder
     performanceScore?: SortOrder
     notes?: SortOrder
+    images?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -19955,14 +19986,6 @@ export namespace Prisma {
     toolId?: SortOrder
   }
 
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
-  }
-
   export type BoolNullableFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
     not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
@@ -20152,6 +20175,10 @@ export namespace Prisma {
     deleteMany?: PackageAssignmentScalarWhereInput | PackageAssignmentScalarWhereInput[]
   }
 
+  export type LaptopCreateimagesInput = {
+    set: string[]
+  }
+
   export type LaptopProfileCreateNestedManyWithoutLaptopInput = {
     create?: XOR<LaptopProfileCreateWithoutLaptopInput, LaptopProfileUncheckedCreateWithoutLaptopInput> | LaptopProfileCreateWithoutLaptopInput[] | LaptopProfileUncheckedCreateWithoutLaptopInput[]
     connectOrCreate?: LaptopProfileCreateOrConnectWithoutLaptopInput | LaptopProfileCreateOrConnectWithoutLaptopInput[]
@@ -20200,6 +20227,11 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type LaptopUpdateimagesInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type LaptopProfileUpdateManyWithoutLaptopNestedInput = {
@@ -21226,6 +21258,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedOS?: LaptopOSCreateNestedManyWithoutLaptopInput
@@ -21244,6 +21277,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedOS?: LaptopOSUncheckedCreateNestedManyWithoutLaptopInput
@@ -21278,6 +21312,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedOS?: LaptopOSUpdateManyWithoutLaptopNestedInput
@@ -21296,6 +21331,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedOS?: LaptopOSUncheckedUpdateManyWithoutLaptopNestedInput
@@ -21314,6 +21350,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
@@ -21332,6 +21369,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
@@ -21366,6 +21404,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
@@ -21384,6 +21423,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput
@@ -21444,6 +21484,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileCreateNestedManyWithoutLaptopInput
@@ -21462,6 +21503,7 @@ export namespace Prisma {
     batteryLife: Decimal | DecimalJsLike | number | string
     performanceScore: Decimal | DecimalJsLike | number | string
     notes?: string | null
+    images?: LaptopCreateimagesInput | string[]
     createdAt?: Date | string
     updatedAt?: Date | string
     supportedProfiles?: LaptopProfileUncheckedCreateNestedManyWithoutLaptopInput
@@ -21538,6 +21580,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUpdateManyWithoutLaptopNestedInput
@@ -21556,6 +21599,7 @@ export namespace Prisma {
     batteryLife?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     performanceScore?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    images?: LaptopUpdateimagesInput | string[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     supportedProfiles?: LaptopProfileUncheckedUpdateManyWithoutLaptopNestedInput

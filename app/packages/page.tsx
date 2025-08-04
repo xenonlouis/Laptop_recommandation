@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
 import { useToast } from "@/hooks/use-toast"
 import type { Package, Accessory, Laptop, PackageStatus, PriceType } from "@/types"
@@ -212,6 +213,283 @@ function StatusColumn({
   );
 }
 
+// Cost Simulator Component
+interface TeamMember {
+  id: string;
+  profileType: 'Developer' | 'Consultant' | 'Designer' | 'Manager';
+  packagePreference: 'Windows Package' | 'Mac Package' | 'Mixed (Average)';
+  quantity: number;
+}
+
+interface PackagePrice {
+  Developer: { windows: number; mac: number };
+  Consultant: { windows: number; mac: number };
+  Designer: { windows: number; mac: number };
+  Manager: { windows: number; mac: number };
+}
+
+function CostSimulator({ packages }: { packages: Package[] }) {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+    { id: '1', profileType: 'Developer', packagePreference: 'Windows Package', quantity: 2 },
+    { id: '2', profileType: 'Consultant', packagePreference: 'Mac Package', quantity: 1 }
+  ]);
+  const [eurToMadRate] = useState(10.8); // Fixed rate as per Notion system
+
+  // Extract package prices from actual data
+  const getPackagePrices = (): PackagePrice => {
+    // Find representative packages for each profile type
+    const devWindows = packages.find(pkg => 
+      pkg.assignedTo?.toLowerCase().includes('dev') || 
+      pkg.name.toLowerCase().includes('dev') ||
+      pkg.name.toLowerCase().includes('thinkpad')
+    );
+    const devMac = packages.find(pkg => 
+      pkg.name.toLowerCase().includes('mac') && 
+      (pkg.assignedTo?.toLowerCase().includes('dev') || pkg.name.toLowerCase().includes('dev'))
+    );
+    
+    // Fallback pricing based on your system (MAD HT)
+    return {
+      Developer: {
+        windows: devWindows ? devWindows.laptop.price + devWindows.accessories.reduce((sum, acc) => sum + acc.price, 0) : 10680, // €1,068 * 10.8
+        mac: devMac ? devMac.laptop.price + devMac.accessories.reduce((sum, acc) => sum + acc.price, 0) : 12999 // MacBook Air M4
+      },
+      Consultant: {
+        windows: 11208, // HP ProBook 440 G8 
+        mac: 12999 // MacBook Air M4
+      },
+      Designer: {
+        windows: 13500, // Higher spec for design work
+        mac: 15999 // MacBook Pro for design
+      },
+      Manager: {
+        windows: 10000, // Standard business laptop
+        mac: 12999 // Standard MacBook
+      }
+    };
+  };
+
+  const packagePrices = getPackagePrices();
+
+  const addTeamMember = () => {
+    const newId = (teamMembers.length + 1).toString();
+    setTeamMembers([...teamMembers, {
+      id: newId,
+      profileType: 'Developer',
+      packagePreference: 'Windows Package',
+      quantity: 1
+    }]);
+  };
+
+  const updateTeamMember = (id: string, field: keyof TeamMember, value: any) => {
+    setTeamMembers(teamMembers.map(member => 
+      member.id === id ? { ...member, [field]: value } : member
+    ));
+  };
+
+  const removeTeamMember = (id: string) => {
+    setTeamMembers(teamMembers.filter(member => member.id !== id));
+  };
+
+  const calculateMemberCost = (member: TeamMember): number => {
+    const prices = packagePrices[member.profileType];
+    let unitPrice = 0;
+
+    switch (member.packagePreference) {
+      case 'Windows Package':
+        unitPrice = prices.windows;
+        break;
+      case 'Mac Package':
+        unitPrice = prices.mac;
+        break;
+      case 'Mixed (Average)':
+        unitPrice = (prices.windows + prices.mac) / 2;
+        break;
+    }
+
+    return unitPrice * member.quantity;
+  };
+
+  const getTotalCostMAD = (): number => {
+    return teamMembers.reduce((sum, member) => sum + calculateMemberCost(member), 0);
+  };
+
+  const getTotalCostEUR = (): number => {
+    return getTotalCostMAD() / eurToMadRate;
+  };
+
+  const formatCurrency = (amount: number, currency: 'MAD' | 'EUR'): string => {
+    return `${amount.toLocaleString()} ${currency}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Cost Simulator</h2>
+        <p className="text-muted-foreground">
+          Calculate total costs for different team compositions based on actual package pricing.
+        </p>
+      </div>
+
+      {/* Team Composition Input */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Team Composition</CardTitle>
+          <CardDescription>Define your team structure and package preferences</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {teamMembers.map((member) => (
+            <div key={member.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
+              <div className="space-y-2">
+                <Label>Profile Type</Label>
+                <Select
+                  value={member.profileType}
+                  onValueChange={(value: any) => updateTeamMember(member.id, 'profileType', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Developer">Developer</SelectItem>
+                    <SelectItem value="Consultant">Consultant</SelectItem>
+                    <SelectItem value="Designer">Designer</SelectItem>
+                    <SelectItem value="Manager">Manager</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Package Preference</Label>
+                <Select
+                  value={member.packagePreference}
+                  onValueChange={(value: any) => updateTeamMember(member.id, 'packagePreference', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Windows Package">Windows Package</SelectItem>
+                    <SelectItem value="Mac Package">Mac Package</SelectItem>
+                    <SelectItem value="Mixed (Average)">Mixed (Average)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Quantity</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={member.quantity}
+                  onChange={(e) => updateTeamMember(member.id, 'quantity', parseInt(e.target.value) || 1)}
+                />
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeTeamMember(member.id)}
+                  disabled={teamMembers.length === 1}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          <Button onClick={addTeamMember} variant="outline">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Team Member
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Cost Breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Cost Breakdown</CardTitle>
+          <CardDescription>Detailed cost analysis for your team configuration</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Profile</TableHead>
+                <TableHead>Package</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Unit Price (MAD HT)</TableHead>
+                <TableHead>Unit Price (EUR HT)</TableHead>
+                <TableHead>Total (MAD HT)</TableHead>
+                <TableHead>Total (EUR HT)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teamMembers.map((member) => {
+                const totalMAD = calculateMemberCost(member);
+                const unitPriceMAD = totalMAD / member.quantity;
+                const unitPriceEUR = unitPriceMAD / eurToMadRate;
+                const totalEUR = totalMAD / eurToMadRate;
+
+                return (
+                  <TableRow key={member.id}>
+                    <TableCell className="font-medium">{member.profileType}</TableCell>
+                    <TableCell>{member.packagePreference}</TableCell>
+                    <TableCell>{member.quantity}</TableCell>
+                    <TableCell>{formatCurrency(unitPriceMAD, 'MAD')}</TableCell>
+                    <TableCell>{formatCurrency(unitPriceEUR, 'EUR')}</TableCell>
+                    <TableCell className="font-medium">{formatCurrency(totalMAD, 'MAD')}</TableCell>
+                    <TableCell className="font-medium">{formatCurrency(totalEUR, 'EUR')}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Total Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Total</CardTitle>
+          <CardDescription>Complete cost estimation for your project</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-lg">Total Cost (HT)</h4>
+                <p className="text-2xl font-bold text-primary">{formatCurrency(getTotalCostMAD(), 'MAD')}</p>
+                <p className="text-lg text-muted-foreground">{formatCurrency(getTotalCostEUR(), 'EUR')}</p>
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-lg">Total Cost (TTC)</h4>
+                <p className="text-2xl font-bold">{formatCurrency(getTotalCostMAD() * 1.2, 'MAD')}</p>
+                <p className="text-lg text-muted-foreground">{formatCurrency(getTotalCostEUR() * 1.2, 'EUR')}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium">Currency Rate</h4>
+                <p className="text-sm text-muted-foreground">1 EUR ≈ {eurToMadRate} MAD</p>
+              </div>
+              
+              <div>
+                <h4 className="font-medium">Team Summary</h4>
+                <p className="text-sm text-muted-foreground">
+                  {teamMembers.reduce((sum, member) => sum + member.quantity, 0)} team members across {teamMembers.length} different configurations
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function PackagesPage() {
   const [packages, setPackages] = useState<Package[]>([])
   const [loading, setLoading] = useState(true)
@@ -368,6 +646,7 @@ export default function PackagesPage() {
   }
 
   const getTotalPrice = (pkg: Package) => {
+    // Prices are now properly converted to numbers in the API layer
     const laptopPrice = pkg.laptop.price
     const accessoriesPrice = pkg.accessories.reduce((sum: number, acc: Accessory) => sum + acc.price, 0)
     const totalPrice = laptopPrice + accessoriesPrice
@@ -742,81 +1021,103 @@ export default function PackagesPage() {
       <main className="container py-6">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight mb-2">Package Management</h1>
+            <h1 className="text-2xl font-bold tracking-tight mb-2">Packages & Cost Simulator</h1>
             <p className="text-muted-foreground">
-              Manage laptop packages and track their status. Drag packages between columns to change their status.
+              Manage laptop packages and calculate team costs for project planning.
             </p>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Add Package
-          </Button>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-[500px] w-full rounded-xl" />
+        <Tabs defaultValue="management" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="management">Package Management</TabsTrigger>
+            <TabsTrigger value="simulator">Cost Simulator</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="management" className="mt-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-semibold mb-2">Package Management</h2>
+                <p className="text-muted-foreground">
+                  Drag packages between columns to change their status.
+                </p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {columns.map((column) => (
-                <StatusColumn
-                  key={column.id}
-                  title={column.title}
-                  icon={column.icon}
-                  count={getPackagesByStatus(column.id).length}
-                  status={column.id}
-                  color={column.color}
-                >
-                  <SortableContext
-                    items={getPackagesByStatus(column.id).map(pkg => pkg.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-3">
-                      {getPackagesByStatus(column.id).map((pkg) => (
-                        <SortablePackageCard
-                          key={pkg.id}
-                          pkg={pkg}
-                          formatPrice={formatPrice}
-                          getTotalPrice={getTotalPrice}
-                          getAccessoryIcon={getAccessoryIcon}
-                          getStatusBadge={getStatusBadge}
-                          onClick={() => handlePackageClick(pkg)}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </StatusColumn>
-              ))}
+              <Button onClick={() => setIsAddDialogOpen(true)}>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add Package
+              </Button>
             </div>
 
-            <DragOverlay>
-              {activePackage ? (
-                <div className="w-full opacity-80">
-                  <PackageCard
-                    pkg={activePackage}
-                    formatPrice={formatPrice}
-                    getTotalPrice={getTotalPrice}
-                    getAccessoryIcon={getAccessoryIcon}
-                    getStatusBadge={getStatusBadge}
-                  />
+            {loading ? (
+              <div className="grid grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-[500px] w-full rounded-xl" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {columns.map((column) => (
+                    <StatusColumn
+                      key={column.id}
+                      title={column.title}
+                      icon={column.icon}
+                      count={getPackagesByStatus(column.id).length}
+                      status={column.id}
+                      color={column.color}
+                    >
+                      <SortableContext
+                        items={getPackagesByStatus(column.id).map(pkg => pkg.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-3">
+                          {getPackagesByStatus(column.id).map((pkg) => (
+                            <SortablePackageCard
+                              key={pkg.id}
+                              pkg={pkg}
+                              formatPrice={formatPrice}
+                              getTotalPrice={getTotalPrice}
+                              getAccessoryIcon={getAccessoryIcon}
+                              getStatusBadge={getStatusBadge}
+                              onClick={() => handlePackageClick(pkg)}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </StatusColumn>
+                  ))}
                 </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        )}
+
+                <DragOverlay>
+                  {activePackage ? (
+                    <div className="w-full opacity-80">
+                      <PackageCard
+                        pkg={activePackage}
+                        formatPrice={formatPrice}
+                        getTotalPrice={getTotalPrice}
+                        getAccessoryIcon={getAccessoryIcon}
+                        getStatusBadge={getStatusBadge}
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+            )}
+          </TabsContent>
+
+          <TabsContent value="simulator" className="mt-6">
+            <CostSimulator packages={packages} />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Add Package Dialog */}

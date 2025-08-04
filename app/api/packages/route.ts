@@ -17,11 +17,20 @@ export async function GET(req: NextRequest) {
 
     // Format the data to match the expected structure
     const formattedPackages = packages.map(pkg => {
-      // Get accessories
-      const accessories = pkg.accessories.map(pa => pa.accessory);
+      // Get accessories and convert Decimal prices to numbers
+      const accessories = pkg.accessories.map(pa => ({
+        ...pa.accessory,
+        price: Number(pa.accessory.price)
+      }));
       
       return {
         ...pkg,
+        laptop: {
+          ...pkg.laptop,
+          price: Number(pkg.laptop.price),
+          batteryLife: Number(pkg.laptop.batteryLife),
+          performanceScore: Number(pkg.laptop.performanceScore)
+        },
         accessories,
       };
     });
@@ -66,10 +75,19 @@ export async function POST(req: NextRequest) {
       }
     });
     
-    // Format the response
+    // Format the response and convert Decimal prices to numbers
     const formattedPackage = {
       ...newPackage,
-      accessories: newPackage.accessories.map(pa => pa.accessory)
+      laptop: {
+        ...newPackage.laptop,
+        price: Number(newPackage.laptop.price),
+        batteryLife: Number(newPackage.laptop.batteryLife),
+        performanceScore: Number(newPackage.laptop.performanceScore)
+      },
+      accessories: newPackage.accessories.map(pa => ({
+        ...pa.accessory,
+        price: Number(pa.accessory.price)
+      }))
     };
     
     return NextResponse.json(formattedPackage);

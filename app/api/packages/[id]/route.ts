@@ -30,12 +30,21 @@ export async function GET(
       return NextResponse.json({ error: 'Package not found' }, { status: 404 });
     }
     
-    // Format the response to match the expected structure
-    const accessories = pkg.accessories.map(pa => pa.accessory);
+    // Format the response to match the expected structure and convert Decimals
+    const accessories = pkg.accessories.map(pa => ({
+      ...pa.accessory,
+      price: Number(pa.accessory.price)
+    }));
     const assignedPeople = pkg.assignments.map(assignment => assignment.person);
     
     const formattedPackage = {
       ...pkg,
+      laptop: {
+        ...pkg.laptop,
+        price: Number(pkg.laptop.price),
+        batteryLife: Number(pkg.laptop.batteryLife),
+        performanceScore: Number(pkg.laptop.performanceScore)
+      },
       accessories,
       assignedPeople,
       // Remove the raw relations

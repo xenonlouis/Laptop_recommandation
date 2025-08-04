@@ -174,7 +174,11 @@ export function LaptopComparison() {
                               dominantBaseline="middle"
                               className="text-lg font-bold fill-foreground"
                             >
-                              {laptop.performanceScore.toFixed(1)}
+                              {(typeof laptop.performanceScore === 'number' && !isNaN(laptop.performanceScore) 
+                                ? laptop.performanceScore 
+                                : typeof laptop.performanceScore === 'string' && !isNaN(parseFloat(laptop.performanceScore))
+                                ? parseFloat(laptop.performanceScore)
+                                : 0).toFixed(1)}
                             </text>
                           </svg>
                         </div>
