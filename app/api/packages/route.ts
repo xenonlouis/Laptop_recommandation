@@ -29,7 +29,8 @@ export async function GET(req: NextRequest) {
           ...pkg.laptop,
           price: Number(pkg.laptop.price),
           batteryLife: Number(pkg.laptop.batteryLife),
-          performanceScore: Number(pkg.laptop.performanceScore)
+          performanceScore: Number(pkg.laptop.performanceScore),
+          images: pkg.laptop.images || [] // Include images for frontend display
         },
         accessories,
       };
@@ -82,7 +83,8 @@ export async function POST(req: NextRequest) {
         ...newPackage.laptop,
         price: Number(newPackage.laptop.price),
         batteryLife: Number(newPackage.laptop.batteryLife),
-        performanceScore: Number(newPackage.laptop.performanceScore)
+        performanceScore: Number(newPackage.laptop.performanceScore),
+        images: newPackage.laptop.images || [] // Include images for frontend display
       },
       accessories: newPackage.accessories.map(pa => ({
         ...pa.accessory,

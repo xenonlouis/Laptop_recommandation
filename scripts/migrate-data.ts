@@ -311,6 +311,7 @@ async function migrateLaptops() {
           batteryLife: laptop.batteryLife,
           performanceScore: laptop.performanceScore,
           notes: laptop.notes || null,
+          images: laptop.images || [], // Include images from JSON data
           createdAt: laptop.createdAt ? new Date(laptop.createdAt) : new Date(),
           updatedAt: laptop.updatedAt ? new Date(laptop.updatedAt) : new Date(),
         },

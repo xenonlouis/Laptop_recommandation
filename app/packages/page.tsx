@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
+import { getEurToMadRate, formatCurrency as formatCurrencyUtil, madToEur } from "@/lib/exchange-rates"
 import { useToast } from "@/hooks/use-toast"
 import type { Package, Accessory, Laptop, PackageStatus, PriceType } from "@/types"
 // Import dnd-kit components
@@ -213,58 +214,326 @@ function StatusColumn({
   );
 }
 
+// Pricing Breakdown Component  
+function PricingBreakdown({ packages }: { packages: Package[] }) {
+  const [eurToMadRate, setEurToMadRate] = useState(10.8);
+  const [isLiveRate, setIsLiveRate] = useState(false);
+  const [rateLoading, setRateLoading] = useState(false);
+
+  // Fetch live exchange rate on component mount
+  useEffect(() => {
+    const fetchRate = async () => {
+      setRateLoading(true);
+      try {
+        const { rate, isLive } = await getEurToMadRate();
+        setEurToMadRate(rate);
+        setIsLiveRate(isLive);
+      } catch (error) {
+        console.error('Failed to fetch exchange rate:', error);
+      } finally {
+        setRateLoading(false);
+      }
+    };
+
+    fetchRate();
+  }, []);
+  // Separate packages by laptop OS/brand to determine Windows vs Mac
+  const windowsPackages = packages.filter(pkg => 
+    pkg.laptop.brand?.toLowerCase() !== 'apple' && 
+    pkg.laptop.model?.toLowerCase().includes('windows') === false
+  );
+  const macPackages = packages.filter(pkg => 
+    pkg.laptop.brand?.toLowerCase() === 'apple' || 
+    pkg.laptop.model?.toLowerCase().includes('mac')
+  );
+  
+  // Calculate average prices for each category
+  const calculateAveragePrice = (packageList: Package[]): number => {
+    if (packageList.length === 0) return 0;
+    const totalPrice = packageList.reduce((sum, pkg) => {
+      const laptopPrice = pkg.laptop.price;
+      const accessoriesPrice = pkg.accessories.reduce((accSum, acc) => accSum + acc.price, 0);
+      return sum + laptopPrice + accessoriesPrice;
+    }, 0);
+    return Math.round(totalPrice / packageList.length);
+  };
+  
+  const avgWindowsPrice = calculateAveragePrice(windowsPackages);
+  const avgMacPrice = calculateAveragePrice(macPackages);
+  const defaultWindows = avgWindowsPrice || 10680;
+  const defaultMac = avgMacPrice || 14490;
+
+  
+  // Profile multipliers
+  const profiles = [
+    { name: 'Full-Stack Developer', windowsMultiplier: 1.1, macMultiplier: 1.0, reason: '+10% for dev tools & IDEs | Base Mac price' },
+    { name: 'Salesforce Consultant', windowsMultiplier: 0.95, macMultiplier: 0.95, reason: '-5% standard business tools | -5% standard business tools' },
+    { name: 'MuleSoft Developer', windowsMultiplier: 1.15, macMultiplier: 1.1, reason: '+15% for integration tools | +10% for development on Mac' },
+    { name: 'Salesforce Developer', windowsMultiplier: 1.05, macMultiplier: 1.0, reason: '+5% for Salesforce dev tools | Base Mac price' }
+  ];
+  
+  return (
+    <div className="space-y-6">
+      {/* Data Source Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle>📊 Data Source Analysis</CardTitle>
+          <CardDescription>How we identify and categorize your packages</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium">Windows Packages</h4>
+              <p className="text-sm text-muted-foreground">Packages with non-Apple laptops</p>
+              <div className="text-2xl font-bold text-blue-600">{windowsPackages.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Average: {avgWindowsPrice ? `${avgWindowsPrice.toLocaleString()} MAD` : 'No data - using fallback'}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium">Mac Packages</h4>
+              <p className="text-sm text-muted-foreground">Packages with Apple laptops</p>
+              <div className="text-2xl font-bold text-gray-600">{macPackages.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Average: {avgMacPrice ? `${avgMacPrice.toLocaleString()} MAD` : 'No data - using fallback'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Base Prices */}
+      <Card>
+        <CardHeader>
+          <CardTitle>💰 Base Prices (Before Profile Adjustments)</CardTitle>
+          <CardDescription>Foundation prices calculated from your package data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-muted/30 border rounded-lg">
+              <h4 className="font-medium">Windows Base Price</h4>
+              <div className="text-2xl font-bold text-primary">{defaultWindows.toLocaleString()} MAD</div>
+              <div className="text-sm text-muted-foreground">{Math.round(defaultWindows / eurToMadRate).toLocaleString()} EUR</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {avgWindowsPrice ? 'Calculated from your data' : 'Fallback value (no Windows packages found)'}
+              </p>
+            </div>
+            <div className="p-4 bg-muted/30 border rounded-lg">
+              <h4 className="font-medium">Mac Base Price</h4>
+              <div className="text-2xl font-bold text-primary">{defaultMac.toLocaleString()} MAD</div>
+              <div className="text-sm text-muted-foreground">{Math.round(defaultMac / eurToMadRate).toLocaleString()} EUR</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {avgMacPrice ? 'Calculated from your data' : 'Fallback value (no Mac packages found)'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Profile-Based Pricing */}
+      <Card>
+        <CardHeader>
+          <CardTitle>🎯 Profile-Based Pricing</CardTitle>
+          <CardDescription>How base prices are adjusted for different roles</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 font-medium">Profile</th>
+                  <th className="text-center py-2 font-medium">Windows Price</th>
+                  <th className="text-center py-2 font-medium">Mac Price</th>
+                  <th className="text-left py-2 font-medium">Reasoning</th>
+                </tr>
+              </thead>
+              <tbody>
+                {profiles.map((profile) => (
+                  <tr key={profile.name} className="border-b">
+                    <td className="py-3 font-medium">{profile.name}</td>
+                    <td className="text-center py-3">
+                      <div className="space-y-1">
+                        <div className="font-medium">
+                          {Math.round(defaultWindows * profile.windowsMultiplier).toLocaleString()} MAD
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {Math.round((defaultWindows * profile.windowsMultiplier) / eurToMadRate).toLocaleString()} EUR
+                        </div>
+                        <div className={`text-xs ${profile.windowsMultiplier > 1 ? 'text-green-500' : profile.windowsMultiplier < 1 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                          {profile.windowsMultiplier > 1 ? '+' : ''}{Math.round((profile.windowsMultiplier - 1) * 100)}%
+                        </div>
+                      </div>
+                    </td>
+                    <td className="text-center py-3">
+                      <div className="space-y-1">
+                        <div className="font-medium">
+                          {Math.round(defaultMac * profile.macMultiplier).toLocaleString()} MAD
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {Math.round((defaultMac * profile.macMultiplier) / eurToMadRate).toLocaleString()} EUR
+                        </div>
+                        <div className={`text-xs ${profile.macMultiplier > 1 ? 'text-green-500' : profile.macMultiplier < 1 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                          {profile.macMultiplier > 1 ? '+' : ''}{Math.round((profile.macMultiplier - 1) * 100)}%
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 text-sm text-muted-foreground">{profile.reason}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Currency Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle>💱 Currency Conversion</CardTitle>
+          <CardDescription>Exchange rate used for EUR calculations</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center p-4 bg-muted rounded-lg">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="text-lg font-medium">1 EUR = {eurToMadRate.toFixed(2)} MAD</div>
+              {rateLoading ? (
+                <div className="text-sm text-muted-foreground">Updating...</div>
+              ) : (
+                <div className={`text-xs px-2 py-1 rounded ${isLiveRate ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                  {isLiveRate ? 'Live Rate' : 'Fallback Rate'}
+                </div>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  setRateLoading(true);
+                  try {
+                    const { rate, isLive } = await getEurToMadRate();
+                    setEurToMadRate(rate);
+                    setIsLiveRate(isLive);
+                  } catch (error) {
+                    console.error('Failed to refresh rate:', error);
+                  } finally {
+                    setRateLoading(false);
+                  }
+                }}
+                disabled={rateLoading}
+                className="h-6 px-2 text-xs"
+              >
+                {rateLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : '🔄'}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isLiveRate ? 'Updated from live exchange rate API' : 'Using fallback rate (API unavailable)'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // Cost Simulator Component
 interface TeamMember {
   id: string;
-  profileType: 'Developer' | 'Consultant' | 'Designer' | 'Manager';
+  profileType: 'Salesforce Consultant' | 'MuleSoft Developer' | 'Full-Stack Developer' | 'Salesforce Developer';
   packagePreference: 'Windows Package' | 'Mac Package' | 'Mixed (Average)';
   quantity: number;
 }
 
 interface PackagePrice {
-  Developer: { windows: number; mac: number };
-  Consultant: { windows: number; mac: number };
-  Designer: { windows: number; mac: number };
-  Manager: { windows: number; mac: number };
+  'Salesforce Consultant': { windows: number; mac: number };
+  'MuleSoft Developer': { windows: number; mac: number };
+  'Full-Stack Developer': { windows: number; mac: number };
+  'Salesforce Developer': { windows: number; mac: number };
 }
 
 function CostSimulator({ packages }: { packages: Package[] }) {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    { id: '1', profileType: 'Developer', packagePreference: 'Windows Package', quantity: 2 },
-    { id: '2', profileType: 'Consultant', packagePreference: 'Mac Package', quantity: 1 }
+    { id: '1', profileType: 'Full-Stack Developer', packagePreference: 'Windows Package', quantity: 2 },
+    { id: '2', profileType: 'Salesforce Consultant', packagePreference: 'Mac Package', quantity: 1 }
   ]);
-  const [eurToMadRate] = useState(10.8); // Fixed rate as per Notion system
+  const [eurToMadRate, setEurToMadRate] = useState(10.8);
+  const [isLiveRate, setIsLiveRate] = useState(false);
+  const [rateLoading, setRateLoading] = useState(false);
 
-  // Extract package prices from actual data
+  // Fetch live exchange rate on component mount
+  useEffect(() => {
+    const fetchRate = async () => {
+      setRateLoading(true);
+      try {
+        const { rate, isLive } = await getEurToMadRate();
+        setEurToMadRate(rate);
+        setIsLiveRate(isLive);
+      } catch (error) {
+        console.error('Failed to fetch exchange rate:', error);
+      } finally {
+        setRateLoading(false);
+      }
+    };
+
+    fetchRate();
+  }, []);
+
+  // Calculate package prices from actual data
   const getPackagePrices = (): PackagePrice => {
-    // Find representative packages for each profile type
-    const devWindows = packages.find(pkg => 
-      pkg.assignedTo?.toLowerCase().includes('dev') || 
-      pkg.name.toLowerCase().includes('dev') ||
-      pkg.name.toLowerCase().includes('thinkpad')
+    console.log('📊 Calculating prices from', packages.length, 'packages');
+    
+    // Separate packages by laptop OS/brand to determine Windows vs Mac
+    const windowsPackages = packages.filter(pkg => 
+      pkg.laptop.brand?.toLowerCase() !== 'apple' && 
+      pkg.laptop.model?.toLowerCase().includes('windows') === false // Exclude if explicitly Windows in name
     );
-    const devMac = packages.find(pkg => 
-      pkg.name.toLowerCase().includes('mac') && 
-      (pkg.assignedTo?.toLowerCase().includes('dev') || pkg.name.toLowerCase().includes('dev'))
+    const macPackages = packages.filter(pkg => 
+      pkg.laptop.brand?.toLowerCase() === 'apple' || 
+      pkg.laptop.model?.toLowerCase().includes('mac')
     );
     
-    // Fallback pricing based on your system (MAD HT)
+    // Calculate average prices for each category
+    const calculateAveragePrice = (packageList: Package[]): number => {
+      if (packageList.length === 0) return 0;
+      const totalPrice = packageList.reduce((sum, pkg) => {
+        const laptopPrice = pkg.laptop.price;
+        const accessoriesPrice = pkg.accessories.reduce((accSum, acc) => accSum + acc.price, 0);
+        return sum + laptopPrice + accessoriesPrice;
+      }, 0);
+      return Math.round(totalPrice / packageList.length);
+    };
+    
+    const avgWindowsPrice = calculateAveragePrice(windowsPackages);
+    const avgMacPrice = calculateAveragePrice(macPackages);
+    
+    // Fallback to representative values if no data
+    const defaultWindows = avgWindowsPrice || 10680;
+    const defaultMac = avgMacPrice || 14490;
+    
+    console.log('💰 Calculated pricing:', {
+      windowsPackages: windowsPackages.length,
+      macPackages: macPackages.length,
+      avgWindowsPrice,
+      avgMacPrice,
+      defaultWindows,
+      defaultMac
+    });
+    
+    // Apply different pricing strategies per profile type
     return {
-      Developer: {
-        windows: devWindows ? devWindows.laptop.price + devWindows.accessories.reduce((sum, acc) => sum + acc.price, 0) : 10680, // €1,068 * 10.8
-        mac: devMac ? devMac.laptop.price + devMac.accessories.reduce((sum, acc) => sum + acc.price, 0) : 12999 // MacBook Air M4
+      'Full-Stack Developer': {
+        windows: Math.round(defaultWindows * 1.1), // +10% for dev tools & IDEs
+        mac: Math.round(defaultMac * 1.0) // Base Mac price
       },
-      Consultant: {
-        windows: 11208, // HP ProBook 440 G8 
-        mac: 12999 // MacBook Air M4
+      'Salesforce Consultant': {
+        windows: Math.round(defaultWindows * 0.95), // -5% standard business tools
+        mac: Math.round(defaultMac * 0.95) // -5% standard business tools
       },
-      Designer: {
-        windows: 13500, // Higher spec for design work
-        mac: 15999 // MacBook Pro for design
+      'MuleSoft Developer': {
+        windows: Math.round(defaultWindows * 1.15), // +15% for integration tools
+        mac: Math.round(defaultMac * 1.1) // +10% for development on Mac
       },
-      Manager: {
-        windows: 10000, // Standard business laptop
-        mac: 12999 // Standard MacBook
+      'Salesforce Developer': {
+        windows: Math.round(defaultWindows * 1.05), // +5% for Salesforce dev tools
+        mac: Math.round(defaultMac * 1.0) // Base Mac price
       }
     };
   };
@@ -275,7 +544,7 @@ function CostSimulator({ packages }: { packages: Package[] }) {
     const newId = (teamMembers.length + 1).toString();
     setTeamMembers([...teamMembers, {
       id: newId,
-      profileType: 'Developer',
+      profileType: 'Full-Stack Developer',
       packagePreference: 'Windows Package',
       quantity: 1
     }]);
@@ -319,7 +588,7 @@ function CostSimulator({ packages }: { packages: Package[] }) {
   };
 
   const formatCurrency = (amount: number, currency: 'MAD' | 'EUR'): string => {
-    return `${amount.toLocaleString()} ${currency}`;
+    return formatCurrencyUtil(amount, currency);
   };
 
   return (
@@ -350,10 +619,10 @@ function CostSimulator({ packages }: { packages: Package[] }) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Developer">Developer</SelectItem>
-                    <SelectItem value="Consultant">Consultant</SelectItem>
-                    <SelectItem value="Designer">Designer</SelectItem>
-                    <SelectItem value="Manager">Manager</SelectItem>
+                    <SelectItem value="Full-Stack Developer">Full-Stack Developer</SelectItem>
+                    <SelectItem value="Salesforce Consultant">Salesforce Consultant</SelectItem>
+                    <SelectItem value="MuleSoft Developer">MuleSoft Developer</SelectItem>
+                    <SelectItem value="Salesforce Developer">Salesforce Developer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -472,8 +741,41 @@ function CostSimulator({ packages }: { packages: Package[] }) {
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium">Currency Rate</h4>
-                <p className="text-sm text-muted-foreground">1 EUR ≈ {eurToMadRate} MAD</p>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium">Currency Rate</h4>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      setRateLoading(true);
+                      try {
+                        const { rate, isLive } = await getEurToMadRate();
+                        setEurToMadRate(rate);
+                        setIsLiveRate(isLive);
+                      } catch (error) {
+                        console.error('Failed to refresh rate:', error);
+                      } finally {
+                        setRateLoading(false);
+                      }
+                    }}
+                    disabled={rateLoading}
+                    className="h-6 px-2 text-xs"
+                  >
+                    {rateLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : '🔄'}
+                  </Button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm text-muted-foreground">
+                    1 EUR = {eurToMadRate.toFixed(2)} MAD
+                  </p>
+                  {rateLoading ? (
+                    <div className="text-xs text-muted-foreground">Updating...</div>
+                  ) : (
+                    <div className={`text-xs px-2 py-1 rounded ${isLiveRate ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                      {isLiveRate ? 'Live' : 'Fallback'}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div>
@@ -1029,10 +1331,14 @@ export default function PackagesPage() {
         </div>
 
         <Tabs defaultValue="management" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="management">Package Management</TabsTrigger>
-            <TabsTrigger value="simulator">Cost Simulator</TabsTrigger>
-          </TabsList>
+          {/* Left-Aligned Pill Style */}
+          <div className="mb-6">
+            <TabsList className="inline-flex bg-muted/50 rounded-full p-1">
+              <TabsTrigger value="management" className="rounded-full">📦 Package Management</TabsTrigger>
+              <TabsTrigger value="simulator" className="rounded-full">🧮 Cost Simulator</TabsTrigger>
+              <TabsTrigger value="pricing" className="rounded-full">📊 Pricing Details</TabsTrigger>
+            </TabsList>
+          </div>
           
           <TabsContent value="management" className="mt-6">
             <div className="flex justify-between items-center mb-6">
@@ -1116,6 +1422,19 @@ export default function PackagesPage() {
 
           <TabsContent value="simulator" className="mt-6">
             <CostSimulator packages={packages} />
+          </TabsContent>
+
+          <TabsContent value="pricing" className="mt-6">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold mb-2">Pricing Calculation Details</h2>
+                <p className="text-muted-foreground">
+                  Transparent breakdown of how unit prices are calculated from your actual package data.
+                </p>
+              </div>
+              
+              <PricingBreakdown packages={packages} />
+            </div>
           </TabsContent>
         </Tabs>
       </main>

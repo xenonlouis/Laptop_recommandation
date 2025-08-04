@@ -43,7 +43,8 @@ export async function GET(
         ...pkg.laptop,
         price: Number(pkg.laptop.price),
         batteryLife: Number(pkg.laptop.batteryLife),
-        performanceScore: Number(pkg.laptop.performanceScore)
+        performanceScore: Number(pkg.laptop.performanceScore),
+        images: pkg.laptop.images || [] // Include images for frontend display
       },
       accessories,
       assignedPeople,
