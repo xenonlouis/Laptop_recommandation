@@ -4,720 +4,983 @@ import { useState, useEffect } from "react"
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Plus, Loader2, MoveHorizontal, CheckCircle2, XCircle, Package as PackageIcon, MousePointer2, Keyboard, Headphones, Plug, Info, Pencil, Trash2, PlusCircle } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, Users, Package as PackageIcon, Calculator, UserCheck, Trash2, Edit, Eye, X, Layout, List, Grid3X3, Filter, BarChart3, Database, DollarSign, RefreshCw, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { fetchPackages, fetchLaptops, fetchAccessories, createPackage, updatePackage, deletePackage } from "@/lib/api-client"
+import { Slider } from "@/components/ui/slider"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { getEurToMadRate, formatCurrency as formatCurrencyUtil } from "@/lib/exchange-rates"
 import { useToast } from "@/hooks/use-toast"
-import type { Package, Accessory, Laptop, PackageStatus, PriceType } from "@/types"
-// Import dnd-kit components
-import { 
-  DndContext, 
-  DragOverlay, 
-  closestCorners, 
-  KeyboardSensor, 
-  PointerSensor, 
-  useSensor, 
-  useSensors, 
-  useDroppable,
-  DragEndEvent,
-  DragStartEvent,
-  DragOverEvent 
-} from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Skeleton } from "@/components/ui/skeleton"
 
-// Define a type for our droppable areas (status columns)
-type StatusColumn = "proposed" | "approved" | "rejected" | "delivered";
-
-// Sortable Package Card component
-function SortablePackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge, onClick }: { 
-  pkg: Package, 
-  formatPrice: (price: number, priceType: "HT" | "TTC") => string,
-  getTotalPrice: (pkg: Package) => string,
-  getAccessoryIcon: (type: string) => React.ReactElement,
-  getStatusBadge: (status: string) => React.ReactElement,
-  onClick: () => void
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({
-    id: pkg.id,
-    data: {
-      type: 'package',
-      package: pkg
-    }
-  });
-  
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 999 : 1,
-  };
-
-  const statusColors = {
-    proposed: 'hover:border-blue-200',
-    approved: 'hover:border-green-200',
-    rejected: 'hover:border-red-200 opacity-80',
-    delivered: 'hover:border-purple-200'
-  };
-  
-  return (
-    <Card 
-      ref={setNodeRef}
-      style={style}
-      className={`cursor-pointer hover:shadow-md transition-shadow border-2 border-transparent ${statusColors[pkg.status]}`}
-      onClick={onClick}
-      {...attributes} 
-      {...listeners}
-    >
-      <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-        <CardDescription className="text-xs truncate">
-          For: {pkg.assignedTo}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 pb-0">
-        <div className="flex items-center mt-1 mb-2">
-          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-            <Image
-              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-              alt={pkg.laptop.model}
-              fill
-              className="object-contain"
-            />
-          </div>
-          <div className="text-xs">
-            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1 mb-2">
-          {pkg.accessories.map((acc: Accessory) => (
-            <Badge key={acc.id} variant="outline" className="flex items-center text-xs gap-1">
-              {getAccessoryIcon(acc.type)}
-              {acc.name.split(' ')[0]}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between p-4 pt-2">
-        <div className="text-xs font-medium">
-          {getTotalPrice(pkg)}
-        </div>
-        {getStatusBadge(pkg.status)}
-      </CardFooter>
-    </Card>
-  );
+// Types for new architecture
+interface PackageTemplate {
+  id: string
+  name: string
+  description?: string
+  profileType: string
+  priceType: 'HT' | 'TTC'
+  isActive: boolean
+  notes?: string
+  createdAt: string
+  updatedAt: string
+  laptop: {
+    id: string
+    brand: string
+    model: string
+    price: number
+    processor: string
+    ram: string
+    storage: string
+    batteryLife: number
+    performanceScore: number
+    images: string[]
+    supportedProfiles: { profile: string }[]
+    supportedOS: { os: string }[]
+  }
+  accessories: {
+    id: string
+    name: string
+    type: string
+    brand: string
+    price: number
+    image?: string
+  }[]
+  assignments: PersonAssignment[]
+  assignmentCount: number
+  totalPrice: number
 }
 
-// Package Card for the drag overlay
-function PackageCard({ pkg, formatPrice, getTotalPrice, getAccessoryIcon, getStatusBadge }: { 
-  pkg: Package, 
-  formatPrice: (price: number, priceType: "HT" | "TTC") => string,
-  getTotalPrice: (pkg: Package) => string,
-  getAccessoryIcon: (type: string) => React.ReactElement,
-  getStatusBadge: (status: string) => React.ReactElement,
-}) {
-  return (
-    <Card className="cursor-grabbing shadow-md border-2 border-primary w-[280px]">
-      <CardHeader className="p-4 pb-2">
-        <CardTitle className="text-sm">{pkg.name}</CardTitle>
-        <CardDescription className="text-xs truncate">
-          For: {pkg.assignedTo}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 pb-0">
-        <div className="flex items-center mt-1 mb-2">
-          <div className="relative h-9 w-12 mr-2 bg-gray-100 rounded">
-            <Image
-              src={pkg.laptop.images?.[0] || "/placeholder.svg"}
-              alt={pkg.laptop.model}
-              fill
-              className="object-contain"
-            />
-          </div>
-          <div className="text-xs">
-            <p className="font-medium">{pkg.laptop.brand} {pkg.laptop.model}</p>
-            <p className="text-muted-foreground">{formatPrice(pkg.laptop.price, pkg.laptop.priceType)}</p>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between p-4 pt-2">
-        <div className="text-xs font-medium">
-          {getTotalPrice(pkg)}
-        </div>
-        {getStatusBadge(pkg.status)}
-      </CardFooter>
-    </Card>
-  );
+interface PersonAssignment {
+  id: string
+  status: 'assigned' | 'delivered' | 'returned'
+  pcReference?: string
+  assignedAt: string
+  deliveredAt?: string
+  notes?: string
+  person: {
+    id: string
+    name: string
+    email?: string
+    department?: string
+    position?: string
+  }
+  template?: PackageTemplate
 }
 
-// Droppable container for each status column
-function StatusColumn({ 
-  children, 
-  title, 
-  icon, 
-  count, 
-  status, 
-  color 
-}: { 
-  children: React.ReactNode, 
-  title: string, 
-  icon: React.ReactElement, 
-  count: number, 
-  status: StatusColumn,
-  color: string
-}) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
-  
-  const dropStyles = {
-    backgroundColor: isOver ? `${color}50` : '',
-    borderColor: isOver ? color : '',
-    transition: 'background-color 0.2s, border-color 0.2s',
-  };
-  
-  return (
-    <div className="flex flex-col h-full min-h-[500px]">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-muted-foreground">{icon}</span>
-        <span className="font-medium">{title}</span>
-        <Badge variant="secondary" className="ml-auto">
-          {count}
-        </Badge>
-      </div>
-      <div 
-        ref={setNodeRef}
-        className="flex-1 p-2 bg-muted/30 rounded-lg border-2 border-dashed overflow-y-auto" 
-        style={dropStyles}
-      >
-        {children}
-      </div>
-    </div>
-  );
+interface Person {
+  id: string
+  name: string
+  email?: string
+  department?: string
+  position?: string
 }
 
 export default function PackagesPage() {
-  const [packages, setPackages] = useState<Package[]>([])
+  const [activeTab, setActiveTab] = useState("catalog")
+  const [templates, setTemplates] = useState<PackageTemplate[]>([])
+  const [assignments, setAssignments] = useState<PersonAssignment[]>([])
+  const [people, setPeople] = useState<Person[]>([])
+  const [laptops, setLaptops] = useState<any[]>([])
+  const [accessories, setAccessories] = useState<any[]>([])
+  const [profiles, setProfiles] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [laptops, setLaptops] = useState<Laptop[]>([])
-  const [accessories, setAccessories] = useState<Accessory[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [activePackage, setActivePackage] = useState<Package | null>(null)
-
-  const [newPackage, setNewPackage] = useState<Partial<Package>>({
-    name: "",
-    status: "proposed",
-    priceType: "HT",
-    accessories: [],
-    assignedTo: "",
-    notes: "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+  const [eurToMadRate, setEurToMadRate] = useState<{ rate: number; isLive: boolean }>({ rate: 10.80, isLive: false })
+  
+  // Dialog states
+  const [isCreateTemplateOpen, setIsCreateTemplateOpen] = useState(false)
+  const [isEditTemplateOpen, setIsEditTemplateOpen] = useState(false)
+  const [isViewTemplateOpen, setIsViewTemplateOpen] = useState(false)
+  const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false)
+  const [isEditAssignmentOpen, setIsEditAssignmentOpen] = useState(false)
+  const [isBatchAssignmentOpen, setIsBatchAssignmentOpen] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<PackageTemplate | null>(null)
+  const [selectedAssignment, setSelectedAssignment] = useState<PersonAssignment | null>(null)
+  
+  // Form states
+  const [templateForm, setTemplateForm] = useState({
+    name: '',
+    description: '',
+    profileType: 'General',
+    laptopId: '',
+    priceType: 'HT',
+    accessoryIds: [] as string[],
+    notes: ''
   })
-  const [selectedLaptopId, setSelectedLaptopId] = useState<string>("")
-  const [selectedAccessoryIds, setSelectedAccessoryIds] = useState<string[]>([])
+  
+  const [assignmentForm, setAssignmentForm] = useState({
+    personId: '',
+    templateId: '',
+    status: 'assigned',
+    pcReference: '',
+    notes: ''
+  })
 
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [editPackage, setEditPackage] = useState<Package | null>(null)
-  const [editSelectedLaptopId, setEditSelectedLaptopId] = useState<string>("")
-  const [editSelectedAccessoryIds, setEditSelectedAccessoryIds] = useState<string[]>([])
+  const [batchAssignmentForm, setBatchAssignmentForm] = useState({
+    selectedPersonIds: [] as string[],
+    templateId: '',
+    status: 'assigned' as 'assigned' | 'delivered' | 'returned',
+    pcReference: '',
+    notes: ''
+  })
+
+  // Cost Simulator state
+  const [teamConfig, setTeamConfig] = useState<Record<string, number>>({})
+  const [simulatorPriceType, setSimulatorPriceType] = useState<'HT' | 'TTC'>('TTC')
+  
+  // Team Composition state for new layout
+  const [teamComposition, setTeamComposition] = useState<Array<{
+    id: string
+    profileType: string
+    packagePreference: 'Windows Package' | 'Mac Package'
+    quantity: number
+  }>>([])
+
+  // View and Filter states
+  const [viewMode, setViewMode] = useState<'kanban' | 'list' | 'grid'>('kanban')
+  const [filters, setFilters] = useState({
+    os: 'all',
+    brand: 'all',
+    priceRange: [0, 0] as [number, number] // Will be set dynamically
+  })
+
+  // Assignment filtering and batch operations
+  const [assignmentFilters, setAssignmentFilters] = useState({
+    search: '',
+    status: 'all',
+    profile: 'all'
+  })
+  const [selectedAssignments, setSelectedAssignments] = useState<string[]>([])
 
   const { toast } = useToast()
 
-  // Configure dnd-kit sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // Minimum drag distance for activation (prevents accidental drags)
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  // Utility function to normalize profile names
+  const normalizeProfileName = (profileName: string): string => {
+    return profileName.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+  }
 
-  // Define columns configuration
-  const columns: { id: StatusColumn; title: string; icon: React.ReactElement; color: string }[] = [
-    { 
-      id: 'proposed', 
-      title: 'Proposed', 
-      icon: <MoveHorizontal className="h-5 w-5 mr-2 text-blue-500" />,
-      color: 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-    },
-    { 
-      id: 'approved', 
-      title: 'Approved', 
-      icon: <CheckCircle2 className="h-5 w-5 mr-2 text-green-500" />,
-      color: 'bg-green-100 text-green-800 hover:bg-green-200'
-    },
-    { 
-      id: 'rejected', 
-      title: 'Rejected', 
-      icon: <XCircle className="h-5 w-5 mr-2 text-red-500" />,
-      color: 'bg-red-100 text-red-800 hover:bg-red-200'
-    },
-    { 
-      id: 'delivered', 
-      title: 'Delivered', 
-      icon: <PackageIcon className="h-5 w-5 mr-2 text-purple-500" />,
-      color: 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+  // Team Composition helper functions
+  const addTeamMember = () => {
+    const newMember = {
+      id: Math.random().toString(36).substr(2, 9),
+      profileType: profiles.length > 0 ? profiles[0] : 'General',
+      packagePreference: 'Windows Package' as 'Windows Package' | 'Mac Package',
+      quantity: 1
     }
-  ];
+    setTeamComposition([...teamComposition, newMember])
+  }
 
-  // Get packages for a specific status
-  const getPackagesByStatus = (status: StatusColumn) => {
-    return packages.filter(pkg => pkg.status === status);
-  };
+  const removeTeamMember = (id: string) => {
+    setTeamComposition(teamComposition.filter(member => member.id !== id))
+  }
 
-  // Fetch packages data
-  useEffect(() => {
-    const getPackages = async () => {
-      try {
-        setLoading(true)
-        const data = await fetchPackages()
-        setPackages(data)
-        setError(null)
-      } catch (err) {
-        console.error("Error fetching packages:", err)
-        setError("Failed to load packages. Please try again later.")
-      } finally {
-        setLoading(false)
+  const updateTeamMember = (id: string, field: string, value: any) => {
+    setTeamComposition(teamComposition.map(member => 
+      member.id === id ? { ...member, [field]: value } : member
+    ))
+  }
+
+  const getTeamCompositionCosts = () => {
+    return teamComposition.map(member => {
+      const profilePricing = getProfilePricing().find(p => normalizeProfileName(p.profile) === normalizeProfileName(member.profileType))
+      const unitPrice = member.packagePreference === 'Windows Package' 
+        ? (profilePricing?.windowsPrice || 0)
+        : (profilePricing?.macPrice || 0)
+      
+      return {
+        ...member,
+        unitPriceMAD: unitPrice,
+        unitPriceEUR: unitPrice / eurToMadRate.rate,
+        totalMAD: unitPrice * member.quantity,
+        totalEUR: (unitPrice * member.quantity) / eurToMadRate.rate
       }
-    }
+    })
+  }
 
-    getPackages()
+  // Load data
+  useEffect(() => {
+    loadData()
+    loadExchangeRate()
   }, [])
 
-  // Fetch laptops and accessories for the add package dialog
-  useEffect(() => {
-    const fetchOptions = async () => {
+  const loadData = async () => {
       try {
-        const [laptopsData, accessoriesData] = await Promise.all([
-          fetchLaptops(),
-          fetchAccessories()
-        ])
-        setLaptops(laptopsData)
-        setAccessories(accessoriesData)
-      } catch (err) {
-        console.error("Error fetching options:", err)
-      }
-    }
+        setLoading(true)
+      const [templatesRes, assignmentsRes, peopleRes, laptopsRes, accessoriesRes, profilesRes] = await Promise.all([
+        fetch('/api/templates'),
+        fetch('/api/assignments'),
+        fetch('/api/people'),
+        fetch('/api/laptops'),
+        fetch('/api/accessories'),
+        fetch('/api/profiles')
+      ])
 
-    if (isAddDialogOpen || isEditDialogOpen) {
-      fetchOptions()
-    }
-  }, [isAddDialogOpen, isEditDialogOpen])
-
-  // Initialize edit form when a package is selected for editing
-  useEffect(() => {
-    if (editPackage) {
-      setEditSelectedLaptopId(editPackage.laptop.id)
-      setEditSelectedAccessoryIds(editPackage.accessories.map(acc => acc.id))
-    }
-  }, [editPackage])
-
-  // Add support for URL parameter to open package detail
-  useEffect(() => {
-    const handleUrlParams = async () => {
-      const searchParams = new URLSearchParams(window.location.search);
-      const detailId = searchParams.get('detail');
-      
-      if (detailId && packages.length > 0) {
-        const packageToOpen = packages.find(pkg => pkg.id === detailId);
-        if (packageToOpen) {
-          setSelectedPackage(packageToOpen);
-          setIsDetailDialogOpen(true);
+      if (templatesRes.ok) {
+        const templatesData = await templatesRes.json()
+        setTemplates(templatesData)
+        
+        // Calculate dynamic price range based on actual template prices
+        if (templatesData.length > 0) {
+          const prices = templatesData.map((t: PackageTemplate) => t.totalPrice)
+          const minPrice = Math.min(...prices)
+          const maxPrice = Math.max(...prices)
+          
+          // Add some padding to the range (10% on each side)
+          const padding = (maxPrice - minPrice) * 0.1
+          const newMinPrice = Math.max(0, Math.floor(minPrice - padding))
+          const newMaxPrice = Math.ceil(maxPrice + padding)
+          
+          setFilters(prev => ({
+            ...prev,
+            priceRange: [newMinPrice, newMaxPrice]
+          }))
+          
+          console.log(`💰 Dynamic price range set: [${newMinPrice}, ${newMaxPrice}] MAD`)
         }
       }
-    };
 
-    if (packages.length > 0) {
-      handleUrlParams();
+      if (assignmentsRes.ok) {
+        const assignmentsData = await assignmentsRes.json()
+        console.log('🔗 Loaded assignments:', assignmentsData.length, assignmentsData)
+        setAssignments(assignmentsData)
+      } else {
+        console.error('❌ Assignments API failed:', assignmentsRes.status)
+      }
+
+      if (peopleRes.ok) {
+        const peopleData = await peopleRes.json()
+        setPeople(peopleData)
+      }
+
+      if (laptopsRes.ok) {
+        const laptopsData = await laptopsRes.json()
+        console.log('📱 Loaded laptops:', laptopsData.length)
+        setLaptops(laptopsData)
+      } else {
+        console.error('❌ Laptops API failed:', laptopsRes.status)
+      }
+
+      if (accessoriesRes.ok) {
+        const accessoriesData = await accessoriesRes.json()
+        console.log('🔌 Loaded accessories:', accessoriesData.length)
+        setAccessories(accessoriesData)
+      } else {
+        console.error('❌ Accessories API failed:', accessoriesRes.status)
+      }
+
+      if (profilesRes.ok) {
+        const profilesData = await profilesRes.json()
+        console.log('👥 Loaded profiles:', profilesData.profiles.length)
+        setProfiles(profilesData.profiles)
+      } else {
+        console.error('❌ Profiles API failed:', profilesRes.status)
+      }
+
+    } catch (error) {
+      console.error('Failed to load data:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load data",
+
+      })
+    } finally {
+      setLoading(false)
     }
-  }, [packages]);
-
-  // Group packages by status
-  const proposedPackages = packages.filter((pkg) => pkg.status === "proposed")
-  const approvedPackages = packages.filter((pkg) => pkg.status === "approved")
-  const rejectedPackages = packages.filter((pkg) => pkg.status === "rejected")
-  const deliveredPackages = packages.filter((pkg) => pkg.status === "delivered")
-
-  const formatPrice = (price: number, priceType: "HT" | "TTC") => {
-    return `${price.toLocaleString()} MAD (${priceType})`
   }
 
-  const getTotalPrice = (pkg: Package) => {
-    const laptopPrice = pkg.laptop.price
-    const accessoriesPrice = pkg.accessories.reduce((sum: number, acc: Accessory) => sum + acc.price, 0)
-    const totalPrice = laptopPrice + accessoriesPrice
-    return `${totalPrice.toLocaleString()} MAD (${pkg.priceType})`
+  const loadExchangeRate = async () => {
+    try {
+      const rate = await getEurToMadRate()
+      setEurToMadRate(rate)
+    } catch (error) {
+      console.error('Failed to load exchange rate:', error)
+    }
   }
 
-  const getAccessoryIcon = (type: string) => {
-    switch (type) {
-      case "mouse":
-        return <MousePointer2 className="h-4 w-4" />
-      case "keyboard":
-        return <Keyboard className="h-4 w-4" />
-      case "headphone":
-        return <Headphones className="h-4 w-4" />
-      case "dock":
-        return <Plug className="h-4 w-4" />
-      default:
-        return <Info className="h-4 w-4" />
-    }
+  const formatCurrency = (amount: number) => {
+    return formatCurrencyUtil(amount, 'MAD')
   }
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "proposed":
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">Proposed</Badge>
-      case "approved":
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Approved</Badge>
-      case "rejected":
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">Rejected</Badge>
-      case "delivered":
-        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">Delivered</Badge>
-      default:
-        return <Badge variant="outline">Unknown</Badge>
+    const statusConfig = {
+      assigned: { label: "Assigned", className: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
+      delivered: { label: "Delivered", className: "bg-green-500/10 text-green-700 border-green-500/20" },
+      returned: { label: "Returned", className: "bg-gray-500/10 text-gray-700 border-gray-500/20" }
+    }
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.assigned
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>
+  }
+
+  const getProfileBadge = (profileType: string) => {
+    // Generate dynamic profile config based on available profiles
+    const profileConfig: Record<string, { label: string; className: string }> = {}
+    
+    profiles.forEach(profile => {
+      // Generate colors based on profile name
+      const colors = [
+        "bg-blue-500/10 text-blue-700 border-blue-500/20",
+        "bg-green-500/10 text-green-700 border-green-500/20", 
+        "bg-purple-500/10 text-purple-700 border-purple-500/20",
+        "bg-orange-500/10 text-orange-700 border-orange-500/20",
+        "bg-pink-500/10 text-pink-700 border-pink-500/20",
+        "bg-indigo-500/10 text-indigo-700 border-indigo-500/20",
+        "bg-teal-500/10 text-teal-700 border-teal-500/20",
+        "bg-gray-500/10 text-gray-700 border-gray-500/20"
+      ]
+      
+      const colorIndex = profiles.indexOf(profile) % colors.length
+      profileConfig[profile] = {
+        label: profile,
+        className: colors[colorIndex]
+      }
+    })
+    
+    const config = profileConfig[profileType] || profileConfig['General'] || { label: profileType, className: "bg-gray-500/10 text-gray-700 border-gray-500/20" }
+    return <Badge variant="outline" className={config.className}>{config.label}</Badge>
+  }
+
+  // Price conversion utilities
+  const VAT_RATE = 0.20 // 20% VAT rate in Morocco
+  
+  const convertPrice = (price: number, fromType: 'HT' | 'TTC', toType: 'HT' | 'TTC'): number => {
+    if (fromType === toType) return price
+    
+    if (fromType === 'HT' && toType === 'TTC') {
+      return price * (1 + VAT_RATE) // Add VAT
+    } else if (fromType === 'TTC' && toType === 'HT') {
+      return price / (1 + VAT_RATE) // Remove VAT
+    }
+    
+    return price
+  }
+
+  const normalizeTemplatePrice = (template: PackageTemplate): number => {
+    return convertPrice(template.totalPrice, template.priceType, simulatorPriceType)
+  }
+
+  // Cost Simulator calculation functions
+  const getDataSourceAnalysis = () => {
+    const windowsPackages = templates.filter(t => 
+      t.laptop.supportedOS?.some(os => os.os.toLowerCase().includes('windows'))
+    )
+    const macPackages = templates.filter(t => 
+      t.laptop.supportedOS?.some(os => os.os.toLowerCase().includes('mac'))
+    )
+
+    const windowsAvg = windowsPackages.length > 0 
+      ? windowsPackages.reduce((sum, t) => sum + normalizeTemplatePrice(t), 0) / windowsPackages.length 
+      : 0
+
+    const macAvg = macPackages.length > 0 
+      ? macPackages.reduce((sum, t) => sum + normalizeTemplatePrice(t), 0) / macPackages.length 
+      : 0
+
+    return {
+      windows: { count: windowsPackages.length, average: windowsAvg },
+      mac: { count: macPackages.length, average: macAvg }
     }
   }
 
-  const handlePackageClick = (pkg: Package) => {
-    setSelectedPackage(pkg)
-    setIsDetailDialogOpen(true)
-  }
-
-  // Handle drag start event
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const pkg = packages.find(p => p.id === active.id);
-    if (pkg) {
-      setActivePackage(pkg);
+  const getBasePrices = () => {
+    const analysis = getDataSourceAnalysis()
+    return {
+      windows: {
+        price: analysis.windows.average,
+        eur: analysis.windows.average / eurToMadRate.rate
+      },
+      mac: {
+        price: analysis.mac.average,
+        eur: analysis.mac.average / eurToMadRate.rate
+      }
     }
   }
 
-  // Handle drag over event (not needed for our basic implementation)
-  const handleDragOver = (event: DragOverEvent) => {
-    // Optional: implement logic for sorting within a container
-    return;
+  const getProfilePricing = () => {
+    return profiles.map(profile => {
+      const normalizedProfile = normalizeProfileName(profile)
+      const profileTemplates = templates.filter(t => {
+        const normalizedTemplateProfile = normalizeProfileName(t.profileType)
+        return normalizedTemplateProfile === normalizedProfile || 
+          (profile === 'General' && !profiles.filter(p => p !== 'General').some(p => {
+            const normalizedP = normalizeProfileName(p)
+            return normalizedP === normalizedTemplateProfile
+          }))
+      })
+
+      const windowsTemplates = profileTemplates.filter(t => 
+        t.laptop.supportedOS?.some(os => os.os.toLowerCase().includes('windows'))
+      )
+      const macTemplates = profileTemplates.filter(t => 
+        t.laptop.supportedOS?.some(os => os.os.toLowerCase().includes('mac'))
+      )
+
+      const windowsPrice = windowsTemplates.length > 0 
+        ? windowsTemplates.reduce((sum, t) => sum + normalizeTemplatePrice(t), 0) / windowsTemplates.length 
+        : 0
+
+      const macPrice = macTemplates.length > 0 
+        ? macTemplates.reduce((sum, t) => sum + normalizeTemplatePrice(t), 0) / macTemplates.length 
+        : 0
+
+      const totalPackages = profileTemplates.length
+      const windowsCount = windowsTemplates.length
+      const macCount = macTemplates.length
+
+      return {
+        profile,
+        windowsPrice,
+        macPrice,
+        windowsEur: windowsPrice / eurToMadRate.rate,
+        macEur: macPrice / eurToMadRate.rate,
+        windowsCount,
+        macCount,
+        totalPackages,
+        reasoning: `Based on ${totalPackages} real packages (${windowsCount} Windows + ${macCount} Mac)`
+      }
+    })
   }
 
-  // Handle drag end event
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    // Reset active package
-    setActivePackage(null);
-    
-    // If no over target, do nothing
-    if (!over) {
-      return;
+  const calculateTotalCost = () => {
+    if (teamComposition.length === 0) {
+      // Fallback to old method if no team composition
+      const profilePricing = getProfilePricing()
+      let total = 0
+
+      Object.entries(teamConfig).forEach(([profile, quantity]) => {
+        if (quantity > 0) {
+          const profileData = profilePricing.find(p => p.profile === profile)
+          if (profileData) {
+            // Use weighted average of Windows and Mac prices based on available packages
+            const totalPackages = profileData.windowsCount + profileData.macCount
+            if (totalPackages > 0) {
+              const weightedPrice = (
+                (profileData.windowsPrice * profileData.windowsCount) + 
+                (profileData.macPrice * profileData.macCount)
+              ) / totalPackages
+              total += weightedPrice * quantity
+            }
+          }
+        }
+      })
+
+      return total
     }
-    
-    const packageId = active.id.toString();
-    const newStatus = over.id.toString() as PackageStatus;
-    
-    // Find the package being dragged
-    const pkg = packages.find(p => p.id === packageId);
-    
-    // If package not found or status didn't change, do nothing
-    if (!pkg || pkg.status === newStatus) {
-      return;
-    }
-    
+
+    // Use new team composition method
+    return getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0)
+  }
+
+  // Template Management Functions
+  const handleCreateTemplate = async () => {
     try {
-      // Optimistically update the local state first
-      const updatedPackage: Package = {
-        ...pkg,
-        status: newStatus,
-        updatedAt: new Date().toISOString()
-      };
-      
-      // Update local state immediately to prevent UI flicker
-      setPackages(prev => prev.map(p => 
-        p.id === updatedPackage.id ? updatedPackage : p
-      ));
-      
-      // Then update the backend
-      await updatePackage(updatedPackage);
-      
+      const response = await fetch('/api/templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(templateForm),
+      })
+
+      if (response.ok) {
+        const newTemplate = await response.json()
+        setTemplates([...templates, newTemplate])
+        setIsCreateTemplateOpen(false)
+        resetTemplateForm()
       toast({
-        title: "Status Updated",
-        description: `${updatedPackage.name} moved to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
-      });
-    } catch (err) {
-      console.error("Error updating package status:", err);
-      
-      // Revert to previous state if update fails
-      setPackages(prev => [...prev]);
-      
+          title: "Success",
+          description: "Template created successfully",
+        })
+      } else {
+        const error = await response.json()
       toast({
         title: "Error",
-        description: "Failed to update package status. Please try again."
-      });
+          description: error.error || "Failed to create template",
+  
+        })
+      }
+    } catch (error) {
+      console.error('Failed to create template:', error)
+      toast({
+        title: "Error",
+        description: "Failed to create template",
+
+      })
     }
   }
 
-  const handleAddPackage = async () => {
+  const handleEditTemplate = async () => {
+    if (!selectedTemplate) return
+
     try {
-      setIsSubmitting(true)
+      const response = await fetch(`/api/templates/${selectedTemplate.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(templateForm),
+      })
 
-      // Validate required fields
-      if (!newPackage.name || !selectedLaptopId) {
+      if (response.ok) {
+        const updatedTemplate = await response.json()
+        setTemplates(templates.map(t => t.id === selectedTemplate.id ? updatedTemplate : t))
+        setIsEditTemplateOpen(false)
+        resetTemplateForm()
         toast({
-          title: "Validation Error",
-          description: "Package name and laptop selection are required.",
+          title: "Success",
+          description: "Template updated successfully",
+      })
+      } else {
+        const error = await response.json()
+      toast({
+        title: "Error",
+          description: error.error || "Failed to update template",
+  
         })
-        return
       }
-
-      // Find the selected laptop
-      const selectedLaptop = laptops.find(laptop => laptop.id === selectedLaptopId)
-      if (!selectedLaptop) {
+    } catch (error) {
+      console.error('Failed to update template:', error)
         toast({
           title: "Error",
-          description: "Selected laptop not found.",
-        })
-        return
-      }
+        description: "Failed to update template",
 
-      // Find the selected accessories
-      const selectedAccessories = accessories.filter(acc => selectedAccessoryIds.includes(acc.id))
-
-      // Prepare package data
-      const packageData: Omit<Package, "id"> = {
-        name: newPackage.name,
-        laptop: selectedLaptop,
-        accessories: selectedAccessories,
-        status: newPackage.status as PackageStatus,
-        priceType: newPackage.priceType as PriceType,
-        assignedTo: newPackage.assignedTo || undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        notes: newPackage.notes || undefined
-      }
-
-      // Submit the new package
-      const response = await createPackage(packageData)
-
-      // Refresh the package list
-      const updatedPackages = await fetchPackages()
-      setPackages(updatedPackages)
-
-      // Reset form and close dialog
-      setNewPackage({
-        name: "",
-        status: "proposed",
-        priceType: "HT",
-        accessories: [],
-        assignedTo: "",
-        notes: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
       })
-      setSelectedLaptopId("")
-      setSelectedAccessoryIds([])
-      setIsAddDialogOpen(false)
-
-      toast({
-        title: "Package Added",
-        description: `${packageData.name} has been added successfully.`,
-      })
-    } catch (err) {
-      console.error("Error adding package:", err)
-      toast({
-        title: "Error",
-        description: "Failed to add package. Please try again.",
-      })
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
-  const handleAccessoryToggle = (accessoryId: string) => {
-    setSelectedAccessoryIds(prev => 
-      prev.includes(accessoryId)
-        ? prev.filter(id => id !== accessoryId)
-        : [...prev, accessoryId]
+  const handleViewTemplate = (template: PackageTemplate) => {
+    setSelectedTemplate(template)
+    setIsViewTemplateOpen(true)
+  }
+
+  const handleEditTemplateClick = (template: PackageTemplate) => {
+    setSelectedTemplate(template)
+    setTemplateForm({
+      name: template.name,
+      description: template.description || '',
+      profileType: template.profileType,
+      laptopId: template.laptop.id,
+      priceType: template.priceType,
+      accessoryIds: template.accessories.map(a => a.id),
+      notes: template.notes || ''
+    })
+    setIsEditTemplateOpen(true)
+  }
+
+  const handleAssignPeople = (template: PackageTemplate) => {
+    setSelectedTemplate(template)
+    setAssignmentForm({
+      personId: '',
+      templateId: template.id,
+      status: 'assigned',
+      pcReference: '',
+      notes: ''
+    })
+    setIsCreateAssignmentOpen(true)
+  }
+
+    const handleCreateAssignment = async () => {
+    try {
+      const response = await fetch('/api/assignments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assignmentForm),
+      })
+
+      if (response.ok) {
+        const newAssignment = await response.json()
+        setAssignments([...assignments, newAssignment])
+        
+        // Update the template's assignment count
+        setTemplates(templates.map(t => 
+          t.id === assignmentForm.templateId 
+            ? { ...t, assignmentCount: t.assignmentCount + 1, assignments: [...t.assignments, newAssignment] }
+            : t
+        ))
+        
+        setIsCreateAssignmentOpen(false)
+        setAssignmentForm({
+          personId: '',
+          templateId: '',
+          status: 'assigned',
+          pcReference: '',
+          notes: ''
+        })
+
+      toast({
+          title: "Success",
+          description: "Person assigned to template successfully",
+      })
+      } else {
+        const error = await response.json()
+      toast({
+        title: "Error",
+          description: error.error || "Failed to create assignment",
+  
+        })
+      }
+    } catch (error) {
+      console.error('Failed to create assignment:', error)
+      toast({
+        title: "Error",
+        description: "Failed to create assignment",
+  
+      })
+    }
+  }
+
+  const handleCreateBatchAssignment = async () => {
+    try {
+      // Create assignments for all selected people
+      const assignmentPromises = batchAssignmentForm.selectedPersonIds.map(personId =>
+        fetch('/api/assignments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            personId,
+            templateId: batchAssignmentForm.templateId,
+            status: batchAssignmentForm.status,
+            pcReference: batchAssignmentForm.pcReference,
+            notes: batchAssignmentForm.notes
+          }),
+        })
+      )
+
+      const responses = await Promise.all(assignmentPromises)
+      const newAssignments = await Promise.all(
+        responses.map(response => response.json())
+      )
+
+      // Check if all assignments were successful
+      const successfulAssignments = newAssignments.filter((_, index) => responses[index].ok)
+      
+      if (successfulAssignments.length > 0) {
+        // Update assignments state
+        setAssignments([...assignments, ...successfulAssignments])
+        
+        // Update the template's assignment count and assignments
+        setTemplates(templates.map(t => 
+          t.id === batchAssignmentForm.templateId 
+            ? { 
+                ...t, 
+                assignmentCount: t.assignmentCount + successfulAssignments.length,
+                assignments: [...t.assignments, ...successfulAssignments]
+              }
+            : t
+        ))
+        
+        setIsBatchAssignmentOpen(false)
+        setBatchAssignmentForm({
+          selectedPersonIds: [],
+          templateId: '',
+          status: 'assigned',
+          pcReference: '',
+          notes: ''
+        })
+        
+        toast({
+          title: "Success",
+          description: `${successfulAssignments.length} people assigned to template successfully`,
+        })
+      }
+
+      // Handle any failures
+      const failedCount = newAssignments.length - successfulAssignments.length
+      if (failedCount > 0) {
+        toast({
+          title: "Partial Success",
+          description: `${successfulAssignments.length} assigned successfully, ${failedCount} failed`,
+        })
+      }
+    } catch (error) {
+      console.error('Failed to create batch assignments:', error)
+        toast({
+          title: "Error",
+        description: "Failed to create batch assignments",
+      })
+    }
+  }
+
+  const togglePersonSelection = (personId: string) => {
+    setBatchAssignmentForm(prev => ({
+      ...prev,
+      selectedPersonIds: prev.selectedPersonIds.includes(personId)
+        ? prev.selectedPersonIds.filter(id => id !== personId)
+        : [...prev.selectedPersonIds, personId]
+    }))
+  }
+
+  const resetTemplateForm = () => {
+    setTemplateForm({
+      name: '',
+      description: '',
+      profileType: profiles.length > 0 ? profiles[0] : 'General',
+      laptopId: '',
+      priceType: 'HT',
+      accessoryIds: [],
+      notes: ''
+    })
+    setSelectedTemplate(null)
+  }
+
+  const handleDeleteTemplate = async (templateId: string) => {
+    if (!confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/templates/${templateId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setTemplates(templates.filter(t => t.id !== templateId))
+        toast({
+          title: "Success",
+          description: "Template deleted successfully",
+        })
+      } else {
+        const error = await response.json()
+        toast({
+          title: "Error",
+          description: error.error || "Failed to delete template",
+        })
+      }
+    } catch (error) {
+      console.error('Failed to delete template:', error)
+        toast({
+          title: "Error",
+        description: "Failed to delete template",
+      })
+    }
+  }
+
+  const refreshData = async () => {
+    console.log('🔄 Manually refreshing data...')
+    await loadData()
+  }
+
+  // Filter and grouping functions
+  const getFilteredTemplates = () => {
+    return templates.filter(template => {
+      // OS filter
+      if (filters.os !== 'all') {
+        const hasOS = template.laptop.supportedOS?.some(os => 
+          os.os.toLowerCase() === filters.os.toLowerCase()
+        )
+        if (!hasOS) return false
+      }
+
+      // Brand filter
+      if (filters.brand !== 'all') {
+        if (template.laptop.brand.toLowerCase() !== filters.brand.toLowerCase()) return false
+      }
+
+      // Price range filter
+      const price = template.totalPrice
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false
+
+      return true
+    })
+  }
+
+  const getTemplatesByProfile = () => {
+    const filteredTemplates = getFilteredTemplates()
+    const grouped: Record<string, PackageTemplate[]> = {}
+    
+    profiles.forEach(profile => {
+      // Normalize profile name for case-insensitive matching
+      const normalizedProfile = normalizeProfileName(profile)
+      grouped[profile] = filteredTemplates.filter(t => {
+        const normalizedTemplateProfile = normalizeProfileName(t.profileType)
+        return normalizedTemplateProfile === normalizedProfile
+      })
+    })
+    
+    // Add unassigned templates (those that don't match any normalized profile)
+    grouped['unassigned'] = filteredTemplates.filter(t => {
+      const normalizedTemplateProfile = normalizeProfileName(t.profileType)
+      return !profiles.some(profile => {
+        const normalizedProfile = normalizeProfileName(profile)
+        return normalizedProfile === normalizedTemplateProfile
+      })
+    })
+    
+    return grouped
+  }
+
+  const clearFilters = () => {
+    // Calculate current price range from templates
+    if (templates.length > 0) {
+      const prices = templates.map(t => t.totalPrice)
+      const minPrice = Math.min(...prices)
+      const maxPrice = Math.max(...prices)
+      
+      // Add some padding to the range (10% on each side)
+      const padding = (maxPrice - minPrice) * 0.1
+      const newMinPrice = Math.max(0, Math.floor(minPrice - padding))
+      const newMaxPrice = Math.ceil(maxPrice + padding)
+      
+      setFilters({
+        os: 'all',
+        brand: 'all',
+        priceRange: [newMinPrice, newMaxPrice]
+      })
+    } else {
+      // Fallback if no templates
+      setFilters({
+        os: 'all',
+        brand: 'all',
+        priceRange: [0, 25000]
+      })
+    }
+  }
+
+  // Get unique values for filter options
+  const getUniqueOS = () => {
+    const osSet = new Set<string>()
+    templates.forEach(template => {
+      template.laptop.supportedOS?.forEach(os => osSet.add(os.os))
+    })
+    return Array.from(osSet).sort()
+  }
+
+  const getUniqueBrands = () => {
+    const brandSet = new Set<string>()
+    templates.forEach(template => {
+      brandSet.add(template.laptop.brand)
+    })
+    return Array.from(brandSet).sort()
+  }
+
+  // Assignment Management Functions
+  const handleUpdateAssignmentStatus = async (assignmentId: string, status: string) => {
+    try {
+      const response = await fetch(`/api/assignments/${assignmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      })
+
+      if (response.ok) {
+        const updatedAssignment = await response.json()
+        setAssignments(assignments.map(a => 
+          a.id === assignmentId ? updatedAssignment : a
+        ))
+      toast({
+          title: "Success",
+          description: "Assignment updated successfully",
+      })
+      } else {
+        const error = await response.json()
+      toast({
+        title: "Error",
+          description: error.error || "Failed to update assignment",
+  
+        })
+      }
+    } catch (error) {
+      console.error('Failed to update assignment:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update assignment",
+
+      })
+    }
+  }
+
+  // Assignment filtering and batch operations
+  const getFilteredAssignments = () => {
+    return assignments.filter(assignment => {
+      const matchesSearch = assignmentFilters.search === '' || 
+        assignment.person.name.toLowerCase().includes(assignmentFilters.search.toLowerCase()) ||
+        assignment.template?.name.toLowerCase().includes(assignmentFilters.search.toLowerCase())
+      
+      const matchesStatus = assignmentFilters.status === 'all' || 
+        assignment.status === assignmentFilters.status
+      
+      const matchesProfile = assignmentFilters.profile === 'all' || 
+        assignment.template?.profileType === assignmentFilters.profile
+      
+      return matchesSearch && matchesStatus && matchesProfile
+    })
+  }
+
+  const toggleAssignmentSelection = (assignmentId: string) => {
+    setSelectedAssignments(prev => 
+      prev.includes(assignmentId) 
+        ? prev.filter(id => id !== assignmentId)
+        : [...prev, assignmentId]
     )
   }
 
-  const handleEditClick = async (pkg: Package) => {
-    setEditPackage(pkg)
-    
-    // Set the laptop ID directly from the package
-    const laptopId = pkg.laptop.id
-    console.log("Setting laptop ID:", laptopId)
-    setEditSelectedLaptopId(laptopId)
-    
-    // Set the accessory IDs
-    setEditSelectedAccessoryIds(pkg.accessories.map(acc => acc.id))
-    
-    // Make sure we have both laptops and accessories data
-    if (laptops.length === 0 || accessories.length === 0) {
-      try {
-        const [laptopsData, accessoriesData] = await Promise.all([
-          fetchLaptops(),
-          fetchAccessories()
-        ])
-        setLaptops(laptopsData)
-        setAccessories(accessoriesData)
-      } catch (err) {
-        console.error("Error fetching options for edit:", err)
-      }
-    }
-    
-    setIsEditDialogOpen(true)
-    setIsDetailDialogOpen(false)
-  }
+  const handleBatchDeleteAssignments = async () => {
+    if (selectedAssignments.length === 0) return
 
-  const handleDeleteClick = (pkg: Package) => {
-    setSelectedPackage(pkg)
-    setIsDeleteDialogOpen(true)
-    setIsDetailDialogOpen(false)
-  }
-
-  const handleEditAccessoryToggle = (accessoryId: string) => {
-    setEditSelectedAccessoryIds(prev => 
-      prev.includes(accessoryId)
-        ? prev.filter(id => id !== accessoryId)
-        : [...prev, accessoryId]
-    )
-  }
-
-  const handleEditPackage = async () => {
-    if (!editPackage) return
-    
     try {
-      setIsSubmitting(true)
-
-      // Validate required fields
-      if (!editPackage.name || !editSelectedLaptopId) {
-        toast({
-          title: "Validation Error",
-          description: "Package name and laptop selection are required.",
+      const deletePromises = selectedAssignments.map(assignmentId =>
+        fetch(`/api/assignments/${assignmentId}`, {
+          method: 'DELETE',
         })
-        return
-      }
+      )
 
-      // Find the selected laptop
-      const selectedLaptop = laptops.find(laptop => laptop.id === editSelectedLaptopId)
-      if (!selectedLaptop) {
+      const results = await Promise.all(deletePromises)
+      const allSuccessful = results.every(response => response.ok)
+
+      if (allSuccessful) {
+        setAssignments(assignments.filter(a => !selectedAssignments.includes(a.id)))
+        setSelectedAssignments([])
+        toast({
+          title: "Success",
+          description: `${selectedAssignments.length} assignment(s) deleted successfully`,
+        })
+      } else {
         toast({
           title: "Error",
-          description: "Selected laptop not found.",
+          description: "Some assignments could not be deleted",
         })
-        return
       }
-
-      // Find the selected accessories
-      const selectedAccessories = accessories.filter(acc => editSelectedAccessoryIds.includes(acc.id))
-
-      // Prepare updated package data
-      const updatedPackage: Package = {
-        ...editPackage,
-        laptop: selectedLaptop,
-        accessories: selectedAccessories,
-        updatedAt: new Date().toISOString()
-      }
-
-      // Submit the updated package
-      await updatePackage(updatedPackage)
-
-      // Refresh the package list
-      const updatedPackages = await fetchPackages()
-      setPackages(updatedPackages)
-
-      // Reset form and close dialog
-      setEditPackage(null)
-      setEditSelectedLaptopId("")
-      setEditSelectedAccessoryIds([])
-      setIsEditDialogOpen(false)
-
-      toast({
-        title: "Package Updated",
-        description: `${updatedPackage.name} has been updated successfully.`,
-      })
-    } catch (err) {
-      console.error("Error updating package:", err)
+    } catch (error) {
+      console.error('Failed to delete assignments:', error)
       toast({
         title: "Error",
-        description: "Failed to update package. Please try again.",
+        description: "Failed to delete assignments",
       })
-    } finally {
-      setIsSubmitting(false)
     }
   }
-
-  const handleDeletePackage = async () => {
-    if (!selectedPackage) return
-
-    try {
-      setIsSubmitting(true)
-
-      // Delete the package
-      await deletePackage(selectedPackage.id)
-
-      // Refresh the package list
-      const updatedPackages = await fetchPackages()
-      setPackages(updatedPackages)
-
-      setIsDeleteDialogOpen(false)
-      setSelectedPackage(null)
-
-      toast({
-        title: "Package Deleted",
-        description: `${selectedPackage.name} has been deleted.`,
-      })
-    } catch (err) {
-      console.error("Error deleting package:", err)
-      toast({
-        title: "Error",
-        description: "Failed to delete package. Please try again.",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  // Debug selected laptop
-  useEffect(() => {
-    if (isEditDialogOpen && editPackage && editPackage.laptop) {
-      // Always force set the laptop ID when the dialog opens
-      const laptopId = editPackage.laptop.id;
-      console.log("Setting laptop ID from edit useEffect:", laptopId);
-      setEditSelectedLaptopId(laptopId);
-    }
-  }, [isEditDialogOpen, editPackage]);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading packages...</p>
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto py-6">
+          <div className="flex items-center gap-4 mb-8">
+            <Link href="/">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+            <div className="h-6 border-l border-border" />
+            <h1 className="text-2xl font-bold">IT Package Management</h1>
+          </div>
+          
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin" />
+          </div>
         </div>
       </div>
     )
@@ -725,539 +988,1889 @@ export default function PackagesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
+      <div className="container mx-auto py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
             <Link href="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back to home</span>
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight">Laptop Packages</h1>
+            <div className="h-6 border-l border-border" />
+            <h1 className="text-2xl font-bold">IT Package Management</h1>
           </div>
-        </div>
-      </header>
 
-      <main className="container py-6">
-        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Exchange Rate:</span>  
+            <span className="font-medium">1 EUR = {eurToMadRate.rate} MAD</span>
+            {eurToMadRate.isLive ? (
+              <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/20">Live</Badge>
+            ) : (
+              <Badge variant="outline" className="bg-orange-500/10 text-orange-700 border-orange-500/20">Fallback</Badge>
+            )}
+        </div>
+        </div>
+
+
+
+        {/* Main Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="catalog" className="flex items-center gap-2">
+              <PackageIcon className="w-4 h-4" />
+              Package Catalog
+              <Badge variant="secondary" className="ml-1">{templates.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="assignments" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Assignment Dashboard  
+              <Badge variant="secondary" className="ml-1">{assignments.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="simulator" className="flex items-center gap-2">
+              <Calculator className="w-4 h-4" />
+              Cost Simulator
+            </TabsTrigger>
+          </TabsList>
+
+                    {/* Package Catalog Tab */}
+          <TabsContent value="catalog">
+            <div className="space-y-6">
+              {/* Header with View Controls */}
+              <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight mb-2">Package Management</h1>
-            <p className="text-muted-foreground">
-              Manage laptop packages and track their status. Drag packages between columns to change their status.
-            </p>
+                  <h2 className="text-xl font-semibold">Package Catalog</h2>
+                  <p className="text-muted-foreground">Browse and manage IT packages organized by profile types.</p>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
-            <PlusCircle className="h-4 w-4 mr-2" />
+                <div className="flex items-center gap-2">
+                  {/* View Toggle Buttons */}
+                  <div className="flex items-center border rounded-lg p-1">
+                    <Button
+                      variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('kanban')}
+                      className="h-8 px-3"
+                    >
+                      <Layout className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                      className="h-8 px-3"
+                    >
+                      <List className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('grid')}
+                      className="h-8 px-3"
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Button onClick={() => setIsCreateTemplateOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
             Add Package
           </Button>
+                </div>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-[500px] w-full rounded-xl" />
+              {/* Filters Section */}
+              <div className="flex items-center gap-4 p-4 bg-muted/20 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Filters:</span>
               </div>
-            ))}
-          </div>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {columns.map((column) => (
-                <StatusColumn
-                  key={column.id}
-                  title={column.title}
-                  icon={column.icon}
-                  count={getPackagesByStatus(column.id).length}
-                  status={column.id}
-                  color={column.color}
-                >
-                  <SortableContext
-                    items={getPackagesByStatus(column.id).map(pkg => pkg.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-3">
-                      {getPackagesByStatus(column.id).map((pkg) => (
-                        <SortablePackageCard
-                          key={pkg.id}
-                          pkg={pkg}
-                          formatPrice={formatPrice}
-                          getTotalPrice={getTotalPrice}
-                          getAccessoryIcon={getAccessoryIcon}
-                          getStatusBadge={getStatusBadge}
-                          onClick={() => handlePackageClick(pkg)}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </StatusColumn>
-              ))}
-            </div>
+                
+                <Select value={filters.os} onValueChange={(value) => setFilters({...filters, os: value})}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="All OS" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All OS</SelectItem>
+                    {getUniqueOS().map(os => (
+                      <SelectItem key={os} value={os}>{os}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            <DragOverlay>
-              {activePackage ? (
-                <div className="w-full opacity-80">
-                  <PackageCard
-                    pkg={activePackage}
-                    formatPrice={formatPrice}
-                    getTotalPrice={getTotalPrice}
-                    getAccessoryIcon={getAccessoryIcon}
-                    getStatusBadge={getStatusBadge}
+                <Select value={filters.brand} onValueChange={(value) => setFilters({...filters, brand: value})}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="All Brands" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Brands</SelectItem>
+                    {getUniqueBrands().map(brand => (
+                      <SelectItem key={brand} value={brand}>{brand}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Price:</span>
+                  <span className="text-xs text-muted-foreground min-w-[120px]">
+                    {formatCurrency(filters.priceRange[0])} - {formatCurrency(filters.priceRange[1])}
+                  </span>
+                  <Slider
+                    value={filters.priceRange}
+                    onValueChange={(value) => setFilters({...filters, priceRange: value as [number, number]})}
+                    max={30000}
+                    min={3000}
+                    step={1000}
+                    className="w-32"
                   />
                 </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        )}
-      </main>
 
-      {/* Add Package Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Clear
+                </Button>
+              </div>
+
+              {/* Kanban View */}
+              {viewMode === 'kanban' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {Object.entries(getTemplatesByProfile()).map(([profileKey, profileTemplates]) => {
+                    // Use clean dark background with off-gray borders to match package cards
+                    const colors = [
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Consultant: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Developer: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Unassigned: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400', // Fallback: Clean bg, off-gray border
+                      'bg-background border-border text-blue-600 dark:text-blue-400'  // Fallback: Clean bg, off-gray border
+                    ]
+                    
+                    const icons = ['💻', '🎯', '⚡', '🔧', '📊', '🎨', '🚀', '📦']
+                    
+                    const colorIndex = Object.keys(getTemplatesByProfile()).indexOf(profileKey) % colors.length
+                    const iconIndex = Object.keys(getTemplatesByProfile()).indexOf(profileKey) % icons.length
+                    
+                    const config = {
+                      title: profileKey === 'unassigned' ? 'Unassigned' : profileKey,
+                      description: profileKey === 'unassigned' 
+                        ? 'Packages without specific profile assignment'
+                        : `Packages for ${profileKey} profile`,
+                      icon: icons[iconIndex],
+                      className: colors[colorIndex]
+                    }
+                    const totalAssigned = profileTemplates.reduce((sum, t) => sum + t.assignmentCount, 0)
+
+                    return (
+                      <div key={profileKey} className={`rounded-lg border-2 p-4 ${config.className}`}>
+                        {/* Column Header */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{config.icon}</span>
+                            <div>
+                              <h3 className="font-semibold">{config.title}</h3>
+                              <p className="text-xs opacity-80">{config.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col items-center">
+                              <span className="text-lg font-bold text-primary">
+                                {profileTemplates.length}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {profileTemplates.length === 1 ? 'Config' : 'Configs'}
+                              </span>
+                            </div>
+                            <div className="w-px h-8 bg-border"></div>
+                            <div className="flex flex-col items-center">
+                              <span className="text-lg font-bold text-primary">
+                                {totalAssigned}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {totalAssigned === 1 ? 'Assigned' : 'Assigned'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Template Cards */}
+                        <div className="space-y-3">
+                          {profileTemplates.map((template) => (
+                            <Card key={template.id} className="bg-background/80 hover:bg-background transition-colors">
+                              <CardContent className="p-4">
+                                {/* Template Name & Assignment Count */}
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex-1">
+                                    <h4 className="font-medium text-sm">{template.name}</h4>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      {template.assignmentCount} people assigned
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Laptop Info */}
+                                <div className="flex items-center gap-3 mb-3">
+                                  {template.laptop.images[0] && (
+                                    <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                                      <Image
+                                        src={template.laptop.images[0]}
+                                        alt={`${template.laptop.brand} ${template.laptop.model}`}
+                                        width={48}
+                                        height={48}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="font-medium text-xs truncate">
+                                      {template.laptop.brand} {template.laptop.model}
+                                    </h5>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {template.laptop.processor}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Accessories */}
+                                <div className="mb-3 min-h-[20px]">
+                                  {template.accessories.length > 0 ? (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span>🔌</span>
+                                      <span>{template.accessories.length} accessories</span>
+          </div>
+        ) : (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <span>📦</span>
+                                      <span>No accessories</span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Assigned People Avatars */}
+                                {template.assignments.length > 0 && (
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-xs text-muted-foreground">Assigned to:</span>
+                                    <div className="flex items-center -space-x-1">
+                                      <TooltipProvider>
+                                        {template.assignments.slice(0, 3).map((assignment, index) => (
+                                          <Tooltip key={assignment.id}>
+                                            <TooltipTrigger asChild>
+                                              <div className="w-7 h-7 bg-blue-500/20 border border-blue-500/30 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-300 ring-2 ring-background">
+                                                <span className="leading-none block transform translate-y-[0.5px]">
+                                                  {assignment.person.name?.charAt(0).toUpperCase() || '?'}
+                                                </span>
+                                              </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <p>{assignment.person.name}</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        ))}
+                                        {template.assignments.length > 3 && (
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <div className="w-7 h-7 bg-muted border border-border rounded-full flex items-center justify-center text-xs font-bold text-muted-foreground ring-2 ring-background">
+                                                <span className="leading-none block transform translate-y-[0.5px]">
+                                                  +{template.assignments.length - 3}
+                                                </span>
+                                              </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <div className="space-y-1">
+                                                {template.assignments.slice(3).map((assignment) => (
+                                                  <p key={assignment.id}>{assignment.person.name}</p>
+                                                ))}
+                                              </div>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        )}
+                                      </TooltipProvider>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Price & Actions */}
+                                <div className="flex items-center justify-between">
+                                  <div className="text-sm font-semibold">
+                                    {formatCurrency(template.totalPrice)}
+                                    <span className="text-xs text-muted-foreground ml-1">
+                                      {template.priceType}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 px-2 text-xs"
+                                      onClick={() => handleAssignPeople(template)}
+                                    >
+                                      <Users className="w-3 h-3 mr-1" />
+                                      Assign
+                                    </Button>
+
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => handleViewTemplate(template)}
+                                    >
+                                      <Eye className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => handleEditTemplateClick(template)}
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      onClick={() => handleDeleteTemplate(template.id)}
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+
+                          {profileTemplates.length === 0 && (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <PackageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-xs">No templates in this category</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* List View */}
+              {viewMode === 'list' && (
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Package</TableHead>
+                        <TableHead>Laptop</TableHead>
+                        <TableHead>Profile</TableHead>
+                        <TableHead>Accessories</TableHead>
+                        <TableHead>Assigned</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getFilteredTemplates().map((template) => (
+                        <TableRow key={template.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{template.name}</p>
+                              <p className="text-sm text-muted-foreground">{template.description}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {template.laptop.images[0] && (
+                                <div className="w-8 h-8 bg-muted rounded overflow-hidden">
+                                  <Image
+                                    src={template.laptop.images[0]}
+                                    alt={template.laptop.brand}
+                                    width={32}
+                                    height={32}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-medium text-sm">{template.laptop.brand} {template.laptop.model}</p>
+                                <p className="text-xs text-muted-foreground">{template.laptop.processor}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {getProfileBadge(template.profileType)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              {template.accessories.slice(0, 2).map((acc) => (
+                                <Badge key={acc.id} variant="outline" className="text-xs">
+                                  {acc.name}
+                                </Badge>
+                              ))}
+                              {template.accessories.length > 2 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{template.accessories.length - 2}
+                                </Badge>
+                              )}
+                    </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              {template.assignments.slice(0, 3).map((assignment, index) => (
+                                <div key={assignment.id} className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center text-xs font-medium">
+                                  {assignment.person.name?.charAt(0).toUpperCase()}
+                                </div>
+                              ))}
+                              {template.assignments.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{template.assignments.length - 3}
+                                </Badge>
+                              )}
+            </div>
+                          </TableCell>
+                          <TableCell className="font-semibold">
+                            {formatCurrency(template.totalPrice)}
+                            <span className="text-xs text-muted-foreground ml-1 font-normal">
+                              {template.priceType}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button variant="ghost" size="sm" onClick={() => handleAssignPeople(template)}>
+                                <Users className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleViewTemplate(template)}>
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => handleEditTemplateClick(template)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                onClick={() => handleDeleteTemplate(template.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              )}
+
+              {/* Grid View */}
+              {viewMode === 'grid' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {getFilteredTemplates().map((template) => (
+                    <Card key={template.id} className="overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-sm truncate">{template.name}</h4>
+                            {getProfileBadge(template.profileType)}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mb-3">
+                          {template.laptop.images[0] && (
+                            <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
+                              <Image
+                                src={template.laptop.images[0]}
+                                alt={template.laptop.brand}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                  />
+                </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-xs truncate">
+                              {template.laptop.brand} {template.laptop.model}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {template.laptop.processor}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm mb-3">
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">{template.assignmentCount}</span>
+                          </div>
+                          <div className="font-semibold">
+                            {formatCurrency(template.totalPrice)}
+                            <span className="text-xs text-muted-foreground ml-1 font-normal">
+                              {template.priceType}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 pt-2 border-t">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs flex-1"
+                            onClick={() => handleAssignPeople(template)}
+                          >
+                            <Users className="w-3 h-3 mr-1" />
+                            Assign
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0"
+                            onClick={() => handleViewTemplate(template)}
+                          >
+                            <Eye className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0"
+                            onClick={() => handleEditTemplateClick(template)}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDeleteTemplate(template.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {getFilteredTemplates().length === 0 && (
+                <div className="text-center py-12">
+                  <PackageIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium">No templates found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    {templates.length === 0 ? "Create your first package template to get started" : "Try adjusting your filters"}
+                  </p>
+                  {templates.length === 0 ? (
+                    <Button onClick={() => setIsCreateTemplateOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Template
+                    </Button>
+                  ) : (
+                    <Button variant="outline" onClick={clearFilters}>
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Assignment Dashboard Tab */}
+          <TabsContent value="assignments">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">Assignment Dashboard</h2>
+                  <p className="text-muted-foreground">Track who has which package templates</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedTemplate(null)
+                      setBatchAssignmentForm({
+                        selectedPersonIds: [],
+                        templateId: '',
+                        status: 'assigned',
+                        pcReference: '',
+                        notes: ''
+                      })
+                      setIsBatchAssignmentOpen(true)
+                    }}
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Batch Assignment
+                  </Button>
+                  <Button onClick={() => {
+                    setSelectedTemplate(null)
+                    setAssignmentForm({
+                      personId: '',
+                      templateId: '',
+                      status: 'assigned',
+                      pcReference: '',
+                      notes: ''
+                    })
+                    setIsCreateAssignmentOpen(true)
+                  }}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Assignment
+                  </Button>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex flex-wrap gap-4 items-center">
+                    <div className="flex items-center gap-2">
+                      <Search className="w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search by name..."
+                        value={assignmentFilters.search}
+                        onChange={(e) => setAssignmentFilters({...assignmentFilters, search: e.target.value})}
+                        className="w-64"
+                      />
+                    </div>
+                    
+                    <Select
+                      value={assignmentFilters.status}
+                      onValueChange={(value) => setAssignmentFilters({...assignmentFilters, status: value})}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="All Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="assigned">Assigned</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="returned">Returned</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={assignmentFilters.profile}
+                      onValueChange={(value) => setAssignmentFilters({...assignmentFilters, profile: value})}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="All Profiles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Profiles</SelectItem>
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile} value={profile}>
+                            {profile}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setAssignmentFilters({search: '', status: 'all', profile: 'all'})}
+                    >
+                      Clear Filters
+                    </Button>
+
+                    {selectedAssignments.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        onClick={handleBatchDeleteAssignments}
+                        className="ml-auto"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Selected ({selectedAssignments.length})
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Assignments Table */}
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedAssignments.length === getFilteredAssignments().length && getFilteredAssignments().length > 0}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedAssignments(getFilteredAssignments().map(a => a.id))
+                            } else {
+                              setSelectedAssignments([])
+                            }
+                          }}
+                        />
+                      </TableHead>
+                      <TableHead>Person</TableHead>
+                      <TableHead>Template</TableHead>
+                      <TableHead>Profile</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Assigned Date</TableHead>
+                      <TableHead>Value</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {getFilteredAssignments().map((assignment) => (
+                      <TableRow key={assignment.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedAssignments.includes(assignment.id)}
+                            onCheckedChange={() => toggleAssignmentSelection(assignment.id)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{assignment.person.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {assignment.person.department}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{assignment.template?.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {assignment.template?.laptop.brand} {assignment.template?.laptop.model}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {assignment.template && getProfileBadge(assignment.template.profileType)}
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(assignment.status)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(assignment.assignedAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {assignment.template && formatCurrency(assignment.template.totalPrice)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Select
+                              value={assignment.status}
+                              onValueChange={(status) => handleUpdateAssignmentStatus(assignment.id, status)}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="assigned">Assigned</SelectItem>
+                                <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="returned">Returned</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Card>
+
+              {assignments.length === 0 && (
+                <div className="text-center py-12">
+                  <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium">No assignments found</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Assign templates to people to get started
+                  </p>
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Assignment
+                  </Button>
+                </div>
+              )}
+              </div>
+          </TabsContent>
+
+          {/* Cost Simulator Tab */}
+          <TabsContent value="simulator">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold">Cost Simulator</h2>
+                <p className="text-muted-foreground">
+                  Calculate costs based on template quantities and team profiles
+                </p>
+              </div>
+
+              {/* Team Composition */}
+              <Card>
+                <div className="p-6 border-b">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">Team Composition</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Define your team structure and package preferences
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="priceTypeSelector" className="text-sm font-medium">
+                        Price Type:
+                      </Label>
+                      <Select 
+                        value={simulatorPriceType} 
+                        onValueChange={(value: 'HT' | 'TTC') => setSimulatorPriceType(value)}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="HT">HT</SelectItem>
+                          <SelectItem value="TTC">TTC</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {teamComposition.map((member) => (
+                      <div key={member.id} className="flex items-center gap-4 p-4 border rounded-lg">
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-sm font-medium">Profile Type</Label>
+                            <Select 
+                              value={member.profileType}
+                              onValueChange={(value) => updateTeamMember(member.id, 'profileType', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {profiles.map((profile) => (
+                                  <SelectItem key={profile} value={profile}>
+                                    {profile}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Package Preference</Label>
+                            <Select 
+                              value={member.packagePreference}
+                              onValueChange={(value: 'Windows Package' | 'Mac Package') => updateTeamMember(member.id, 'packagePreference', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Windows Package">Windows Package</SelectItem>
+                                <SelectItem value="Mac Package">Mac Package</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Quantity</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={member.quantity}
+                              onChange={(e) => updateTeamMember(member.id, 'quantity', parseInt(e.target.value) || 1)}
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeTeamMember(member.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    
+                    <Button onClick={addTeamMember} variant="outline" className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Team Member
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Cost Breakdown */}
+              {teamComposition.length > 0 && (
+                <Card>
+                  <div className="p-6 border-b">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5" />
+                      <h3 className="text-lg font-semibold">Cost Breakdown</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Detailed cost analysis for your team configuration
+                    </p>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Profile</TableHead>
+                            <TableHead>Package</TableHead>
+                            <TableHead>Quantity</TableHead>
+                            <TableHead>Unit Price (MAD {simulatorPriceType})</TableHead>
+                            <TableHead>Unit Price (EUR {simulatorPriceType})</TableHead>
+                            <TableHead>Total (MAD {simulatorPriceType})</TableHead>
+                            <TableHead>Total (EUR {simulatorPriceType})</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {getTeamCompositionCosts().map((cost) => (
+                            <TableRow key={cost.id}>
+                              <TableCell className="font-medium">{cost.profileType}</TableCell>
+                              <TableCell>{cost.packagePreference}</TableCell>
+                              <TableCell>{cost.quantity}</TableCell>
+                              <TableCell>{formatCurrency(cost.unitPriceMAD)}</TableCell>
+                              <TableCell>{formatCurrencyUtil(cost.unitPriceEUR, 'EUR')}</TableCell>
+                              <TableCell className="font-medium">{formatCurrency(cost.totalMAD)}</TableCell>
+                              <TableCell className="font-medium">{formatCurrencyUtil(cost.totalEUR, 'EUR')}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Project Total */}
+              {teamComposition.length > 0 && (
+                <Card>
+                  <div className="p-6 border-b">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="w-5 h-5" />
+                      <h3 className="text-lg font-semibold">Project Total</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Complete cost estimation for your project
+                    </p>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-sm text-muted-foreground">Total Cost ({simulatorPriceType})</h4>
+                          <div className="text-3xl font-bold text-primary">
+                            {formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0))}
+                          </div>
+                          <div className="text-lg text-muted-foreground">
+                            {formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0), 'EUR')}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm text-muted-foreground">Total Cost ({simulatorPriceType === 'HT' ? 'TTC' : 'HT'})</h4>
+                          <div className="text-xl font-medium text-muted-foreground">
+                            {simulatorPriceType === 'HT' 
+                              ? formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0) * 1.20)
+                              : formatCurrency(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalMAD, 0) / 1.20)
+                            }
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {simulatorPriceType === 'HT' 
+                              ? formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0) * 1.20, 'EUR')
+                              : formatCurrencyUtil(getTeamCompositionCosts().reduce((sum, cost) => sum + cost.totalEUR, 0) / 1.20, 'EUR')
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-muted/20 rounded-lg">
+                          <h4 className="font-medium mb-2">Currency Rate</h4>
+                          <div className="text-lg font-bold">
+                            1 EUR = {eurToMadRate.rate.toFixed(2)} MAD
+                          </div>
+                          {eurToMadRate.isLive && (
+                            <Badge variant="secondary" className="mt-1">Live</Badge>
+                          )}
+                        </div>
+                        <div className="p-4 bg-muted/20 rounded-lg">
+                          <h4 className="font-medium mb-2">Team Summary</h4>
+                          <div className="text-lg font-bold">
+                            {getTeamCompositionCosts().reduce((sum, cost) => sum + cost.quantity, 0)} team members
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            across {getTeamCompositionCosts().length} different configurations
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Pricing Calculation Details */}
+              <Card>
+                <div className="p-6 border-b">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    <h3 className="text-lg font-semibold">Pricing Calculation Details</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Transparent breakdown of how unit prices are calculated from your actual package data.
+                    All prices below are normalized to <strong>{simulatorPriceType}</strong> using 20% VAT conversion.
+                  </p>
+                </div>
+                
+                <CardContent className="p-6 space-y-6">
+                  {/* Data Source Analysis */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Database className="w-4 h-4" />
+                      <h4 className="font-medium">Data Source Analysis</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      How we identify and categorize your packages. Note: Your templates may have mixed price types (HT/TTC).
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Windows Packages</h5>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Packages with non-Apple laptops
+                        </p>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {getDataSourceAnalysis().windows.count}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Average: {formatCurrency(getDataSourceAnalysis().windows.average)} {simulatorPriceType}
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Mac Packages</h5>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Packages with Apple laptops
+                        </p>
+                        <div className="text-2xl font-bold text-green-600">
+                          {getDataSourceAnalysis().mac.count}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Average: {formatCurrency(getDataSourceAnalysis().mac.average)} {simulatorPriceType}
+                        </div>
+                      </div>
+
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Price Types</h5>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Template price distribution
+                        </p>
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span>HT Templates:</span>
+                            <span className="font-medium">{templates.filter(t => t.priceType === 'HT').length}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>TTC Templates:</span>
+                            <span className="font-medium">{templates.filter(t => t.priceType === 'TTC').length}</span>
+                          </div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-2">
+                          All converted to {simulatorPriceType}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Base Prices */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <DollarSign className="w-4 h-4" />
+                      <h4 className="font-medium">Base Prices (Before Profile Adjustments)</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Foundation prices calculated from your package data
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Windows Base Price</h5>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {formatCurrency(getBasePrices().windows.price)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {getBasePrices().windows.eur.toFixed(0)} EUR • {simulatorPriceType}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Calculated from your data
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 border rounded-lg">
+                        <h5 className="font-medium mb-2">Mac Base Price</h5>
+                        <div className="text-2xl font-bold text-green-600">
+                          {formatCurrency(getBasePrices().mac.price)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {getBasePrices().mac.eur.toFixed(0)} EUR • {simulatorPriceType}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Calculated from your data
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Real Profile-Based Pricing */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Users className="w-4 h-4" />
+                      <h4 className="font-medium">Real Profile-Based Pricing</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Actual average prices calculated from packages assigned to each profile (no artificial multipliers).
+                      All prices are shown in <strong>{simulatorPriceType}</strong> format with automatic VAT conversion (20%).
+                    </p>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-3 font-medium">Profile</th>
+                            <th className="text-left p-3 font-medium">Windows Price ({simulatorPriceType})</th>
+                            <th className="text-left p-3 font-medium">Mac Price ({simulatorPriceType})</th>
+                            <th className="text-left p-3 font-medium">Reasoning</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getProfilePricing().map((profile) => (
+                            <tr key={profile.profile} className="border-b hover:bg-muted/20">
+                              <td className="p-3 font-medium">{profile.profile}</td>
+                              <td className="p-3">
+                                <div className="font-semibold">
+                                  {formatCurrency(profile.windowsPrice)}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {profile.windowsEur.toFixed(0)} EUR
+                                </div>
+                                <div className="text-xs text-blue-600">
+                                  {profile.windowsCount} packages
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <div className="font-semibold">
+                                  {formatCurrency(profile.macPrice)}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {profile.macEur.toFixed(0)} EUR
+                                </div>
+                                <div className="text-xs text-green-600">
+                                  {profile.macCount} packages
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <div className="text-sm text-muted-foreground">
+                                  {profile.reasoning}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Currency Conversion & VAT */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <RefreshCw className="w-4 h-4" />
+                      <h4 className="font-medium">Currency Conversion & VAT</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Exchange rate used for EUR calculations and VAT conversion details
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 border rounded-lg bg-muted/20">
+                        <h5 className="font-medium mb-2">Exchange Rate</h5>
+                        <div className="text-lg font-bold">
+                          1 EUR = {eurToMadRate.rate.toFixed(2)} MAD
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {eurToMadRate.isLive ? 'Updated from live exchange rate API' : 'Using fallback rate'}
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          {eurToMadRate.isLive ? (
+                            <Badge className="bg-green-500/10 text-green-700 border-green-500/20">
+                              Live Rate
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                              Fallback Rate
+                            </Badge>
+                          )}
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={loadExchangeRate}
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="p-4 border rounded-lg bg-muted/20">
+                        <h5 className="font-medium mb-2">VAT Conversion</h5>
+                        <div className="text-lg font-bold">
+                          20% VAT Rate (Morocco)
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          Used for HT ↔ TTC conversion
+                        </div>
+                        <div className="space-y-1 text-sm">
+                          <div>TTC = HT × 1.20</div>
+                          <div>HT = TTC ÷ 1.20</div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-2">
+                          Templates with mixed price types are automatically converted
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Create Template Dialog */}
+        <Dialog open={isCreateTemplateOpen} onOpenChange={setIsCreateTemplateOpen}>
+          <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create New Package</DialogTitle>
-            <DialogDescription>Configure a new laptop package with accessories</DialogDescription>
+              <DialogTitle>Create New Template</DialogTitle>
+              <DialogDescription>
+                Create a new package template for your IT catalog
+              </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="package-name">Package Name</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name">Template Name</Label>
               <Input
-                id="package-name"
-                value={newPackage.name}
-                onChange={(e) => setNewPackage({ ...newPackage, name: e.target.value })}
-                placeholder="Enter package name"
+                    id="name"
+                    value={templateForm.name}
+                    onChange={(e) => setTemplateForm({...templateForm, name: e.target.value})}
+                    placeholder="Developer Workstation"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="laptop">Select Laptop</Label>
+                <div>
+                  <Label htmlFor="profileType">Profile Type</Label>
               <Select
-                value={selectedLaptopId}
-                onValueChange={setSelectedLaptopId}
+                    value={templateForm.profileType} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, profileType: value})}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a laptop" />
+                      <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {laptops.map((laptop) => (
-                    <SelectItem key={laptop.id} value={laptop.id}>
-                      {laptop.brand} {laptop.model} - {formatPrice(laptop.price, laptop.priceType)}
-                    </SelectItem>
-                  ))}
+                      {profiles.map((profile) => (
+                        <SelectItem key={profile} value={profile}>
+                          {profile}
+                        </SelectItem>
+                      ))}
                 </SelectContent>
               </Select>
+                </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Select Accessories</Label>
-              <div className="border rounded-md p-4 h-48 overflow-auto">
-                {accessories.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No accessories available</p>
-                ) : (
-                  <div className="space-y-2">
-                    {accessories.map((accessory) => (
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={templateForm.description}
+                  onChange={(e) => setTemplateForm({...templateForm, description: e.target.value})}
+                  placeholder="High-performance setup for developers"
+                />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                  <Label htmlFor="laptop">Laptop ({laptops.length} available)</Label>
+              <Select
+                    value={templateForm.laptopId} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, laptopId: value})}
+              >
+                <SelectTrigger>
+                      <SelectValue placeholder={laptops.length > 0 ? "Select laptop" : "Loading laptops..."} />
+                </SelectTrigger>
+                <SelectContent>
+                      {laptops.length > 0 ? (
+                        laptops.map((laptop) => (
+                    <SelectItem key={laptop.id} value={laptop.id}>
+                            {laptop.brand} {laptop.model}
+                    </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-laptops" disabled>
+                          No laptops available
+                        </SelectItem>
+                      )}
+                </SelectContent>
+              </Select>
+                </div>
+                <div>
+                  <Label htmlFor="priceType">Price Type</Label>
+                <Select
+                    value={templateForm.priceType} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, priceType: value})}
+                >
+                  <SelectTrigger>
+                      <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="HT">HT (Excluding Tax)</SelectItem>
+                      <SelectItem value="TTC">TTC (Including Tax)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+                            <div>
+                <Label>Accessories ({accessories.length} available)</Label>
+                <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-2">
+                  {accessories.length > 0 ? (
+                    accessories.map((accessory) => (
                       <div key={accessory.id} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id={`accessory-${accessory.id}`}
-                          checked={selectedAccessoryIds.includes(accessory.id)}
-                          onChange={() => handleAccessoryToggle(accessory.id)}
-                          className="h-4 w-4 rounded border-gray-300"
+                        <Checkbox
+                          id={accessory.id}
+                          checked={templateForm.accessoryIds.includes(accessory.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setTemplateForm({
+                                ...templateForm,
+                                accessoryIds: [...templateForm.accessoryIds, accessory.id]
+                              })
+                            } else {
+                              setTemplateForm({
+                                ...templateForm,
+                                accessoryIds: templateForm.accessoryIds.filter(id => id !== accessory.id)
+                              })
+                            }
+                          }}
                         />
-                        <Label htmlFor={`accessory-${accessory.id}`} className="flex items-center gap-2 text-sm font-normal cursor-pointer">
-                          {getAccessoryIcon(accessory.type)}
-                          <span>{accessory.name} ({accessory.brand}) - {formatPrice(accessory.price, accessory.priceType)}</span>
+                        <Label htmlFor={accessory.id} className="text-sm">
+                          {accessory.name} - {formatCurrency(accessory.price)}
                         </Label>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-4 text-center">
+                      {loading ? "Loading accessories..." : "No accessories available"}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select
-                  value={newPackage.status as string}
-                  onValueChange={(value) => setNewPackage({ ...newPackage, status: value as PackageStatus })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="proposed">Proposed</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="rejected">Rejected</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                      <DialogFooter>
+              <Button variant="outline" onClick={refreshData}>
+                🔄 Refresh Data
+              </Button>
+              <Button variant="outline" onClick={() => setIsCreateTemplateOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateTemplate}>
+                Create Template
+              </Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-              <div className="space-y-2">
-                <Label htmlFor="price-type">Price Type</Label>
-                <Select
-                  value={newPackage.priceType as string}
-                  onValueChange={(value) => setNewPackage({ ...newPackage, priceType: value as PriceType })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select price type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="HT">HT (Ex. Tax)</SelectItem>
-                    <SelectItem value="TTC">TTC (Inc. Tax)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+        {/* Edit Template Dialog */}
+        <Dialog open={isEditTemplateOpen} onOpenChange={setIsEditTemplateOpen}>
+          <DialogContent className="max-w-2xl">
+              <DialogHeader>
+              <DialogTitle>Edit Template</DialogTitle>
+                <DialogDescription>
+                Update the package template details
+                </DialogDescription>
+              </DialogHeader>
 
+            <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="assigned-to">Assigned To</Label>
+                <div>
+                  <Label htmlFor="edit-name">Template Name</Label>
                 <Input
-                  id="assigned-to"
-                  value={newPackage.assignedTo || ""}
-                  onChange={(e) => setNewPackage({ ...newPackage, assignedTo: e.target.value })}
-                  placeholder="User name"
+                    id="edit-name"
+                    value={templateForm.name}
+                    onChange={(e) => setTemplateForm({...templateForm, name: e.target.value})}
                 />
               </div>
+                <div>
+                  <Label htmlFor="edit-profileType">Profile Type</Label>
+                <Select
+                    value={templateForm.profileType} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, profileType: value})}
+                >
+                  <SelectTrigger>
+                      <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {profiles.map((profile) => (
+                        <SelectItem key={profile} value={profile}>
+                          {profile}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-description">Description</Label>
+                <Textarea
+                  id="edit-description"
+                  value={templateForm.description}
+                  onChange={(e) => setTemplateForm({...templateForm, description: e.target.value})}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-laptop">Laptop</Label>
+                <Select
+                    value={templateForm.laptopId} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, laptopId: value})}
+                >
+                  <SelectTrigger>
+                      <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {laptops.map((laptop) => (
+                        <SelectItem key={laptop.id} value={laptop.id}>
+                          {laptop.brand} {laptop.model}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-priceType">Price Type</Label>
+                  <Select
+                    value={templateForm.priceType} 
+                    onValueChange={(value) => setTemplateForm({...templateForm, priceType: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="HT">HT (Excluding Tax)</SelectItem>
+                      <SelectItem value="TTC">TTC (Including Tax)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
-              <Input
-                id="notes"
-                value={newPackage.notes || ""}
-                onChange={(e) => setNewPackage({ ...newPackage, notes: e.target.value })}
-                placeholder="Additional information (optional)"
-              />
+              <div>
+                <Label>Accessories</Label>
+                <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-2">
+                  {accessories.map((accessory) => (
+                    <div key={accessory.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-${accessory.id}`}
+                        checked={templateForm.accessoryIds.includes(accessory.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setTemplateForm({
+                              ...templateForm,
+                              accessoryIds: [...templateForm.accessoryIds, accessory.id]
+                            })
+                          } else {
+                            setTemplateForm({
+                              ...templateForm,
+                              accessoryIds: templateForm.accessoryIds.filter(id => id !== accessory.id)
+                            })
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`edit-${accessory.id}`} className="text-sm">
+                        {accessory.name} - {formatCurrency(accessory.price)}
+                      </Label>
+              </div>
+                  ))}
+            </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>
+              <Button variant="outline" onClick={() => setIsEditTemplateOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddPackage} disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Package
+              <Button onClick={handleEditTemplate}>
+                Update Template
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Package Details Dialog */}
-      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          {selectedPackage && (
-            <>
+        {/* View Template Dialog */}
+        <Dialog open={isViewTemplateOpen} onOpenChange={setIsViewTemplateOpen}>
+          <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle className="flex items-center justify-between">
-                  <span>{selectedPackage.name}</span>
-                  {getStatusBadge(selectedPackage.status)}
-                </DialogTitle>
+              <DialogTitle>{selectedTemplate?.name}</DialogTitle>
                 <DialogDescription>
-                  Assigned to {selectedPackage.assignedTo} • Created on {new Date(selectedPackage.createdAt).toLocaleDateString()}
+                {selectedTemplate?.description}
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="mt-4 space-y-6">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Laptop</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center">
-                      <div className="relative h-16 w-20 mr-4 bg-gray-100 rounded">
+            {selectedTemplate && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  {selectedTemplate.laptop.images[0] && (
+                    <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden">
                         <Image
-                          src={selectedPackage.laptop.images?.[0] || "/placeholder.svg"}
-                          alt={selectedPackage.laptop.model}
-                          fill
-                          className="object-contain"
+                        src={selectedTemplate.laptop.images[0]}
+                        alt={`${selectedTemplate.laptop.brand} ${selectedTemplate.laptop.model}`}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
                         />
                       </div>
+                  )}
                       <div>
-                        <h3 className="font-medium">{selectedPackage.laptop.brand} {selectedPackage.laptop.model}</h3>
+                    <h3 className="font-semibold">
+                      {selectedTemplate.laptop.brand} {selectedTemplate.laptop.model}
+                    </h3>
                         <p className="text-sm text-muted-foreground">
-                          {selectedPackage.laptop.processor} • {selectedPackage.laptop.ram}GB RAM • {selectedPackage.laptop.storage}GB
+                      {selectedTemplate.laptop.processor}
                         </p>
-                        <p className="text-sm font-medium mt-1">
-                          {formatPrice(selectedPackage.laptop.price, selectedPackage.laptop.priceType)}
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTemplate.laptop.ram} • {selectedTemplate.laptop.storage}
                         </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {getProfileBadge(selectedTemplate.profileType)}
+                      <Badge variant="outline">
+                        {selectedTemplate.priceType}
+                      </Badge>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                </div>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Accessories ({selectedPackage.accessories.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {selectedPackage.accessories.map((accessory) => (
-                        <div key={accessory.id} className="flex items-center">
-                          <div className="relative h-12 w-12 mr-3 bg-gray-100 rounded p-1">
-                            {accessory.image ? (
-                              <Image
-                                src={accessory.image}
-                                alt={accessory.name}
-                                fill
-                                className="object-contain"
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center h-full">
-                                {getAccessoryIcon(accessory.type)}
+                <div>
+                  <h4 className="font-medium mb-2">Accessories ({selectedTemplate.accessories.length})</h4>
+                  {selectedTemplate.accessories.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedTemplate.accessories.map((accessory) => (
+                        <div key={accessory.id} className="flex items-center justify-between text-sm">
+                          <span>{accessory.name}</span>
+                          <span>{formatCurrency(accessory.price)}</span>
                               </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No accessories included</p>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center">
-                              <h3 className="font-medium">{accessory.name}</h3>
-                              <Badge className="ml-2" variant="outline">{accessory.type}</Badge>
+
+                <div className="flex items-center justify-between font-semibold">
+                  <span>Total Price:</span>
+                  <span>{formatCurrency(selectedTemplate.totalPrice)}</span>
                             </div>
-                            <p className="text-sm text-muted-foreground">{accessory.brand}</p>
-                          </div>
-                          <div className="text-sm font-medium">
-                            {formatPrice(accessory.price, accessory.priceType)}
-                          </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Assignments ({selectedTemplate.assignmentCount})</h4>
+                  {selectedTemplate.assignments.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedTemplate.assignments.map((assignment) => (
+                        <div key={assignment.id} className="flex items-center justify-between text-sm">
+                          <span>{assignment.person.name}</span>
+                          {getStatusBadge(assignment.status)}
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-
-                {selectedPackage.notes && (
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Notes</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm">{selectedPackage.notes}</p>
-                    </CardContent>
-                  </Card>
-                )}
-
-                <div className="flex justify-between items-center pt-2">
-                  <div className="text-sm text-muted-foreground">
-                    Last updated: {new Date(selectedPackage.updatedAt).toLocaleDateString()}
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No current assignments</p>
+                  )}
                   </div>
-                  <div className="text-lg font-semibold">
-                    Total: {getTotalPrice(selectedPackage)}
                   </div>
-                </div>
-              </div>
+          )}
 
-              <DialogFooter className="flex justify-between">
-                <div>
-                  <Button variant="destructive" onClick={() => handleDeleteClick(selectedPackage)}>
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+                      <DialogFooter>
+              <Button variant="outline" onClick={() => setIsViewTemplateOpen(false)}>
                     Close
                   </Button>
-                  <Button onClick={() => handleEditClick(selectedPackage)}>
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit Package
-                  </Button>
-                </div>
               </DialogFooter>
-            </>
-          )}
         </DialogContent>
       </Dialog>
 
-      {/* Add Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        {/* Create Assignment Dialog */}
+        <Dialog open={isCreateAssignmentOpen} onOpenChange={setIsCreateAssignmentOpen}>
+          <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit Package</DialogTitle>
-            <DialogDescription>Update the laptop package configuration</DialogDescription>
+              <DialogTitle>
+                {selectedTemplate ? 'Assign Person to Template' : 'Create New Assignment'}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedTemplate 
+                  ? `Assign a person to ${selectedTemplate.name}`
+                  : 'Assign a person to a package template'
+                }
+              </DialogDescription>
           </DialogHeader>
 
-          {editPackage && (
             <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-package-name">Package Name</Label>
-                <Input
-                  id="edit-package-name"
-                  value={editPackage.name}
-                  onChange={(e) => setEditPackage({ ...editPackage, name: e.target.value })}
-                  placeholder="Enter package name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="edit-laptop">Select Laptop</Label>
+              {!selectedTemplate && (
+                <div>
+                  <Label htmlFor="template">Template</Label>
                 <Select
-                  value={editSelectedLaptopId || ""}
-                  onValueChange={(value) => {
-                    console.log("Laptop selected:", value);
-                    setEditSelectedLaptopId(value);
-                  }}
-                >
-                  <SelectTrigger id="edit-laptop">
-                    <SelectValue placeholder="Select a laptop">
-                      {editSelectedLaptopId && laptops.length > 0 ? 
-                        (() => {
-                          const laptop = laptops.find(l => l.id === editSelectedLaptopId);
-                          return laptop ? `${laptop.brand} ${laptop.model}` : "Select a laptop";
-                        })() : 
-                        "Select a laptop"
-                      }
-                    </SelectValue>
+                    value={assignmentForm.templateId} 
+                    onValueChange={(value) => setAssignmentForm({...assignmentForm, templateId: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select template" />
                   </SelectTrigger>
                   <SelectContent>
-                    {laptops.map((laptop) => (
-                      <SelectItem key={laptop.id} value={laptop.id}>
-                        {laptop.brand} {laptop.model} - {formatPrice(laptop.price, laptop.priceType)}
+                      {templates.map((template) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name} - {formatCurrency(template.totalPrice)} {template.priceType}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Select Accessories</Label>
-                <div className="border rounded-md p-4 h-48 overflow-auto">
-                  {accessories.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">No accessories available</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {accessories.map((accessory) => (
-                        <div key={accessory.id} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id={`edit-accessory-${accessory.id}`}
-                            checked={editSelectedAccessoryIds.includes(accessory.id)}
-                            onChange={() => handleEditAccessoryToggle(accessory.id)}
-                            className="h-4 w-4 rounded border-gray-300"
-                          />
-                          <Label htmlFor={`edit-accessory-${accessory.id}`} className="flex items-center gap-2 text-sm font-normal cursor-pointer">
-                            {getAccessoryIcon(accessory.type)}
-                            <span>{accessory.name} ({accessory.brand}) - {formatPrice(accessory.price, accessory.priceType)}</span>
-                          </Label>
-                        </div>
-                      ))}
                     </div>
                   )}
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-status">Status</Label>
+              <div>
+                <Label htmlFor="person">Person</Label>
                   <Select
-                    value={editPackage.status}
-                    onValueChange={(value) => setEditPackage({ ...editPackage, status: value as PackageStatus })}
+                  value={assignmentForm.personId} 
+                  onValueChange={(value) => setAssignmentForm({...assignmentForm, personId: value})}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Select person" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="proposed">Proposed</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="rejected">Rejected</SelectItem>
+                    {people.map((person) => (
+                      <SelectItem key={person.id} value={person.id}>
+                        {person.name} {person.email && `(${person.email})`}
+                      </SelectItem>
+                    ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+              <div>
+                <Label htmlFor="status">Status</Label>
+                  <Select
+                  value={assignmentForm.status} 
+                  onValueChange={(value) => setAssignmentForm({...assignmentForm, status: value})}
+                  >
+                    <SelectTrigger>
+                    <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                    <SelectItem value="assigned">Assigned</SelectItem>
                       <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="returned">Returned</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-price-type">Price Type</Label>
-                  <Select
-                    value={editPackage.priceType}
-                    onValueChange={(value) => setEditPackage({ ...editPackage, priceType: value as PriceType })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select price type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="HT">HT (Ex. Tax)</SelectItem>
-                      <SelectItem value="TTC">TTC (Inc. Tax)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-assigned-to">Assigned To</Label>
+              <div>
+                <Label htmlFor="pcReference">PC Reference (Optional)</Label>
                   <Input
-                    id="edit-assigned-to"
-                    value={editPackage.assignedTo || ""}
-                    onChange={(e) => setEditPackage({ ...editPackage, assignedTo: e.target.value })}
-                    placeholder="User name"
-                  />
-                </div>
+                  id="pcReference"
+                  value={assignmentForm.pcReference}
+                  onChange={(e) => setAssignmentForm({...assignmentForm, pcReference: e.target.value})}
+                  placeholder="PC-001, LAP-123, etc."
+                />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="edit-notes">Notes</Label>
-                <Input
-                  id="edit-notes"
-                  value={editPackage.notes || ""}
-                  onChange={(e) => setEditPackage({ ...editPackage, notes: e.target.value })}
-                  placeholder="Additional information (optional)"
+              <div>
+                <Label htmlFor="assignmentNotes">Notes (Optional)</Label>
+                <Textarea
+                  id="assignmentNotes"
+                  value={assignmentForm.notes}
+                  onChange={(e) => setAssignmentForm({...assignmentForm, notes: e.target.value})}
+                  placeholder="Additional notes about this assignment..."
+                  className="h-20"
                 />
               </div>
             </div>
-          )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSubmitting}>
+              <Button variant="outline" onClick={() => setIsCreateAssignmentOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleEditPackage} disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update Package
+                            <Button 
+                onClick={handleCreateAssignment} 
+                disabled={!assignmentForm.personId || (!selectedTemplate && !assignmentForm.templateId)}
+              >
+                Assign Person
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Add Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        {/* Batch Assignment Dialog */}
+        <Dialog open={isBatchAssignmentOpen} onOpenChange={setIsBatchAssignmentOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+              <DialogTitle>
+                {selectedTemplate ? 'Batch Assign People to Template' : 'Batch Assignment'}
+              </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this package? This action cannot be undone.
+                {selectedTemplate 
+                  ? `Assign multiple people to ${selectedTemplate.name} at once`
+                  : 'Select a template and assign multiple people to it at once'
+                }
             </DialogDescription>
           </DialogHeader>
 
-          {selectedPackage && (
-            <div className="py-4">
-              <p className="font-medium">{selectedPackage.name}</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {selectedPackage.laptop.brand} {selectedPackage.laptop.model} with {selectedPackage.accessories.length} accessories
-              </p>
+            <div className="grid gap-4 py-4">
+              {/* Template Selection (when no template pre-selected) */}
+              {!selectedTemplate && (
+                <div>
+                  <Label htmlFor="batchTemplate">Template <span className="text-red-500">*</span></Label>
+                  <Select 
+                    value={batchAssignmentForm.templateId} 
+                    onValueChange={(value) => setBatchAssignmentForm({...batchAssignmentForm, templateId: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a template to assign people to" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templates.map((template) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name} - {formatCurrency(template.totalPrice)} {template.priceType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
             </div>
           )}
 
+              {/* People Selection */}
+              <div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Select People ({batchAssignmentForm.selectedPersonIds.length} selected)</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBatchAssignmentForm(prev => ({
+                        ...prev,
+                        selectedPersonIds: people.map(p => p.id)
+                      }))}
+                    >
+                      Select All
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBatchAssignmentForm(prev => ({
+                        ...prev,
+                        selectedPersonIds: []
+                      }))}
+                    >
+                      Clear All
+                    </Button>
+            </div>
+                </div>
+                <div className="mt-2 max-h-60 overflow-y-auto border rounded-lg">
+                  {people.length > 0 ? (
+                    <div className="p-2 space-y-2">
+                      {people.map((person) => (
+                        <div
+                          key={person.id}
+                          className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                            batchAssignmentForm.selectedPersonIds.includes(person.id)
+                              ? 'bg-blue-500/10 border-blue-500/30'
+                              : 'hover:bg-muted/50'
+                          }`}
+                          onClick={() => togglePersonSelection(person.id)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={batchAssignmentForm.selectedPersonIds.includes(person.id)}
+                            onChange={() => togglePersonSelection(person.id)}
+                            className="w-4 h-4"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">{person.name}</div>
+                            {person.email && (
+                              <div className="text-sm text-muted-foreground">{person.email}</div>
+                            )}
+                            {person.department && (
+                              <div className="text-xs text-muted-foreground">{person.department}</div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 text-center text-muted-foreground">
+                      No people available
+            </div>
+          )}
+                </div>
+              </div>
+
+              {/* Status Selection */}
+              <div>
+                <Label htmlFor="batchStatus">Status</Label>
+                <Select 
+                  value={batchAssignmentForm.status} 
+                  onValueChange={(value) => setBatchAssignmentForm({...batchAssignmentForm, status: value as 'assigned' | 'delivered' | 'returned'})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="returned">Returned</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* PC Reference */}
+              <div>
+                <Label htmlFor="batchPcReference">PC Reference (Optional)</Label>
+                <Input
+                  id="batchPcReference"
+                  value={batchAssignmentForm.pcReference}
+                  onChange={(e) => setBatchAssignmentForm({...batchAssignmentForm, pcReference: e.target.value})}
+                  placeholder="PC-001, LAP-123, etc. (will be used for all assignments)"
+                />
+              </div>
+
+              {/* Notes */}
+              <div>
+                <Label htmlFor="batchNotes">Notes (Optional)</Label>
+                <Textarea
+                  id="batchNotes"
+                  value={batchAssignmentForm.notes}
+                  onChange={(e) => setBatchAssignmentForm({...batchAssignmentForm, notes: e.target.value})}
+                  placeholder="Additional notes for all assignments..."
+                  className="h-20"
+                />
+              </div>
+            </div>
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isSubmitting}>
+              <Button variant="outline" onClick={() => setIsBatchAssignmentOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeletePackage} disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
+                            <Button 
+                onClick={handleCreateBatchAssignment} 
+                disabled={
+                  batchAssignmentForm.selectedPersonIds.length === 0 || 
+                  (!selectedTemplate && !batchAssignmentForm.templateId)
+                }
+              >
+                Assign {batchAssignmentForm.selectedPersonIds.length} People
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+            </div>
     </div>
   )
 } 
