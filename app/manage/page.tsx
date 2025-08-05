@@ -410,7 +410,7 @@ export default function ManageLaptops() {
                         </TableCell>
                         <TableCell>
                           {laptop.supportedProfiles.map((profile) => {
-                            const label = profile === "developer" ? "Developer" : "Consultant"
+                            const label = profile.toLowerCase() === "developer" ? "Developer" : "Consultant"
 
                             return (
                               <span
