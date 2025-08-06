@@ -69,7 +69,9 @@ export function formatCurrency(amount: number, currency: 'EUR' | 'MAD'): string 
       maximumFractionDigits: 0,
     }).format(amount);
   } else {
-    return `${amount.toLocaleString()} MAD`;
+    // Ensure amount is a clean number and format it
+    const cleanAmount = typeof amount === 'string' ? parseFloat(amount.toString().trim()) : amount;
+    return `${cleanAmount.toLocaleString()} MAD`;
   }
 }
 

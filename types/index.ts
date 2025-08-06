@@ -68,7 +68,8 @@ export interface Person {
   pcReference?: string  // Reference/serial number of the person's PC
   createdAt: string
   updatedAt: string
-  assignedPackages?: Package[] // Packages assigned to this person
+  assignedPackages?: Package[] // Packages assigned to this person (legacy)
+  personAssignments?: PersonAssignment[] // New assignments
 }
 
 export interface Accessory {
@@ -97,6 +98,29 @@ export interface Laptop {
   images?: string[]
   supportedProfiles: UserProfile[]
   supportedOS: OperatingSystem[]
+}
+
+export interface PersonAssignment {
+  id: string
+  status: 'assigned' | 'delivered' | 'returned'
+  pcReference?: string
+  assignedAt: string
+  deliveredAt?: string
+  notes?: string
+  person: {
+    id: string
+    name: string
+    email?: string
+    department?: string
+    position?: string
+  }
+  template?: {
+    id: string
+    name: string
+    profileType: string
+    laptop: Laptop
+    accessories: Accessory[]
+  }
 }
 
 export interface Package {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Plus, Pencil, Trash2, Package, HardDrive, Database, FileDown, CheckSquare, Square } from "lucide-react"
+import { ArrowLeft, Loader2, Plus, Pencil, Trash2, Package, HardDrive, Database, FileDown , CheckSquare, Square } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { 
   Card, 
@@ -20,12 +20,9 @@ import {
   createPerson, 
   updatePerson, 
   deletePerson,
-  updatePackage,
-  assignPackage,
-  unassignPackage,
-  fetchPersonById
+  assignPackage
 } from "@/lib/api-client"
-import { Package as PackageType, Person, PackageStatus } from "@/types"
+import { Package as PackageType, Person, PersonAssignment } from "@/types"
 import {
   Table,
   TableBody,
@@ -220,7 +217,6 @@ export default function PeoplePage() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [people, setPeople] = useState<Person[]>([])
-  const [peoplePackages, setPeoplePackages] = useState<Record<string, PackageType[]>>({})
   const [editingPerson, setEditingPerson] = useState<Person | null>(null)
   const [newPerson, setNewPerson] = useState({
     name: "",
@@ -255,9 +251,7 @@ export default function PeoplePage() {
     'laptopModels': true,
   });
   
-  // Add state for batch operations
-  const [selectedPackageIds, setSelectedPackageIds] = useState<Record<string, boolean>>({});
-  const [showBatchActions, setShowBatchActions] = useState<boolean>(false);
+
 
   // Batch assign state
   const [batchAssignMode, setBatchAssignMode] = useState(false);
@@ -274,20 +268,8 @@ export default function PeoplePage() {
       if (useMockData) {
         setPeople(MOCK_PEOPLE)
         setAllPackages(MOCK_PACKAGES)
-        
-        // Generate mock people-packages mapping
-        const mockPackagesByPerson: Record<string, PackageType[]> = {}
-        MOCK_PACKAGES.forEach((pkg) => {
-          if (pkg.assignedTo) {
-            if (!mockPackagesByPerson[pkg.assignedTo]) {
-              mockPackagesByPerson[pkg.assignedTo] = []
-            }
-            mockPackagesByPerson[pkg.assignedTo].push(pkg)
-          }
-        })
-        setPeoplePackages(mockPackagesByPerson)
       } else {
-        // Fetch real data from API
+        // Fetch real data from API - now includes assignments in single query
         const [peopleData, packagesData] = await Promise.all([
           fetchPeople(),
           fetchPackages()
@@ -295,60 +277,6 @@ export default function PeoplePage() {
 
         setPeople(peopleData)
         setAllPackages(packagesData)
-
-        // Create a mapping of packages by person ID
-        const packagesByPerson: Record<string, PackageType[]> = {}
-        
-        // Initialize empty arrays for all people
-        peopleData.forEach((person: Person) => {
-          packagesByPerson[person.id] = []
-        })
-        
-        // Loop through each person to get their assigned packages
-        for (const person of peopleData) {
-          // If assignedPackages is available directly from the API, use it
-          if (person.assignedPackages && person.assignedPackages.length > 0) {
-            // Map each package to include person-specific information
-            const personPackages = person.assignedPackages.map(pkg => {
-              // Create a customized package name if it doesn't have one already
-              const customizedName = pkg.name.includes(person.name) 
-                ? pkg.name 
-                : `${person.name}'s Package (${pkg.laptop?.brand || 'Unknown'} ${pkg.laptop?.model || 'Unknown'})`;
-              
-              return {
-                ...pkg,
-                name: customizedName,
-              };
-            });
-            
-            packagesByPerson[person.id] = personPackages;
-          } else {
-            // Alternatively, fetch the person with full package details
-            try {
-              const personWithPackages = await fetchPersonById(person.id)
-              if (personWithPackages.assignedPackages && personWithPackages.assignedPackages.length > 0) {
-                // Map each package to include person-specific information
-                const personPackages = personWithPackages.assignedPackages.map(pkg => {
-                  // Create a customized package name if it doesn't have one already
-                  const customizedName = pkg.name.includes(person.name) 
-                    ? pkg.name 
-                    : `${person.name}'s Package (${pkg.laptop?.brand || 'Unknown'} ${pkg.laptop?.model || 'Unknown'})`;
-                  
-                  return {
-                    ...pkg,
-                    name: customizedName,
-                  };
-                });
-                
-                packagesByPerson[person.id] = personPackages;
-              }
-            } catch (err) {
-              console.error(`Error fetching packages for person ${person.id}:`, err)
-            }
-          }
-        }
-        
-        setPeoplePackages(packagesByPerson)
       }
     } catch (err) {
       console.error("Error fetching data:", err)
@@ -363,48 +291,26 @@ export default function PeoplePage() {
     fetchData()
   }, [useMockData])
 
+  // Function to get PC Reference from assignments
+  const getPcReferenceFromAssignments = (person: Person): string | null => {
+    if (!person.personAssignments || person.personAssignments.length === 0) {
+      return null
+    }
+    
+    // Get the most recent active assignment
+    const activeAssignment = person.personAssignments
+      .filter(a => a.status === 'assigned' || a.status === 'delivered')
+      .sort((a, b) => new Date(b.assignedAt).getTime() - new Date(a.assignedAt).getTime())[0]
+    
+    return activeAssignment?.pcReference || null
+  }
+
   // Function to format price
   const formatPrice = (price: number, currency: string = "€") => {
     return `${price.toLocaleString("fr-FR")} ${currency}`
   }
 
-  // Function to get badge color based on status
-  const getStatusBadge = (status: PackageStatus) => {
-    const statusConfig = {
-      proposed: { variant: "outline", label: "Proposed" },
-      approved: { variant: "outline", label: "Approved" },
-      rejected: { variant: "outline", label: "Rejected" },
-      delivered: { variant: "outline", label: "Delivered" },
-    }
 
-    const config = statusConfig[status]
-    
-    // Handle undefined status gracefully
-    if (!config) {
-      return <Badge variant="outline">Unknown</Badge>;
-    }
-    
-    // Map to valid badge variants
-    let badgeClass = "";
-    switch(status) {
-      case "proposed":
-        badgeClass = "bg-blue-50 text-blue-700 border-blue-300";
-        break;
-      case "approved":
-        badgeClass = "bg-green-50 text-green-700 border-green-300";
-        break;
-      case "rejected":
-        badgeClass = "bg-red-50 text-red-700 border-red-300";
-        break;
-      case "delivered":
-        badgeClass = "bg-purple-50 text-purple-700 border-purple-300";
-        break;
-    }
-    
-    return (
-      <Badge variant="outline" className={badgeClass}>{config.label}</Badge>
-    )
-  }
 
   const handleAddPerson = async () => {
     if (useMockData) {
@@ -528,28 +434,29 @@ export default function PeoplePage() {
     const dataToExport = people.map(person => {
       const personData: Record<string, any> = { ...person };
       
-      // Add package-related fields if selected
-      if (exportFields.packageNames || exportFields.packageStatuses || 
-          exportFields.laptopBrands || exportFields.laptopModels) {
-        
-        const personPackages = peoplePackages[person.id] || peoplePackages[person.name] || [];
-        
-        if (exportFields.packageNames) {
-          personData.packageNames = personPackages.map(pkg => pkg.name).join('; ');
-        }
-        
-        if (exportFields.packageStatuses) {
-          personData.packageStatuses = personPackages.map(pkg => pkg.status).join('; ');
-        }
-        
-        if (exportFields.laptopBrands) {
-          personData.laptopBrands = personPackages.map(pkg => pkg.laptop.brand).join('; ');
-        }
-        
-        if (exportFields.laptopModels) {
-          personData.laptopModels = personPackages.map(pkg => pkg.laptop.model).join('; ');
-        }
-      }
+             // Add package-related fields if selected
+       if (exportFields.packageNames || exportFields.packageStatuses || 
+           exportFields.laptopBrands || exportFields.laptopModels) {
+         
+         // Get assignments from the new data structure
+         const personAssignments = person.personAssignments || [];
+         
+         if (exportFields.packageNames) {
+           personData.packageNames = personAssignments.map(assignment => assignment.template?.name || 'Unknown').join('; ');
+         }
+         
+         if (exportFields.packageStatuses) {
+           personData.packageStatuses = personAssignments.map(assignment => assignment.status).join('; ');
+         }
+         
+         if (exportFields.laptopBrands) {
+           personData.laptopBrands = personAssignments.map(assignment => assignment.template?.laptop.brand || 'Unknown').join('; ');
+         }
+         
+         if (exportFields.laptopModels) {
+           personData.laptopModels = personAssignments.map(assignment => assignment.template?.laptop.model || 'Unknown').join('; ');
+         }
+       }
       
       return personData;
     });
@@ -563,90 +470,7 @@ export default function PeoplePage() {
     setShowExportDialog(false);
   };
 
-  // Add a function to handle unassigning a package
-  const handleUnassignPackage = async (packageId: string, personId: string) => {
-    if (!confirm("Are you sure you want to unassign this package?")) {
-      return;
-    }
-    
-    try {
-      await unassignPackage(packageId, personId);
-      
-      // Refresh data after unassignment
-      fetchData();
-      
-      // Show success message
-      alert("Package unassigned successfully!");
-    } catch (error) {
-      console.error("Error unassigning package:", error);
-      alert("Failed to unassign package. Please try again.");
-    }
-  };
 
-  // Function to toggle package selection
-  const togglePackageSelection = (packageId: string) => {
-    setSelectedPackageIds(prev => ({
-      ...prev,
-      [packageId]: !prev[packageId]
-    }));
-  };
-
-  // Count selected packages
-  const selectedPackageCount = Object.values(selectedPackageIds).filter(Boolean).length;
-
-  // Toggle batch mode
-  const toggleBatchMode = () => {
-    setShowBatchActions(!showBatchActions);
-    // Clear selections when toggling off
-    if (showBatchActions) {
-      setSelectedPackageIds({});
-    }
-  };
-
-  // Function to handle batch unassign
-  const handleBatchUnassign = async () => {
-    if (selectedPackageCount === 0) {
-      alert("Please select at least one package to unassign");
-      return;
-    }
-    
-    if (!confirm(`Are you sure you want to unassign ${selectedPackageCount} package(s)?`)) {
-      return;
-    }
-    
-    setLoading(true);
-    
-    try {
-      // Get all selected package IDs and their person IDs
-      const unassignTasks: Promise<any>[] = [];
-      
-      // Find all people and their packages to unassign
-      Object.entries(peoplePackages).forEach(([personId, packages]) => {
-        packages.forEach(pkg => {
-          if (selectedPackageIds[pkg.id]) {
-            unassignTasks.push(unassignPackage(pkg.id, personId));
-          }
-        });
-      });
-      
-      // Execute all unassign operations in parallel
-      await Promise.all(unassignTasks);
-      
-      // Clear selections
-      setSelectedPackageIds({});
-      
-      // Refresh data
-      await fetchData();
-      
-      // Show success message
-      alert(`Successfully unassigned ${selectedPackageCount} package(s)`);
-    } catch (error) {
-      console.error("Error during batch unassign:", error);
-      alert("There was an error unassigning some packages. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Toggle batch assign mode
   const toggleBatchAssignMode = () => {
@@ -877,29 +701,7 @@ export default function PeoplePage() {
             >
               {batchAssignMode ? "Exit Batch Assign" : "Batch Assign"}
             </Button>
-            {showBatchActions && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">
-                  {selectedPackageCount} package{selectedPackageCount !== 1 ? 's' : ''} selected
-                </span>
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={handleBatchUnassign}
-                  disabled={selectedPackageCount === 0}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Unassign Selected
-                </Button>
-              </div>
-            )}
             
-            <Button
-              variant={showBatchActions ? "default" : "outline"}
-              onClick={toggleBatchMode}
-            >
-              {showBatchActions ? "Exit Batch Mode" : "Enter Batch Mode"}
-            </Button>
             
             <Dialog>
               <DialogTrigger asChild>
@@ -1007,7 +809,6 @@ export default function PeoplePage() {
                 <TableHead>Department</TableHead>
                 <TableHead>Position</TableHead>
                 <TableHead>PC Reference</TableHead>
-                <TableHead>Assigned Packages</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -1027,50 +828,13 @@ export default function PeoplePage() {
                   <TableCell>{person.department || "-"}</TableCell>
                   <TableCell>{person.position || "-"}</TableCell>
                   <TableCell>
-                    {person.pcReference ? (
+                    {getPcReferenceFromAssignments(person) ? (
                       <div className="flex items-center gap-2">
                         <HardDrive className="h-4 w-4 text-muted-foreground" />
-                        <span>{person.pcReference}</span>
+                        <span>{getPcReferenceFromAssignments(person)}</span>
                       </div>
                     ) : (
                       <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {peoplePackages[person.id] && peoplePackages[person.id].length > 0 ? (
-                      <div className="flex flex-col gap-1">
-                        {peoplePackages[person.id].map((pkg) => (
-                          <div key={pkg.id} className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2">
-                              {showBatchActions && (
-                                <Checkbox 
-                                  checked={!!selectedPackageIds[pkg.id]} 
-                                  onCheckedChange={() => togglePackageSelection(pkg.id)}
-                                  className="mr-1"
-                                />
-                              )}
-                              <Link href={`/packages/${pkg.id}`} className="text-blue-500 hover:underline flex items-center gap-1">
-                                <Package className="h-3.5 w-3.5" />
-                                {pkg.name}
-                              </Link>
-                              {getStatusBadge(pkg.status)}
-                            </div>
-                            {!showBatchActions && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-6 px-2 text-xs" 
-                                onClick={() => handleUnassignPackage(pkg.id, person.id)}
-                                title="Unassign package"
-                              >
-                                <Trash2 className="h-3 w-3 text-red-500" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">No packages</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -1273,12 +1037,12 @@ export default function PeoplePage() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will permanently delete {person.name} and cannot be undone.
-                              {peoplePackages[person.id] && peoplePackages[person.id].length > 0 && (
-                                <span className="block mt-2 font-semibold text-destructive">
-                                  Warning: This person has {peoplePackages[person.id].length} assigned packages.
-                                </span>
-                              )}
+                                                             This will permanently delete {person.name} and cannot be undone.
+                               {person.personAssignments && person.personAssignments.length > 0 && (
+                                 <span className="block mt-2 font-semibold text-destructive">
+                                   Warning: This person has {person.personAssignments.length} assigned packages.
+                                 </span>
+                               )}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

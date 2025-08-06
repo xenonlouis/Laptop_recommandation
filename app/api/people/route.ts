@@ -3,13 +3,32 @@ import { PrismaClient } from '@/lib/generated/prisma';
 
 const prisma = new PrismaClient();
 
-// GET /api/people - Get all people
+// GET /api/people - Get all people with their assignments
 export async function GET(request: NextRequest) {
   try {
     const people = await prisma.person.findMany({
       orderBy: [
         { name: 'asc' }
-      ]
+      ],
+      include: {
+        personAssignments: {
+          include: {
+            template: {
+              include: {
+                laptop: true,
+                accessories: {
+                  include: {
+                    accessory: true
+                  }
+                }
+              }
+            }
+          },
+          orderBy: {
+            assignedAt: 'desc'
+          }
+        }
+      }
     });
 
     return NextResponse.json(people);

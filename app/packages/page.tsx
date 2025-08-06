@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Plus, Loader2, Users, Package as PackageIcon, Calculator, UserCheck, Trash2, Edit, Eye, X, Layout, List, Grid3X3, Filter, BarChart3, Database, DollarSign, RefreshCw, Search } from "lucide-react"
+import { ArrowLeft, Plus, Loader2, Users, Package as PackageIcon, Calculator, UserCheck, Trash2, Edit, Eye, X, Layout, List, Grid3X3, Filter, BarChart3, Database, DollarSign, RefreshCw, Search, HardDrive, ChevronUp, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -100,10 +100,18 @@ export default function PackagesPage() {
   const [isEditTemplateOpen, setIsEditTemplateOpen] = useState(false)
   const [isViewTemplateOpen, setIsViewTemplateOpen] = useState(false)
   const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false)
-  const [isEditAssignmentOpen, setIsEditAssignmentOpen] = useState(false)
   const [isBatchAssignmentOpen, setIsBatchAssignmentOpen] = useState(false)
+  const [isEditAssignmentOpen, setIsEditAssignmentOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<PackageTemplate | null>(null)
   const [selectedAssignment, setSelectedAssignment] = useState<PersonAssignment | null>(null)
+  const [editingAssignment, setEditingAssignment] = useState<PersonAssignment | null>(null)
+  const [editAssignmentForm, setEditAssignmentForm] = useState({
+    status: 'assigned' as 'assigned' | 'delivered' | 'returned',
+    pcReference: '',
+    notes: '',
+    assignedAt: '',
+    deliveredAt: ''
+  })
   
   // Form states
   const [templateForm, setTemplateForm] = useState({
@@ -156,7 +164,9 @@ export default function PackagesPage() {
   const [assignmentFilters, setAssignmentFilters] = useState({
     search: '',
     status: 'all',
-    profile: 'all'
+    profile: 'all',
+    sortColumn: 'pcReference' as 'person' | 'template' | 'profile' | 'status' | 'pcReference' | 'assignedAt' | 'value',
+    sortDirection: 'desc' as 'asc' | 'desc'
   })
   const [selectedAssignments, setSelectedAssignments] = useState<string[]>([])
 
@@ -306,6 +316,7 @@ export default function PackagesPage() {
   }
 
   const formatCurrency = (amount: number) => {
+    console.log('formatCurrency input:', amount, typeof amount, JSON.stringify(amount));
     return formatCurrencyUtil(amount, 'MAD')
   }
 
@@ -877,35 +888,100 @@ export default function PackagesPage() {
       })
 
       if (response.ok) {
-        const updatedAssignment = await response.json()
-        setAssignments(assignments.map(a => 
-          a.id === assignmentId ? updatedAssignment : a
-        ))
-      toast({
-          title: "Success",
-          description: "Assignment updated successfully",
-      })
-      } else {
-        const error = await response.json()
-      toast({
-        title: "Error",
-          description: error.error || "Failed to update assignment",
-  
+        toast({
+          title: "Status Updated",
+          description: "Assignment status has been updated successfully.",
         })
+        refreshData()
+      } else {
+        throw new Error('Failed to update assignment status')
       }
     } catch (error) {
-      console.error('Failed to update assignment:', error)
+      console.error('Error updating assignment status:', error)
       toast({
         title: "Error",
-        description: "Failed to update assignment",
+        description: "Failed to update assignment status.",
+      })
+    }
+  }
 
+  const handleEditAssignment = (assignment: PersonAssignment) => {
+    setEditingAssignment(assignment)
+    setEditAssignmentForm({
+      status: assignment.status,
+      pcReference: assignment.pcReference || '',
+      notes: assignment.notes || '',
+      assignedAt: assignment.assignedAt.split('T')[0], // Convert to YYYY-MM-DD format
+      deliveredAt: assignment.deliveredAt ? assignment.deliveredAt.split('T')[0] : ''
+    })
+    setIsEditAssignmentOpen(true)
+  }
+
+  const handleUpdateAssignment = async () => {
+    if (!editingAssignment) return
+
+    try {
+      const response = await fetch(`/api/assignments/${editingAssignment.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: editAssignmentForm.status,
+          pcReference: editAssignmentForm.pcReference,
+          notes: editAssignmentForm.notes,
+          assignedAt: editAssignmentForm.assignedAt,
+          deliveredAt: editAssignmentForm.deliveredAt || null
+        }),
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Assignment Updated",
+          description: "Assignment has been updated successfully.",
+        })
+        setIsEditAssignmentOpen(false)
+        setEditingAssignment(null)
+        refreshData()
+      } else {
+        throw new Error('Failed to update assignment')
+      }
+    } catch (error) {
+      console.error('Error updating assignment:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update assignment.",
+      })
+    }
+  }
+
+  const handleDeleteAssignment = async (assignmentId: string) => {
+    try {
+      const response = await fetch(`/api/assignments/${assignmentId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setAssignments(assignments.filter(a => a.id !== assignmentId))
+        toast({
+          title: "Assignment Deleted",
+          description: "Assignment has been deleted successfully.",
+        })
+      } else {
+        throw new Error('Failed to delete assignment')
+      }
+    } catch (error) {
+      console.error('Error deleting assignment:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete assignment.",
       })
     }
   }
 
   // Assignment filtering and batch operations
   const getFilteredAssignments = () => {
-    return assignments.filter(assignment => {
+    const filtered = assignments.filter(assignment => {
       const matchesSearch = assignmentFilters.search === '' || 
         assignment.person.name.toLowerCase().includes(assignmentFilters.search.toLowerCase()) ||
         assignment.template?.name.toLowerCase().includes(assignmentFilters.search.toLowerCase())
@@ -918,6 +994,54 @@ export default function PackagesPage() {
       
       return matchesSearch && matchesStatus && matchesProfile
     })
+
+    // Sort assignments based on selected column and direction
+    return filtered.sort((a, b) => {
+      const { sortColumn, sortDirection } = assignmentFilters
+      const direction = sortDirection === 'asc' ? 1 : -1
+      
+      switch (sortColumn) {
+        case 'person':
+          return direction * a.person.name.localeCompare(b.person.name)
+        
+        case 'template':
+          const aTemplate = a.template?.name || ''
+          const bTemplate = b.template?.name || ''
+          return direction * aTemplate.localeCompare(bTemplate)
+        
+        case 'profile':
+          const aProfile = a.template?.profileType || ''
+          const bProfile = b.template?.profileType || ''
+          return direction * aProfile.localeCompare(bProfile)
+        
+        case 'status':
+          return direction * a.status.localeCompare(b.status)
+        
+        case 'pcReference':
+          // Special handling for PC Reference: null values go last
+          const aHasRef = !!a.pcReference
+          const bHasRef = !!b.pcReference
+          if (aHasRef && !bHasRef) return -1
+          if (!aHasRef && bHasRef) return 1
+          if (aHasRef && bHasRef) {
+            return direction * (a.pcReference || '').localeCompare(b.pcReference || '')
+          }
+          return 0
+        
+        case 'assignedAt':
+          const aDate = new Date(a.assignedAt).getTime()
+          const bDate = new Date(b.assignedAt).getTime()
+          return direction * (aDate - bDate)
+        
+        case 'value':
+          const aValue = a.template?.totalPrice || 0
+          const bValue = b.template?.totalPrice || 0
+          return direction * (aValue - bValue)
+        
+        default:
+          return 0
+      }
+    })
   }
 
   const toggleAssignmentSelection = (assignmentId: string) => {
@@ -926,6 +1050,14 @@ export default function PackagesPage() {
         ? prev.filter(id => id !== assignmentId)
         : [...prev, assignmentId]
     )
+  }
+
+  const handleColumnSort = (column: 'person' | 'template' | 'profile' | 'status' | 'pcReference' | 'assignedAt' | 'value') => {
+    setAssignmentFilters(prev => ({
+      ...prev,
+      sortColumn: column,
+      sortDirection: prev.sortColumn === column && prev.sortDirection === 'asc' ? 'desc' : 'asc'
+    }))
   }
 
   const handleBatchDeleteAssignments = async () => {
@@ -961,6 +1093,38 @@ export default function PackagesPage() {
         description: "Failed to delete assignments",
       })
     }
+  }
+
+  const SortableColumnHeader = ({ 
+    column, 
+    children, 
+    className = "" 
+  }: { 
+    column: 'person' | 'template' | 'profile' | 'status' | 'pcReference' | 'assignedAt' | 'value'
+    children: React.ReactNode
+    className?: string
+  }) => {
+    const isActive = assignmentFilters.sortColumn === column
+    const isAscending = assignmentFilters.sortDirection === 'asc'
+    
+    return (
+      <TableHead 
+        className={`cursor-pointer hover:bg-muted/50 transition-colors group ${className}`}
+        onClick={() => handleColumnSort(column)}
+      >
+        <div className="flex items-center justify-between">
+          <span className="font-medium">{children}</span>
+          <div className="flex flex-col items-center ml-2 opacity-60 group-hover:opacity-100 transition-opacity">
+            <ChevronUp 
+              className={`w-4 h-4 ${isActive && isAscending ? 'text-primary' : 'text-muted-foreground'}`} 
+            />
+            <ChevronDown 
+              className={`w-4 h-4 -mt-1 ${isActive && !isAscending ? 'text-primary' : 'text-muted-foreground'}`} 
+            />
+          </div>
+        </div>
+      </TableHead>
+    )
   }
 
   if (loading) {
@@ -1659,9 +1823,11 @@ export default function PackagesPage() {
                       </SelectContent>
                     </Select>
 
+
+
                     <Button
                       variant="outline"
-                      onClick={() => setAssignmentFilters({search: '', status: 'all', profile: 'all'})}
+                      onClick={() => setAssignmentFilters({search: '', status: 'all', profile: 'all', sortColumn: 'pcReference', sortDirection: 'desc'})}
                     >
                       Clear Filters
                     </Button>
@@ -1697,18 +1863,35 @@ export default function PackagesPage() {
                           }}
                         />
                       </TableHead>
-                      <TableHead>Person</TableHead>
-                      <TableHead>Template</TableHead>
-                      <TableHead>Profile</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Assigned Date</TableHead>
-                      <TableHead>Value</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <SortableColumnHeader column="person" className="min-w-[180px]">
+                        Person
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="template" className="min-w-[220px]">
+                        Template
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="profile" className="min-w-[100px]">
+                        Profile
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="status" className="min-w-[100px]">
+                        Status
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="pcReference" className="min-w-[140px]">
+                        PC Reference
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="assignedAt" className="min-w-[120px]">
+                        Assigned Date
+                      </SortableColumnHeader>
+                      <SortableColumnHeader column="value" className="min-w-[100px]">
+                        Value
+                      </SortableColumnHeader>
+                      <TableHead className="text-right w-20">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {getFilteredAssignments().map((assignment) => (
-                      <TableRow key={assignment.id}>
+                      <TableRow 
+                        key={assignment.id}
+                      >
                         <TableCell>
                           <Checkbox
                             checked={selectedAssignments.includes(assignment.id)}
@@ -1716,17 +1899,19 @@ export default function PackagesPage() {
                           />
                         </TableCell>
                         <TableCell>
-                          <div>
-                            <p className="font-medium">{assignment.person.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {assignment.person.department}
-                            </p>
+                          <div className="space-y-1">
+                            <p className="font-medium text-sm">{assignment.person.name}</p>
+                            {assignment.person.department && (
+                              <p className="text-xs text-muted-foreground">
+                                {assignment.person.department}
+                              </p>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div>
-                            <p className="font-medium">{assignment.template?.name}</p>
-                            <p className="text-sm text-muted-foreground">
+                          <div className="space-y-1">
+                            <p className="font-medium text-sm">{assignment.template?.name}</p>
+                            <p className="text-xs text-muted-foreground">
                               {assignment.template?.laptop.brand} {assignment.template?.laptop.model}
                             </p>
                           </div>
@@ -1738,31 +1923,45 @@ export default function PackagesPage() {
                           {getStatusBadge(assignment.status)}
                         </TableCell>
                         <TableCell>
-                          {new Date(assignment.assignedAt).toLocaleDateString()}
+                          {assignment.pcReference ? (
+                            <div className="flex items-center gap-2">
+                              <HardDrive className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm font-mono">{assignment.pcReference}</span>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
                         </TableCell>
                         <TableCell>
-                          {assignment.template && formatCurrency(assignment.template.totalPrice)}
+                          <span className="text-sm">
+                            {new Date(assignment.assignedAt).toLocaleDateString()}
+                          </span>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Select
-                              value={assignment.status}
-                              onValueChange={(status) => handleUpdateAssignmentStatus(assignment.id, status)}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="assigned">Assigned</SelectItem>
-                                <SelectItem value="delivered">Delivered</SelectItem>
-                                <SelectItem value="returned">Returned</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
+                        <TableCell>
+                          <span className="text-sm font-medium">
+                            {assignment.template && formatCurrency(assignment.template.totalPrice)}
+                          </span>
                         </TableCell>
+                                <TableCell className="text-right">
+          <div className="flex items-center justify-end gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => handleEditAssignment(assignment)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+              onClick={() => handleDeleteAssignment(assignment.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -2866,6 +3065,110 @@ export default function PackagesPage() {
                 }
               >
                 Assign {batchAssignmentForm.selectedPersonIds.length} People
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Assignment Dialog */}
+      <Dialog open={isEditAssignmentOpen} onOpenChange={setIsEditAssignmentOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Assignment</DialogTitle>
+            <DialogDescription>
+              Update the assignment details for {editingAssignment?.person.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {/* Assignment Info Display */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Person</Label>
+                <p className="text-sm font-medium">{editingAssignment?.person.name}</p>
+                {editingAssignment?.person.department && (
+                  <p className="text-xs text-muted-foreground">{editingAssignment.person.department}</p>
+                )}
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-muted-foreground">Template</Label>
+                <p className="text-sm font-medium">{editingAssignment?.template?.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {editingAssignment?.template?.laptop.brand} {editingAssignment?.template?.laptop.model}
+                </p>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div>
+              <Label htmlFor="editStatus">Status</Label>
+              <Select 
+                value={editAssignmentForm.status} 
+                onValueChange={(value) => setEditAssignmentForm({...editAssignmentForm, status: value as 'assigned' | 'delivered' | 'returned'})}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="assigned">Assigned</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="returned">Returned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* PC Reference */}
+            <div>
+              <Label htmlFor="editPcReference">PC Reference (Optional)</Label>
+              <Input
+                id="editPcReference"
+                value={editAssignmentForm.pcReference}
+                onChange={(e) => setEditAssignmentForm({...editAssignmentForm, pcReference: e.target.value})}
+                placeholder="PC-001, LAP-123, etc."
+              />
+            </div>
+
+            {/* Assigned Date */}
+            <div>
+              <Label htmlFor="editAssignedAt">Assigned Date</Label>
+              <Input
+                id="editAssignedAt"
+                type="date"
+                value={editAssignmentForm.assignedAt}
+                onChange={(e) => setEditAssignmentForm({...editAssignmentForm, assignedAt: e.target.value})}
+              />
+            </div>
+
+            {/* Delivered Date */}
+            <div>
+              <Label htmlFor="editDeliveredAt">Delivered Date (Optional)</Label>
+              <Input
+                id="editDeliveredAt"
+                type="date"
+                value={editAssignmentForm.deliveredAt}
+                onChange={(e) => setEditAssignmentForm({...editAssignmentForm, deliveredAt: e.target.value})}
+              />
+            </div>
+
+            {/* Notes */}
+            <div>
+              <Label htmlFor="editNotes">Notes (Optional)</Label>
+              <Textarea
+                id="editNotes"
+                value={editAssignmentForm.notes}
+                onChange={(e) => setEditAssignmentForm({...editAssignmentForm, notes: e.target.value})}
+                placeholder="Additional notes about this assignment..."
+                className="h-20"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditAssignmentOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateAssignment}>
+              Update Assignment
             </Button>
           </DialogFooter>
         </DialogContent>

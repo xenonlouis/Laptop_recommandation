@@ -85,7 +85,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { status, pcReference, notes, deliveredAt } = body;
+    const { status, pcReference, notes, assignedAt, deliveredAt } = body;
 
     // Check if assignment exists
     const existingAssignment = await prisma.personAssignment.findUnique({
@@ -122,6 +122,10 @@ export async function PUT(
     
     if (notes !== undefined) {
       updateData.notes = notes;
+    }
+    
+    if (assignedAt !== undefined) {
+      updateData.assignedAt = new Date(assignedAt);
     }
     
     if (deliveredAt !== undefined) {

@@ -4,10 +4,10 @@ import { prisma } from '@/lib/db';
 // GET /api/people/:id - Get a specific person
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     
     const person = await prisma.person.findUnique({
       where: { id },
@@ -62,10 +62,10 @@ export async function GET(
 // PUT /api/people/:id - Update a specific person
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     const data = await req.json();
     
     // Check if person exists
@@ -96,10 +96,10 @@ export async function PUT(
 // DELETE /api/people/:id - Delete a specific person
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
     
     // Check if person exists
     const existingPerson = await prisma.person.findUnique({
