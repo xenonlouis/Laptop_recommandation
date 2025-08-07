@@ -83,12 +83,12 @@ function LaptopRecommendationTreeContent() {
   // Filter laptops based on selected criteria
   const filteredLaptops = laptops.filter((laptop) => {
     // Filter by profile
-    if (!laptop.supportedProfiles.includes(profile)) {
+    if (!laptop.supportedProfiles.map(p => p.toLowerCase()).includes(profile.toLowerCase())) {
       return false
     }
 
     // Filter by OS if specified
-    if (os && !laptop.supportedOS.includes(os)) {
+    if (os && !laptop.supportedOS.map(o => o.toLowerCase()).includes(os.toLowerCase())) {
       return false
     }
 

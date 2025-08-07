@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     // Format the response
     const formattedLaptop = {
       ...createdLaptop,
-      supportedProfiles: createdLaptop.supportedProfiles.map(p => p.profile),
+      supportedProfiles: createdLaptop.supportedProfiles.map(p => p.profile.toLowerCase()),
       supportedOS: createdLaptop.supportedOS.map(os => os.os),
     };
     

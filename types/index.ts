@@ -1,4 +1,4 @@
-export type UserProfile = "consultant" | "developer"
+export type UserProfile = "Consultant" | "Developer"
 
 export type OperatingSystem = "windows" | "macos" | "linux"
 
