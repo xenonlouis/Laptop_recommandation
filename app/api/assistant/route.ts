@@ -121,22 +121,47 @@ async function searchAssignments(query: string) {
 
 export async function POST(req: NextRequest) {
   try {
-  const { messages } = await req.json();
-  const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')?.content || '';
+    const { messages } = await req.json();
+    const lastUser = [...messages].reverse().find((m: any) => m.role === 'user')?.content || '';
+
+    console.log('\n' + '='.repeat(80));
+    console.log('🤖 AI ASSISTANT DECISION LOGGING');
+    console.log('='.repeat(80));
+    console.log('🔍 QUERY ANALYSIS:');
+    console.log(`📝 User Query: "${lastUser}"`);
 
     // Check if this is a people/assignment query or contains person names
     let peopleContext = '';
     const peopleKeywords = ['who has', 'what laptop', 'which computer', 'pc reference', 'assigned to', 'assignment', 'delivered', 'status'];
     const hasPersonName = /\b[A-Z][a-z]+ [A-Z][a-z]+\b/.test(lastUser);
     const isPersonQuery = peopleKeywords.some(keyword => lastUser.toLowerCase().includes(keyword)) || hasPersonName;
+
+    console.log(`🔎 Query Type Analysis:`);
+    console.log(`   - Has Person Name: ${hasPersonName}`);
+    console.log(`   - People Keywords Found: ${peopleKeywords.filter(k => lastUser.toLowerCase().includes(k))}`);
+    console.log(`   - Is Person Query: ${isPersonQuery}`);
     
     if (isPersonQuery) {
+      console.log('🔧 TOOL SELECTION: Person/Assignment Search');
+      
       // Extract potential person name from query
       const nameMatches = lastUser.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/g);
+      console.log(`👤 Person Names Detected: ${nameMatches ? nameMatches.join(', ') : 'None'}`);
+      
       if (nameMatches) {
         for (const name of nameMatches) {
+          console.log(`🔍 Searching database for: "${name}"`);
           const people = await searchPeople(name);
+          console.log(`📊 Search Results: Found ${people.length} person(s)`);
+          
           if (people.length > 0) {
+            console.log(`✅ Person Data Found:`, people.map(p => ({
+              name: p.name,
+              department: p.department,
+              position: p.position,
+              pcReference: p.pcReference,
+              assignmentCount: p.personAssignments?.length || 0
+            })));
             peopleContext += `\nPEOPLE & ASSIGNMENTS FOUND (CURRENT DATABASE):\n`;
             people.forEach(person => {
               peopleContext += `\n=== ${person.name} ===\n`;
@@ -209,14 +234,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check for laptop-related queries
+    const laptopKeywords = ['recommend', 'laptop', 'macbook', 'thinkpad', 'best', 'budget', 'developer', 'consultant', 'performance', 'compare'];
+    const isLaptopQuery = laptopKeywords.some(keyword => lastUser.toLowerCase().includes(keyword));
+    
+    if (!isPersonQuery && isLaptopQuery) {
+      console.log('🔧 TOOL SELECTION: Laptop Recommendation/Search');
+      console.log(`💻 Laptop Keywords Found: ${laptopKeywords.filter(k => lastUser.toLowerCase().includes(k))}`);
+    }
+
     // Get RAG context for general laptop queries (but prioritize database for people)
     let contextText = '';
+    console.log('🔧 TOOL SELECTION: RAG Context Retrieval');
+    
     try {
       const [queryEmbedding] = await embedTexts([String(lastUser || '')]);
       const retrieved = await retrieveChunks({ queryEmbedding, topK: 6 });
       contextText = retrieved.map((c, i) => `#${i + 1} [${c.title ?? c.source}:${c.sourceId}]\n${c.content}`).join('\n\n');
+      
+      console.log(`📚 RAG Context Retrieved: ${retrieved.length} chunks`);
+      console.log(`📋 Context Sources:`, retrieved.map(r => ({
+        source: r.source,
+        title: r.title || 'No title',
+        contentPreview: r.content.substring(0, 100) + '...'
+      })));
     } catch (error) {
-      console.error('RAG error:', error);
+      console.error('❌ RAG error:', error);
       contextText = 'RAG context unavailable';
     }
 
@@ -224,7 +267,31 @@ export async function POST(req: NextRequest) {
     const conversationText = messages.map((m: any) => `${m.role}: ${m.content}`).join('\n');
     const fullPrompt = `${systemPrompt}\n\nCONTEXT:\n${contextText}${peopleContext}\n\nConversation:\n${conversationText}\nassistant:`;
 
+    console.log('🛠️ CONTEXT BUILDING SUMMARY:');
+    console.log(`📊 Final Context Components:`);
+    console.log(`   - System Prompt Length: ${systemPrompt.length} chars`);
+    console.log(`   - RAG Context Length: ${contextText.length} chars`);
+    console.log(`   - People Context Length: ${peopleContext.length} chars`);
+    console.log(`   - Conversation Length: ${conversationText.length} chars`);
+    console.log(`   - Total Prompt Length: ${fullPrompt.length} chars`);
+    
+    console.log('🎯 AI DECISION REASONING:');
+    if (isPersonQuery && peopleContext.length > 0) {
+      console.log(`   ✅ Will use DATABASE PEOPLE INFO as primary source`);
+    }
+    if (isLaptopQuery && contextText.length > 10) {
+      console.log(`   ✅ Will use RAG CONTEXT for laptop recommendations`);
+    }
+    if (!isPersonQuery && !isLaptopQuery) {
+      console.log(`   ⚠️ General query - using available context`);
+    }
+    
+    console.log(`\n📤 SENDING TO OLLAMA (first 200 chars):`);
+    console.log(`"${fullPrompt.substring(0, 200)}..."`);
+    console.log('=' .repeat(80));
+
     // Call Ollama directly
+    console.log('🚀 CALLING OLLAMA API...');
     const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -236,8 +303,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
+      console.error(`❌ Ollama API error: ${response.statusText}`);
       throw new Error(`Ollama API error: ${response.statusText}`);
     }
+
+    console.log('✅ Ollama API response received - starting stream...');
 
     // Create a simple streaming response
     const encoder = new TextEncoder();
