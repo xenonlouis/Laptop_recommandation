@@ -8,6 +8,7 @@ import { UserProfileSelector } from "@/components/user-profile-selector"
 import { SortingCriteriaSelector } from "@/components/sorting-criteria-selector"
 import { CompareProvider } from "@/hooks/use-compare"
 import { LaptopComparison } from "@/components/laptop-comparison"
+import { SimpleChat } from "@/components/simple-chat"
 
 export default function Home() {
   return (
@@ -73,6 +74,9 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </main>
+        
+        {/* AI Assistant Chat */}
+        <SimpleChat />
       </div>
     </CompareProvider>
   )

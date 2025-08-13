@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Analytics } from "@/components/analytics"
+import { SimpleChat } from "@/components/simple-chat"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -25,6 +26,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <Analytics />
+          <SimpleChat />
         </ThemeProvider>
       </body>
     </html>
