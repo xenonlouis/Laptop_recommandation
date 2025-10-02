@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
 
     // 4. Database Duplicate Check (by Email)
     console.log(`Migration: Checking for existing email: ${responseData.email}`);
-    const existingByEmail = await prisma.surveyResponse.findUnique({
-      where: { email: responseData.email.toLowerCase() },
+    const existingByEmail = await prisma.surveyResponse.findFirst({
+      where: { email: { equals: responseData.email.toLowerCase(), mode: 'insensitive' } },
       select: { id: true },
     });
 

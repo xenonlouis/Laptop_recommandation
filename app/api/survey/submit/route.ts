@@ -175,8 +175,9 @@ export async function POST(request: NextRequest) {
     
     // --- Database Duplicate Check --- 
     console.log(`Checking for existing email: ${data.email}`);
-    const existingResponse = await prisma.surveyResponse.findUnique({
-      where: { email: data.email.toLowerCase() }, // Check using lowercase email
+    const existingResponse = await prisma.surveyResponse.findFirst({
+      where: { email: { equals: data.email.toLowerCase(), mode: 'insensitive' } },
+      select: { id: true },
     });
 
     if (existingResponse) {
@@ -224,11 +225,6 @@ export async function POST(request: NextRequest) {
         selectedTools: data.selectedTools || [],
         otherTools: data.otherTools || null,
         simultaneousApplications: data.simultaneousApplications || null,
-        multipleWorkspaces: data.multipleWorkspaces || false,
-        typicalBrowserTabs: data.typicalBrowserTabs || null,
-        externalDisplays: data.externalDisplays || null,
-        resourceIntensiveApps: data.resourceIntensiveApps || false,
-        resourceIntensiveAppsList: data.resourceIntensiveAppsList || null,
         // Temporary/default values for fields not directly from data but needed for type
         id: 'temp', 
         submittedAt: new Date().toISOString(),
@@ -326,4 +322,4 @@ export async function POST(request: NextRequest) {
       { status: status }
     );
   }
-} 
+}  

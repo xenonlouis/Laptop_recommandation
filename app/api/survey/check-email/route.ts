@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
   console.log(`Checking database for email: ${email}`);
 
   try {
-    const existingResponse = await prisma.surveyResponse.findUnique({
-      where: { email: email.toLowerCase() }, // Check using lowercase email
-      select: { id: true }, // Only select the ID, we just need to know if it exists
+    const existingResponse = await prisma.surveyResponse.findFirst({
+      where: { email: { equals: email.toLowerCase(), mode: 'insensitive' } },
+      select: { id: true },
     });
 
     const exists = !!existingResponse;
