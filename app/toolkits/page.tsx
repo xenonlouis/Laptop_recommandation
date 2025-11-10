@@ -2,6 +2,8 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Plus } from "lucide-react"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { Permission } from "@/lib/permissions"
 import { ToolkitsContent } from "./toolkits-content"
 
 export default function ToolkitsPage() {
@@ -30,17 +32,21 @@ export default function ToolkitsPage() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/toolkits/add">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Toolkit
-              </Button>
-            </Link>
-            <Link href="/manage/tools">
-              <Button variant="outline">
-                Manage Tools
-              </Button>
-            </Link>
+            <PermissionGate permission={Permission.MANAGE_TOOLKITS}>
+              <Link href="/toolkits/add">
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Toolkit
+                </Button>
+              </Link>
+            </PermissionGate>
+            <PermissionGate permission={Permission.MANAGE_TOOLS}>
+              <Link href="/manage/tools">
+                <Button variant="outline">
+                  Manage Tools
+                </Button>
+              </Link>
+            </PermissionGate>
           </div>
         </div>
 

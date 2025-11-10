@@ -19,6 +19,8 @@ import { CategoryDistributionChart } from "./components/category-distribution-ch
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { BarChart } from "lucide-react"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { Permission } from "@/lib/permissions"
 
 export function ToolkitsContent() {
   const [toolkits, setToolkits] = useState<Toolkit[]>([])
@@ -215,11 +217,13 @@ export function ToolkitsContent() {
                       </div>
                       <CardDescription>{toolkit.description}</CardDescription>
                     </div>
-                    <Link href={`/toolkits/edit/${toolkit.id}`}>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </Link>
+                    <PermissionGate permission={Permission.MANAGE_TOOLKITS}>
+                      <Link href={`/toolkits/edit/${toolkit.id}`}>
+                        <Button variant="outline" size="sm">
+                          Edit
+                        </Button>
+                      </Link>
+                    </PermissionGate>
                   </div>
                 </CardHeader>
                 

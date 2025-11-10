@@ -1465,15 +1465,17 @@ export default function PackagesPage() {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-7 px-2 text-xs"
-                                      onClick={() => handleAssignPeople(template)}
-                                    >
-                                      <Users className="w-3 h-3 mr-1" />
-                                      Assign
-                                    </Button>
+                                    <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 px-2 text-xs"
+                                        onClick={() => handleAssignPeople(template)}
+                                      >
+                                        <Users className="w-3 h-3 mr-1" />
+                                        Assign
+                                      </Button>
+                                    </PermissionGate>
 
                                     <Button
                                       variant="ghost"
@@ -1483,22 +1485,26 @@ export default function PackagesPage() {
                                     >
                                       <Eye className="w-3 h-3" />
                                     </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-7 w-7 p-0"
-                                      onClick={() => handleEditTemplateClick(template)}
-                                    >
-                                      <Edit className="w-3 h-3" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                      onClick={() => handleDeleteTemplate(template.id)}
-                                    >
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
+                                    <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0"
+                                        onClick={() => handleEditTemplateClick(template)}
+                                      >
+                                        <Edit className="w-3 h-3" />
+                                      </Button>
+                                    </PermissionGate>
+                                    <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        onClick={() => handleDeleteTemplate(template.id)}
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </PermissionGate>
                                   </div>
                                 </div>
                               </CardContent>
@@ -1600,23 +1606,29 @@ export default function PackagesPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="sm" onClick={() => handleAssignPeople(template)}>
-                                <Users className="w-4 h-4" />
-                              </Button>
+                              <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                <Button variant="ghost" size="sm" onClick={() => handleAssignPeople(template)}>
+                                  <Users className="w-4 h-4" />
+                                </Button>
+                              </PermissionGate>
                               <Button variant="ghost" size="sm" onClick={() => handleViewTemplate(template)}>
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" onClick={() => handleEditTemplateClick(template)}>
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                onClick={() => handleDeleteTemplate(template.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
+                              <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                <Button variant="ghost" size="sm" onClick={() => handleEditTemplateClick(template)}>
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              </PermissionGate>
+                              <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  onClick={() => handleDeleteTemplate(template.id)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </PermissionGate>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -1676,15 +1688,17 @@ export default function PackagesPage() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-1 pt-2 border-t">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs flex-1"
-                            onClick={() => handleAssignPeople(template)}
-                          >
-                            <Users className="w-3 h-3 mr-1" />
-                            Assign
-                          </Button>
+                          <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs flex-1"
+                              onClick={() => handleAssignPeople(template)}
+                            >
+                              <Users className="w-3 h-3 mr-1" />
+                              Assign
+                            </Button>
+                          </PermissionGate>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -1693,22 +1707,26 @@ export default function PackagesPage() {
                           >
                             <Eye className="w-3 h-3" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0"
-                            onClick={() => handleEditTemplateClick(template)}
-                          >
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleDeleteTemplate(template.id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
+                          <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0"
+                              onClick={() => handleEditTemplateClick(template)}
+                            >
+                              <Edit className="w-3 h-3" />
+                            </Button>
+                          </PermissionGate>
+                          <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleDeleteTemplate(template.id)}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </PermissionGate>
                         </div>
                       </CardContent>
                     </Card>
@@ -1954,22 +1972,26 @@ export default function PackagesPage() {
                         </TableCell>
                                 <TableCell className="text-right">
           <div className="flex items-center justify-end gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => handleEditAssignment(assignment)}
-            >
-              <Edit className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-              onClick={() => handleDeleteAssignment(assignment.id)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => handleEditAssignment(assignment)}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            </PermissionGate>
+            <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                onClick={() => handleDeleteAssignment(assignment.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </PermissionGate>
           </div>
         </TableCell>
                       </TableRow>
