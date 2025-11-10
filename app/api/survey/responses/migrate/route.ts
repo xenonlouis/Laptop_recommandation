@@ -1,75 +1,60 @@
 import { NextResponse, NextRequest } from 'next/server';
-import prisma from '@/lib/prisma'; // Import Prisma client
-import { SurveyResponse } from '@/types'; // Import the type for validation
+import prisma from '@/lib/prisma';
+import { SurveyResponse } from '@/types';
+import { withPermission, Permission, AuthenticatedUser } from '@/lib/auth-helpers';
 
-// --- POST Handler for Manual Migration ---
-export async function POST(request: NextRequest) {
-  console.log('Manual survey migration request received');
-  
-  try {
-    // 1. Authentication Check
-    const apiKey = request.headers.get('x-api-key');
-    const requiredKey = process.env.ADMIN_API_KEY || 'sbaxilobaxi';
-    if (apiKey !== requiredKey) {
-      console.log('Migration failed: Unauthorized access');
-      return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
-    }
-    console.log('Migration authentication successful');
-    
-    // 2. Get and Parse JSON Body
-    let responseData: Partial<SurveyResponse>; // Use Partial initially
+// POST Handler for Manual Migration - requires ADMIN role
+export const POST = withPermission(
+  Permission.VIEW_SURVEY_RESPONSES, // Using VIEW permission since it's a migration operation
+  async (request: NextRequest, user: AuthenticatedUser) => {
     try {
-      responseData = await request.json();
-      console.log('Received migration data for:', responseData.email);
-    } catch (parseError) {
-      console.error('Migration failed: Invalid JSON format', parseError);
-      return NextResponse.json({ error: 'Invalid JSON format in request body' }, { status: 400 });
-    }
+      // Get and Parse JSON Body
+      let responseData: Partial<SurveyResponse>;
+      try {
+        responseData = await request.json();
+      } catch (parseError) {
+        console.error('Migration failed: Invalid JSON format', parseError);
+        return NextResponse.json({ error: 'Invalid JSON format in request body' }, { status: 400 });
+      }
 
-    // 3. Basic Validation (Ensure required fields exist)
-    if (!responseData.name || !responseData.email || !responseData.position || !responseData.id || !responseData.submittedAt) {
-       console.log('Migration failed: Missing required fields (name, email, position, id, submittedAt)');
-       return NextResponse.json({ error: 'Missing required fields (name, email, position, id, submittedAt)' }, { status: 400 });
-    }
+      // Basic Validation
+      if (!responseData.name || !responseData.email || !responseData.position || !responseData.id || !responseData.submittedAt) {
+        return NextResponse.json(
+          { error: 'Missing required fields (name, email, position, id, submittedAt)' },
+          { status: 400 }
+        );
+      }
 
-    // 4. Database Duplicate Check (by Email)
-    console.log(`Migration: Checking for existing email: ${responseData.email}`);
-    const existingByEmail = await prisma.surveyResponse.findFirst({
-      where: { email: { equals: responseData.email.toLowerCase(), mode: 'insensitive' } },
-      select: { id: true },
-    });
+      // Database Duplicate Check (by Email)
+      const existingByEmail = await prisma.surveyResponse.findFirst({
+        where: { email: { equals: responseData.email.toLowerCase(), mode: 'insensitive' } },
+        select: { id: true },
+      });
 
-    if (existingByEmail) {
-      console.log('Migration skipped: Duplicate email found in database:', responseData.email);
-      // Return a specific status/message indicating duplicate email
-      return NextResponse.json(
-        { message: `Skipped: Email ${responseData.email} already exists in database.`, existingId: existingByEmail.id },
-        { status: 409 } // Conflict
-      );
-    }
-    console.log('Migration: No duplicate email found.');
+      if (existingByEmail) {
+        return NextResponse.json(
+          { message: `Skipped: Email ${responseData.email} already exists in database.`, existingId: existingByEmail.id },
+          { status: 409 }
+        );
+      }
 
-    // 5. Database Duplicate Check (by ID - less likely but good practice)
-    console.log(`Migration: Checking for existing ID: ${responseData.id}`);
-    const existingById = await prisma.surveyResponse.findUnique({
-      where: { id: responseData.id },
-      select: { id: true },
-    });
+      // Database Duplicate Check (by ID)
+      const existingById = await prisma.surveyResponse.findUnique({
+        where: { id: responseData.id },
+        select: { id: true },
+      });
 
-    if (existingById) {
-      console.log('Migration skipped: Duplicate ID found in database:', responseData.id);
-      return NextResponse.json(
-        { message: `Skipped: ID ${responseData.id} already exists in database.` },
-        { status: 409 } // Conflict
-      );
-    }
-    console.log('Migration: No duplicate ID found.');
+      if (existingById) {
+        return NextResponse.json(
+          { message: `Skipped: ID ${responseData.id} already exists in database.` },
+          { status: 409 }
+        );
+      }
 
-    // 6. Prepare data for creation (align with Prisma schema)
-    // We trust the structure from the pasted JSON but ensure types/defaults
-    const dataToCreate = {
-        id: responseData.id, // Use the ID from the JSON
-        submittedAt: new Date(responseData.submittedAt), // Convert string to Date
+      // Prepare data for creation
+      const dataToCreate = {
+        id: responseData.id,
+        submittedAt: new Date(responseData.submittedAt),
         name: responseData.name,
         email: responseData.email.toLowerCase(),
         position: responseData.position,
@@ -102,24 +87,20 @@ export async function POST(request: NextRequest) {
         resourceIntensiveAppsList: responseData.resourceIntensiveAppsList || null,
         matchedToolkitId: responseData.matchedToolkitId || null,
         matchScore: responseData.matchScore ?? null,
-    };
+      };
 
-    // 7. Create record in Database
-    console.log(`Migration: Attempting to create survey response in database for ID: ${dataToCreate.id}`);
-    const newSurveyResponse = await prisma.surveyResponse.create({
-      data: dataToCreate,
-    });
-    console.log('Migration: Successfully created survey response in database. ID:', newSurveyResponse.id);
-    
-    // 8. Return Success
-    return NextResponse.json(newSurveyResponse, { status: 201 }); // Created
+      // Create record in Database
+      const newSurveyResponse = await prisma.surveyResponse.create({
+        data: dataToCreate,
+      });
 
-  } catch (error) {
-    console.error('Error processing manual migration request:', error);
-    // Check for specific Prisma errors if needed (e.g., invalid data format)
-    return NextResponse.json(
-      { error: 'Failed to process manual survey migration' },
-      { status: 500 }
-    );
+      return NextResponse.json(newSurveyResponse, { status: 201 });
+    } catch (error) {
+      console.error('Error processing manual migration request:', error);
+      return NextResponse.json(
+        { error: 'Failed to process manual survey migration' },
+        { status: 500 }
+      );
+    }
   }
-} 
+); 

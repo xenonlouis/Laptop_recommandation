@@ -1,4 +1,8 @@
-import { Suspense } from "react"
+"use client";
+
+import { Suspense, useEffect, useState } from "react"
+import { useSession, signOut } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LaptopRecommendationTree } from "@/components/laptop-recommendation-tree"
 import { Button } from "@/components/ui/button"
@@ -8,8 +12,12 @@ import { UserProfileSelector } from "@/components/user-profile-selector"
 import { SortingCriteriaSelector } from "@/components/sorting-criteria-selector"
 import { CompareProvider } from "@/hooks/use-compare"
 import { LaptopComparison } from "@/components/laptop-comparison"
+import { LogOut } from "lucide-react"
+import { ProtectedRoute } from "@/components/auth/protected-route"
 
-export default function Home() {
+function HomeContent() {
+  const { data: session } = useSession()
+
   return (
     <CompareProvider>
       <div className="min-h-screen bg-background">
@@ -35,6 +43,21 @@ export default function Home() {
               <Link href="/notion">
                 <Button variant="outline">Notion Sync</Button>
               </Link>
+              {session?.user && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    {session.user.name || session.user.email}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    title="Sign out"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <ThemeToggle />
             </div>
           </div>
@@ -75,6 +98,14 @@ export default function Home() {
         </main>
       </div>
     </CompareProvider>
+  )
+}
+
+export default function Home() {
+  return (
+    <ProtectedRoute>
+      <HomeContent />
+    </ProtectedRoute>
   )
 }
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { SurveyResponse } from "@/types";
 import { fetchSurveyResponseById, updateSurveyResponse } from "@/lib/api-client-survey";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, ArrowLeft, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Slider } from "@/components/ui/slider";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 // Helper function to format dates (optional, might not be needed here)
 // ...
@@ -27,39 +29,39 @@ export default function EditSurveyResponsePage() {
   const id = params.id as string;
   const { toast } = useToast();
 
+  const { data: session, status } = useSession();
   const [response, setResponse] = useState<Partial<SurveyResponse>>({}); // Use Partial for editable form state
   const [initialResponse, setInitialResponse] = useState<SurveyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const adminKey = localStorage.getItem("survey-admin-key");
-    if (!adminKey) {
-      setLoading(false);
-      setIsAuthenticated(false);
-      setError("Admin access required. Please login.");
-      return;
+    if (status === "authenticated") {
+      loadResponse(id);
+    } else if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/survey/responses");
     }
-    setIsAuthenticated(true);
-    loadResponse(id);
-  }, [id]);
+  }, [status, id, router]);
 
   async function loadResponse(responseId: string) {
     try {
       setLoading(true);
+      setError(null);
       const data = await fetchSurveyResponseById(responseId);
       if (data) {
         setInitialResponse(data);
         setResponse(data); // Initialize form state
-        setError(null);
       } else {
         setError("Survey response not found or failed to load.");
       }
     } catch (err: any) {
       console.error("Failed to fetch survey response:", err);
-      setError(err.message || "Failed to load survey response.");
+      if (err?.message?.includes("401") || err?.message?.includes("403")) {
+        setError("You don't have permission to edit this survey response.");
+      } else {
+        setError(err.message || "Failed to load survey response.");
+      }
     } finally {
       setLoading(false);
     }
@@ -105,31 +107,40 @@ export default function EditSurveyResponsePage() {
   // ----------------------
 
   // --- Render Logic --- 
-  if (loading) {
-    return <div className="container p-6 flex justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  if (loading || status === "loading") {
+    return (
+      <ProtectedRoute>
+        <div className="container p-6 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </ProtectedRoute>
+    );
   }
 
-  if (!isAuthenticated || error || !initialResponse) {
+  if (error || !initialResponse) {
     return (
-      <div className="container mx-auto p-6 max-w-lg">
-         <div className="flex items-center mb-6">
-          <Link href="/survey/responses">
-            <Button variant="ghost" size="icon" className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Error Loading Response</h1>
+      <ProtectedRoute>
+        <div className="container mx-auto p-6 max-w-lg">
+          <div className="flex items-center mb-6">
+            <Link href="/survey/responses">
+              <Button variant="ghost" size="icon" className="mr-2">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold">Error Loading Response</h1>
+          </div>
+          <Alert variant="destructive">
+            <AlertDescription>{error || "Survey response could not be loaded."}</AlertDescription>
+          </Alert>
         </div>
-        <Alert variant="destructive">
-          <AlertDescription>{error || "Survey response could not be loaded."}</AlertDescription>
-        </Alert>
-      </div>
+      </ProtectedRoute>
     );
   }
 
   // --- Form Rendering --- 
   return (
-    <div className="container mx-auto p-6">
+    <ProtectedRoute>
+      <div className="container mx-auto p-6">
       <div className="flex items-center mb-6">
           <Link href={`/survey/responses/${id}`}> {/* Link back to detail view */}
             <Button variant="ghost" size="icon" className="mr-2">
@@ -304,6 +315,7 @@ export default function EditSurveyResponsePage() {
           </CardFooter>
         </Card>
       </form>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 } 

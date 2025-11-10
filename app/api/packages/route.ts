@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { withPermission, Permission, AuthenticatedUser } from '@/lib/auth-helpers';
 
-// GET /api/packages - Get all packages
+// GET /api/packages - Get all packages (public)
 export async function GET(req: NextRequest) {
   try {
     const packages = await prisma.package.findMany({
@@ -47,62 +48,65 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/packages - Create a new package
-export async function POST(req: NextRequest) {
-  try {
-    const data = await req.json();
-    const { accessories, laptop, ...packageData } = data;
-    
-    // Create the package with relationships
-    const newPackage = await prisma.package.create({
-      data: {
-        ...packageData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        laptop: laptop ? { 
-          connect: { id: laptop.id } 
-        } : undefined,
-        accessories: accessories && accessories.length > 0 ? {
-          create: accessories.map((accessory: any) => ({
-            accessory: {
-              connect: { id: accessory.id }
-            }
-          }))
-        } : undefined
-      },
-      include: {
-        laptop: {
-          include: {
-            supportedProfiles: true
-          }
+// POST /api/packages - Create a new package (requires MANAGE_PACKAGES permission)
+export const POST = withPermission(
+  Permission.MANAGE_PACKAGES,
+  async (req: NextRequest, user: AuthenticatedUser) => {
+    try {
+      const data = await req.json();
+      const { accessories, laptop, ...packageData } = data;
+      
+      // Create the package with relationships
+      const newPackage = await prisma.package.create({
+        data: {
+          ...packageData,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          laptop: laptop ? { 
+            connect: { id: laptop.id } 
+          } : undefined,
+          accessories: accessories && accessories.length > 0 ? {
+            create: accessories.map((accessory: any) => ({
+              accessory: {
+                connect: { id: accessory.id }
+              }
+            }))
+          } : undefined
         },
-        accessories: {
-          include: {
-            accessory: true
+        include: {
+          laptop: {
+            include: {
+              supportedProfiles: true
+            }
+          },
+          accessories: {
+            include: {
+              accessory: true
+            }
           }
         }
-      }
-    });
-    
-    // Format the response and convert Decimal prices to numbers
-    const formattedPackage = {
-      ...newPackage,
-      laptop: {
-        ...newPackage.laptop,
-        price: Number(newPackage.laptop.price),
-        batteryLife: Number(newPackage.laptop.batteryLife),
-        performanceScore: Number(newPackage.laptop.performanceScore),
-        images: newPackage.laptop.images || [] // Include images for frontend display
-      },
-      accessories: newPackage.accessories.map(pa => ({
-        ...pa.accessory,
-        price: Number(pa.accessory.price)
-      }))
-    };
-    
-    return NextResponse.json(formattedPackage);
-  } catch (error) {
-    console.error('Error creating package:', error);
-    return NextResponse.json({ error: 'Failed to create package' }, { status: 500 });
+      });
+      
+      // Format the response and convert Decimal prices to numbers
+      const formattedPackage = {
+        ...newPackage,
+        laptop: {
+          ...newPackage.laptop,
+          price: Number(newPackage.laptop.price),
+          batteryLife: Number(newPackage.laptop.batteryLife),
+          performanceScore: Number(newPackage.laptop.performanceScore),
+          images: newPackage.laptop.images || [] // Include images for frontend display
+        },
+        accessories: newPackage.accessories.map(pa => ({
+          ...pa.accessory,
+          price: Number(pa.accessory.price)
+        }))
+      };
+      
+      return NextResponse.json(formattedPackage);
+    } catch (error) {
+      console.error('Error creating package:', error);
+      return NextResponse.json({ error: 'Failed to create package' }, { status: 500 });
+    }
   }
-} 
+); 

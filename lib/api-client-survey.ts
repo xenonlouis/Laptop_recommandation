@@ -8,7 +8,6 @@ export async function hasCompletedSurvey(email: string): Promise<boolean> {
   if (!email) return false;
   
   try {
-    // We'll make a call to check this against our GitHub stored data
     const res = await fetch(`/api/survey/check-email?email=${encodeURIComponent(email)}`, {
       method: 'GET',
       headers: {
@@ -27,18 +26,11 @@ export async function hasCompletedSurvey(email: string): Promise<boolean> {
 }
 
 /**
- * Fetches all survey responses
+ * Fetches all survey responses (requires authentication)
  */
 export async function fetchSurveyResponses(): Promise<SurveyResponse[]> {
-  // We'll need an admin key to fetch all responses
-  const adminKey = localStorage.getItem("survey-admin-key") || '';
-  
   try {
-    const res = await fetch('/api/survey/responses', {
-      headers: {
-        'x-api-key': adminKey
-      }
-    });
+    const res = await fetch('/api/survey/responses');
     
     if (!res.ok) {
       throw new Error('Failed to fetch survey responses');
@@ -52,18 +44,11 @@ export async function fetchSurveyResponses(): Promise<SurveyResponse[]> {
 }
 
 /**
- * Fetches a specific survey response by ID
+ * Fetches a specific survey response by ID (requires authentication)
  */
 export async function fetchSurveyResponseById(id: string): Promise<SurveyResponse | null> {
-  // We'll need an admin key to fetch a response
-  const adminKey = localStorage.getItem("survey-admin-key") || '';
-  
   try {
-    const res = await fetch(`/api/survey/responses/${id}`, {
-      headers: {
-        'x-api-key': adminKey
-      }
-    });
+    const res = await fetch(`/api/survey/responses/${id}`);
     
     if (!res.ok) {
       throw new Error('Failed to fetch survey response');
@@ -98,7 +83,7 @@ export async function createSurveyResponse(
     
     // Return only the saved SurveyResponse (which includes matchId/score)
     const responseData = await res.json(); 
-    return responseData.surveyResponse; // Assuming API returns { surveyResponse: ..., matchedToolkit: ...}
+    return responseData.surveyResponse;
   } catch (error) {
     console.error('Error creating survey response:', error);
     throw error;
@@ -106,18 +91,14 @@ export async function createSurveyResponse(
 }
 
 /**
- * Updates an existing survey response
+ * Updates an existing survey response (requires authentication)
  */
 export async function updateSurveyResponse(id: string, data: Partial<SurveyResponse>): Promise<SurveyResponse> {
-  // We'll need an admin key to update a response
-  const adminKey = localStorage.getItem("survey-admin-key") || '';
-  
   try {
     const res = await fetch(`/api/survey/responses/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': adminKey
       },
       body: JSON.stringify(data),
     });
@@ -134,18 +115,12 @@ export async function updateSurveyResponse(id: string, data: Partial<SurveyRespo
 }
 
 /**
- * Deletes a survey response
+ * Deletes a survey response (requires authentication)
  */
 export async function deleteSurveyResponse(id: string): Promise<void> {
-  // We'll need an admin key to delete a response
-  const adminKey = localStorage.getItem("survey-admin-key") || '';
-  
   try {
     const res = await fetch(`/api/survey/responses/${id}`, {
       method: 'DELETE',
-      headers: {
-        'x-api-key': adminKey
-      }
     });
     
     if (!res.ok) {
@@ -155,4 +130,4 @@ export async function deleteSurveyResponse(id: string): Promise<void> {
     console.error(`Error deleting survey response with ID ${id}:`, error);
     throw new Error('Failed to delete survey response');
   }
-} 
+}

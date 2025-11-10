@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { SurveyResponse, Toolkit, Tool } from "@/types";
 import { fetchToolkits } from "@/lib/api-client";
 import { fetchTools } from "@/lib/api-client-tools";
+import { fetchSurveyResponseById } from "@/lib/api-client-survey";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Loader2, CheckCircle, Star, Wrench } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 
 // Helper function to format dates
 const formatDate = (dateString: string): string => {
@@ -68,8 +71,8 @@ function calculateAllToolkitScores(
     else if (surveyData.primaryOS === toolkit.operatingSystem) currentScore += 5;
 
     // 2. Role Score
-    const isDeveloperRole = surveyData.primaryRole === 'developer';
-    const isConsultantRole = surveyData.primaryRole === 'consultant';
+    const isDeveloperRole = surveyData.primaryRole === 'Developer';
+    const isConsultantRole = surveyData.primaryRole === 'Consultant';
     const isDeveloperToolkit = profileNameLower.includes('developer') || profileNameLower.includes('engineer');
     const isConsultantToolkit = profileNameLower.includes('consultant') || profileNameLower.includes('analyst') || profileNameLower.includes('admin');
     if (isDeveloperToolkit && isDeveloperRole) currentScore += 10;
@@ -129,10 +132,10 @@ export default function SurveyResponseDetailsPage() {
   const params = useParams();
   const id = params.id as string;
   
+  const { data: session, status } = useSession();
   const [response, setResponse] = useState<SurveyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   // State for toolkits and tools data
   const [allToolkits, setAllToolkits] = useState<Toolkit[]>([]);
@@ -176,51 +179,44 @@ export default function SurveyResponseDetailsPage() {
   // ------------------------------------------------------
 
   useEffect(() => {
-    const adminKey = localStorage.getItem("survey-admin-key");
-    if (!adminKey) {
-      setLoading(false);
-      setIsAuthenticated(false);
-      return;
+    if (status === "authenticated") {
+      loadData();
+    } else if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=/survey/responses");
     }
-    
-    // Load response and toolkit/tool data
-    loadData(adminKey);
-  }, [id]);
+  }, [status, id, router]);
 
   // Combined function to load all necessary data
-  async function loadData(adminKey: string) {
+  async function loadData() {
     try {
       setLoading(true);
       setError(null);
       
       // Fetch response, all toolkits, and all tools in parallel
       const [responseResult, toolkitsResult, toolsResult] = await Promise.allSettled([
-        fetch(`/api/survey/responses/${id}`, { headers: { 'x-api-key': adminKey } }),
+        fetchSurveyResponseById(id),
         fetchToolkits(), // Use API client function
         fetchTools()     // Use API client function
       ]);
 
       // Process Response Result
       if (responseResult.status === 'fulfilled') {
-        const res = responseResult.value;
-        if (!res.ok) {
-          if (res.status === 401) {
-            setIsAuthenticated(false);
-            localStorage.removeItem("survey-admin-key");
-            throw new Error("Admin access required. Please login at the responses page.");
-          } else if (res.status === 404) {
-            throw new Error("Survey response not found.");
-          } else {
-            throw new Error("Failed to load survey response. Please try again later.");
-          }
+        const responseData = responseResult.value;
+        if (!responseData) {
+          throw new Error("Survey response not found.");
         }
-        const responseData: SurveyResponse = await res.json();
         setResponse(responseData);
-        setIsAuthenticated(true);
       } else {
         // Handle fetch rejection for response
         console.error("Failed to fetch response:", responseResult.reason);
-        throw new Error("Failed to fetch survey response details.");
+        const error = responseResult.reason as any;
+        if (error?.message?.includes("401") || error?.message?.includes("403")) {
+          throw new Error("You don't have permission to view this survey response.");
+        } else if (error?.message?.includes("404")) {
+          throw new Error("Survey response not found.");
+        } else {
+          throw new Error("Failed to fetch survey response details.");
+        }
       }
 
       // Process Toolkits Result
@@ -271,30 +267,6 @@ export default function SurveyResponseDetailsPage() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto p-6 max-w-lg">
-        <div className="flex items-center mb-6">
-          <Link href="/survey/responses">
-            <Button variant="ghost" size="icon" className="mr-2">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold">Admin Access Required</h1>
-        </div>
-        
-        <Alert>
-          <AlertDescription>
-            You need to be authenticated to view this response. Please go to the{' '}
-            <Link href="/survey/responses" className="underline">
-              responses page
-            </Link>{' '}
-            and login.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   if (error || !response) {
     return (
@@ -331,7 +303,8 @@ export default function SurveyResponseDetailsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <ProtectedRoute>
+      <div className="container mx-auto p-6">
       <div className="flex items-center mb-6">
         <Link href="/survey/responses">
           <Button variant="ghost" size="icon" className="mr-2">
@@ -548,6 +521,7 @@ export default function SurveyResponseDetailsPage() {
           </Tabs>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 } 
