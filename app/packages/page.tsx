@@ -20,6 +20,9 @@ import { Slider } from "@/components/ui/slider"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getEurToMadRate, formatCurrency as formatCurrencyUtil } from "@/lib/exchange-rates"
 import { useToast } from "@/hooks/use-toast"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { Permission } from "@/lib/permissions"
+import { ApiError } from "@/lib/api-error-handler"
 
 // Types for new architecture
 interface PackageTemplate {
@@ -506,24 +509,23 @@ export default function PackagesPage() {
         setTemplates([...templates, newTemplate])
         setIsCreateTemplateOpen(false)
         resetTemplateForm()
-      toast({
+        toast({
           title: "Success",
           description: "Template created successfully",
         })
       } else {
-        const error = await response.json()
-      toast({
-        title: "Error",
-          description: error.error || "Failed to create template",
-  
+        const { handleApiError } = await import("@/lib/api-error-handler")
+        const error = await handleApiError(response)
+        toast({
+          title: error.isPermissionError ? "Permission Denied" : "Error",
+          description: error.message || "Failed to create template",
         })
       }
     } catch (error) {
-      console.error('Failed to create template:', error)
+      const apiError = error as ApiError
       toast({
-        title: "Error",
-        description: "Failed to create template",
-
+        title: apiError.isPermissionError ? "Permission Denied" : "Error",
+        description: apiError.message || "Failed to create template",
       })
     }
   }
@@ -1235,10 +1237,12 @@ export default function PackagesPage() {
                       <Grid3X3 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <Button onClick={() => setIsCreateTemplateOpen(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-            Add Package
-          </Button>
+                  <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                    <Button onClick={() => setIsCreateTemplateOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Package
+                    </Button>
+                  </PermissionGate>
                 </div>
         </div>
 
@@ -1720,10 +1724,12 @@ export default function PackagesPage() {
                     {templates.length === 0 ? "Create your first package template to get started" : "Try adjusting your filters"}
                   </p>
                   {templates.length === 0 ? (
-                    <Button onClick={() => setIsCreateTemplateOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Template
-                    </Button>
+                    <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                      <Button onClick={() => setIsCreateTemplateOpen(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Template
+                      </Button>
+                    </PermissionGate>
                   ) : (
                     <Button variant="outline" onClick={clearFilters}>
                       Clear Filters
@@ -1743,37 +1749,41 @@ export default function PackagesPage() {
                   <p className="text-muted-foreground">Track who has which package templates</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
+                  <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedTemplate(null)
+                        setBatchAssignmentForm({
+                          selectedPersonIds: [],
+                          templateId: '',
+                          status: 'assigned',
+                          pcReference: '',
+                          notes: ''
+                        })
+                        setIsBatchAssignmentOpen(true)
+                      }}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Batch Assignment
+                    </Button>
+                  </PermissionGate>
+                  <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                    <Button onClick={() => {
                       setSelectedTemplate(null)
-                      setBatchAssignmentForm({
-                        selectedPersonIds: [],
+                      setAssignmentForm({
+                        personId: '',
                         templateId: '',
                         status: 'assigned',
                         pcReference: '',
                         notes: ''
                       })
-                      setIsBatchAssignmentOpen(true)
-                    }}
-                  >
-                    <Users className="w-4 h-4 mr-2" />
-                    Batch Assignment
-                  </Button>
-                  <Button onClick={() => {
-                    setSelectedTemplate(null)
-                    setAssignmentForm({
-                      personId: '',
-                      templateId: '',
-                      status: 'assigned',
-                      pcReference: '',
-                      notes: ''
-                    })
-                    setIsCreateAssignmentOpen(true)
-                  }}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Assignment
-                  </Button>
+                      setIsCreateAssignmentOpen(true)
+                    }}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Assignment
+                    </Button>
+                  </PermissionGate>
                 </div>
               </div>
 
@@ -1975,10 +1985,22 @@ export default function PackagesPage() {
                   <p className="text-muted-foreground mb-4">
                     Assign templates to people to get started
                   </p>
-                  <Button>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Assignment
-                  </Button>
+                  <PermissionGate permission={Permission.MANAGE_PACKAGES}>
+                    <Button onClick={() => {
+                      setSelectedTemplate(null)
+                      setAssignmentForm({
+                        personId: '',
+                        templateId: '',
+                        status: 'assigned',
+                        pcReference: '',
+                        notes: ''
+                      })
+                      setIsCreateAssignmentOpen(true)
+                    }}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Assignment
+                    </Button>
+                  </PermissionGate>
                 </div>
               )}
               </div>

@@ -146,13 +146,14 @@ export async function createLaptop(laptop: Omit<Laptop, "id">): Promise<{ messag
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || `Error: ${response.status}`)
+      const { handleApiError } = await import("./api-error-handler")
+      const error = await handleApiError(response)
+      throw error
     }
 
     return await response.json()
   } catch (error) {
-    console.error("Failed to create laptop:", error)
+    // Re-throw the error so it can be handled by the caller
     throw error
   }
 }
@@ -238,13 +239,13 @@ export async function updateLaptop(laptop: Laptop): Promise<{ message: string }>
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || `Error: ${response.status}`)
+      const { handleApiError } = await import("./api-error-handler")
+      const error = await handleApiError(response)
+      throw error
     }
 
     return await response.json()
   } catch (error) {
-    console.error(`Failed to update laptop with ID ${laptop.id}:`, error)
     throw error
   }
 }
@@ -326,13 +327,13 @@ export async function deleteLaptop(id: string): Promise<{ message: string }> {
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || `Error: ${response.status}`)
+      const { handleApiError } = await import("./api-error-handler")
+      const error = await handleApiError(response)
+      throw error
     }
 
     return await response.json()
   } catch (error) {
-    console.error(`Failed to delete laptop with ID ${id}:`, error)
     throw error
   }
 }

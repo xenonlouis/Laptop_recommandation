@@ -14,6 +14,8 @@ import { CompareProvider } from "@/hooks/use-compare"
 import { LaptopComparison } from "@/components/laptop-comparison"
 import { LogOut } from "lucide-react"
 import { ProtectedRoute } from "@/components/auth/protected-route"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { Permission } from "@/lib/permissions"
 
 function HomeContent() {
   const { data: session } = useSession()
@@ -34,15 +36,19 @@ function HomeContent() {
               <Link href="/people">
                 <Button variant="outline">People</Button>
               </Link>
-              <Link href="/manage">
-                <Button variant="outline">Manage Laptops</Button>
-              </Link>
+              <PermissionGate permission={Permission.MANAGE_LAPTOPS}>
+                <Link href="/manage">
+                  <Button variant="outline">Manage Laptops</Button>
+                </Link>
+              </PermissionGate>
               <Link href="/toolkits">
                 <Button variant="outline">Toolkits</Button>
               </Link>
-              <Link href="/notion">
-                <Button variant="outline">Notion Sync</Button>
-              </Link>
+              <PermissionGate permission={Permission.NOTION_SYNC}>
+                <Link href="/notion">
+                  <Button variant="outline">Notion Sync</Button>
+                </Link>
+              </PermissionGate>
               {session?.user && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">

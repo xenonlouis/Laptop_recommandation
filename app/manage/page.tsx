@@ -24,6 +24,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ArrowLeft, Plus, Pencil, Trash2, MoreVertical, Search, Loader2, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { fetchLaptops, createLaptop, updateLaptop, deleteLaptop as apiDeleteLaptop } from "@/lib/api-client"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { Permission } from "@/lib/permissions"
+import { ApiError } from "@/lib/api-error-handler"
 
 // Helper function to safely get performance score as a number
 const getPerformanceScore = (score: any): number => {
@@ -105,7 +108,6 @@ export default function ManageLaptops() {
         toast({
           title: "Validation Error",
           description: "Brand and model are required fields.",
-          variant: "destructive",
         })
         return
       }
@@ -155,11 +157,12 @@ export default function ManageLaptops() {
         description: `${laptopData.brand} ${laptopData.model} has been added to the database.`,
       })
     } catch (err) {
-      console.error("Error adding laptop:", err)
+      const error = err as ApiError
+      
+      // Show user-friendly error message
       toast({
-        title: "Error",
-        description: "Failed to add laptop. Please try again.",
-        variant: "destructive",
+        title: error.isPermissionError ? "Permission Denied" : "Error",
+        description: error.message || "Failed to add laptop. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -186,11 +189,10 @@ export default function ManageLaptops() {
         description: `${currentLaptop.brand} ${currentLaptop.model} has been updated.`,
       })
     } catch (err) {
-      console.error("Error updating laptop:", err)
+      const error = err as ApiError
       toast({
-        title: "Error",
-        description: "Failed to update laptop. Please try again.",
-        variant: "destructive",
+        title: error.isPermissionError ? "Permission Denied" : "Error",
+        description: error.message || "Failed to update laptop. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -217,11 +219,10 @@ export default function ManageLaptops() {
 
       setCurrentLaptop(null)
     } catch (err) {
-      console.error("Error deleting laptop:", err)
+      const error = err as ApiError
       toast({
-        title: "Error",
-        description: "Failed to delete laptop. Please try again.",
-        variant: "destructive",
+        title: error.isPermissionError ? "Permission Denied" : "Error",
+        description: error.message || "Failed to delete laptop. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -324,15 +325,19 @@ export default function ManageLaptops() {
             <h1 className="text-2xl font-bold tracking-tight">Manage Laptops</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/manage/accessories">
-              <Button variant="outline">
-                Manage Accessories
+            <PermissionGate permission={Permission.MANAGE_ACCESSORIES}>
+              <Link href="/manage/accessories">
+                <Button variant="outline">
+                  Manage Accessories
+                </Button>
+              </Link>
+            </PermissionGate>
+            <PermissionGate permission={Permission.MANAGE_LAPTOPS}>
+              <Button onClick={() => setIsAddDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Laptop
               </Button>
-            </Link>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Laptop
-            </Button>
+            </PermissionGate>
           </div>
         </div>
       </header>
@@ -437,41 +442,47 @@ export default function ManageLaptops() {
                           })}
                         </TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setCurrentLaptop({
-                                    ...laptop,
-                                    performanceScore: getPerformanceScore(laptop.performanceScore) || 7
-                                  })
-                                  setIsEditDialogOpen(true)
-                                }}
-                              >
-                                <Pencil className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setCurrentLaptop({
-                                    ...laptop,
-                                    performanceScore: getPerformanceScore(laptop.performanceScore) || 7
-                                  })
-                                  setIsDeleteDialogOpen(true)
-                                }}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <PermissionGate permission={Permission.MANAGE_LAPTOPS}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <PermissionGate permission={Permission.MANAGE_LAPTOPS}>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setCurrentLaptop({
+                                        ...laptop,
+                                        performanceScore: getPerformanceScore(laptop.performanceScore) || 7
+                                      })
+                                      setIsEditDialogOpen(true)
+                                    }}
+                                  >
+                                    <Pencil className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                </PermissionGate>
+                                <PermissionGate permission={Permission.MANAGE_LAPTOPS}>
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setCurrentLaptop({
+                                        ...laptop,
+                                        performanceScore: getPerformanceScore(laptop.performanceScore) || 7
+                                      })
+                                      setIsDeleteDialogOpen(true)
+                                    }}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </PermissionGate>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </PermissionGate>
                         </TableCell>
                       </TableRow>
                     ))

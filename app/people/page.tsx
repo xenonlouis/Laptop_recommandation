@@ -23,6 +23,10 @@ import {
   assignPackage
 } from "@/lib/api-client"
 import { Package as PackageType, Person, PersonAssignment } from "@/types"
+import { Permission } from "@/lib/permissions"
+import { PermissionGate } from "@/components/auth/permission-gate"
+import { usePermissions } from "@/hooks/use-permissions"
+import { ApiError } from "@/lib/api-error-handler"
 import {
   Table,
   TableBody,
@@ -214,6 +218,8 @@ const exportToCSV = (data: any[], fields: string[], filename: string) => {
 
 export default function PeoplePage() {
   const router = useRouter()
+  const { hasPermission } = usePermissions()
+  const canManagePeople = hasPermission(Permission.MANAGE_PEOPLE)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [people, setPeople] = useState<Person[]>([])
@@ -686,30 +692,35 @@ export default function PeoplePage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Button
-                  variant="default"
-                  disabled={!batchAssignPackageId || selectedPeopleCount === 0}
-                  onClick={handleBatchAssign}
-                >
-                  Assign Selected ({selectedPeopleCount})
-                </Button>
+                <PermissionGate permission={Permission.MANAGE_PEOPLE}>
+                  <Button
+                    variant="default"
+                    disabled={!batchAssignPackageId || selectedPeopleCount === 0}
+                    onClick={handleBatchAssign}
+                  >
+                    Assign Selected ({selectedPeopleCount})
+                  </Button>
+                </PermissionGate>
               </>
             )}
-            <Button
-              variant={batchAssignMode ? "default" : "outline"}
-              onClick={toggleBatchAssignMode}
-            >
-              {batchAssignMode ? "Exit Batch Assign" : "Batch Assign"}
-            </Button>
+            <PermissionGate permission={Permission.MANAGE_PEOPLE}>
+              <Button
+                variant={batchAssignMode ? "default" : "outline"}
+                onClick={toggleBatchAssignMode}
+              >
+                {batchAssignMode ? "Exit Batch Assign" : "Batch Assign"}
+              </Button>
+            </PermissionGate>
             
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Person
-                </Button>
-              </DialogTrigger>
+            <PermissionGate permission={Permission.MANAGE_PEOPLE}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Person
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Person</DialogTitle>
@@ -785,6 +796,7 @@ export default function PeoplePage() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+            </PermissionGate>
           </div>
         </div>
 
@@ -809,7 +821,7 @@ export default function PeoplePage() {
                 <TableHead>Department</TableHead>
                 <TableHead>Position</TableHead>
                 <TableHead>PC Reference</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                {canManagePeople && <TableHead className="text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -837,226 +849,230 @@ export default function PeoplePage() {
                       <span className="text-muted-foreground">-</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => openAssignDialog(person)}
-                            title="Assign package"
-                          >
-                            <Package className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Assign Package</DialogTitle>
-                            <DialogDescription>
-                              Assign a package to {currentPersonForAssign?.name}.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="package" className="text-right">
-                                Package
-                              </Label>
-                              <div className="col-span-3">
-                                <Select 
-                                  value={selectedPackageId} 
-                                  onValueChange={setSelectedPackageId}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a package" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {allPackages.map((pkg) => (
-                                      <SelectItem key={pkg.id} value={pkg.id}>
-                                        {pkg.name} ({pkg.laptop.brand} {pkg.laptop.model})
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                              <Label htmlFor="pcReference" className="text-right">
-                                PC Reference
-                              </Label>
-                              <div className="col-span-3">
-                                <Input
-                                  id="pcReference"
-                                  value={pcReference}
-                                  onChange={(e) => setPcReference(e.target.value)}
-                                  placeholder="Serial number, asset tag, or reference ID"
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  A unique identifier for this person's specific PC
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <DialogClose asChild>
-                              <Button 
-                                onClick={handleAssignPackage} 
-                                disabled={!selectedPackageId || isAssigning}
+                  {canManagePeople && (
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <PermissionGate permission={Permission.MANAGE_PEOPLE}>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => openAssignDialog(person)}
+                                title="Assign package"
                               >
-                                {isAssigning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Assign Package
+                                <Package className="h-4 w-4" />
                               </Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setEditingPerson(person)}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Edit Person</DialogTitle>
-                            <DialogDescription>
-                              Make changes to the person's information.
-                            </DialogDescription>
-                          </DialogHeader>
-                          {editingPerson && (
+                            </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Assign Package</DialogTitle>
+                              <DialogDescription>
+                                Assign a package to {currentPersonForAssign?.name}.
+                              </DialogDescription>
+                            </DialogHeader>
                             <div className="grid gap-4 py-4">
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="edit-name" className="text-right">
-                                  Name
+                                <Label htmlFor="package" className="text-right">
+                                  Package
                                 </Label>
-                                <Input
-                                  id="edit-name"
-                                  value={editingPerson.name}
-                                  onChange={(e) =>
-                                    setEditingPerson({
-                                      ...editingPerson,
-                                      name: e.target.value,
-                                    })
-                                  }
-                                  className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                  <Select 
+                                    value={selectedPackageId} 
+                                    onValueChange={setSelectedPackageId}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select a package" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {allPackages.map((pkg) => (
+                                        <SelectItem key={pkg.id} value={pkg.id}>
+                                          {pkg.name} ({pkg.laptop.brand} {pkg.laptop.model})
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="edit-email" className="text-right">
-                                  Email
-                                </Label>
-                                <Input
-                                  id="edit-email"
-                                  value={editingPerson.email || ""}
-                                  onChange={(e) =>
-                                    setEditingPerson({
-                                      ...editingPerson,
-                                      email: e.target.value,
-                                    })
-                                  }
-                                  className="col-span-3"
-                                />
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="edit-department" className="text-right">
-                                  Department
-                                </Label>
-                                <Input
-                                  id="edit-department"
-                                  value={editingPerson.department || ""}
-                                  onChange={(e) =>
-                                    setEditingPerson({
-                                      ...editingPerson,
-                                      department: e.target.value,
-                                    })
-                                  }
-                                  className="col-span-3"
-                                />
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="edit-position" className="text-right">
-                                  Position
-                                </Label>
-                                <Input
-                                  id="edit-position"
-                                  value={editingPerson.position || ""}
-                                  onChange={(e) =>
-                                    setEditingPerson({
-                                      ...editingPerson,
-                                      position: e.target.value,
-                                    })
-                                  }
-                                  className="col-span-3"
-                                />
-                              </div>
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="edit-pcReference" className="text-right">
+                                <Label htmlFor="pcReference" className="text-right">
                                   PC Reference
                                 </Label>
-                                <Input
-                                  id="edit-pcReference"
-                                  value={editingPerson.pcReference || ""}
-                                  onChange={(e) =>
-                                    setEditingPerson({
-                                      ...editingPerson,
-                                      pcReference: e.target.value,
-                                    })
-                                  }
-                                  className="col-span-3"
-                                  placeholder="Serial number or asset tag"
-                                />
+                                <div className="col-span-3">
+                                  <Input
+                                    id="pcReference"
+                                    value={pcReference}
+                                    onChange={(e) => setPcReference(e.target.value)}
+                                    placeholder="Serial number, asset tag, or reference ID"
+                                  />
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    A unique identifier for this person's specific PC
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          )}
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <DialogClose asChild>
-                              <Button onClick={handleUpdatePerson}>Save Changes</Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                              </DialogClose>
+                              <DialogClose asChild>
+                                <Button 
+                                  onClick={handleAssignPackage} 
+                                  disabled={!selectedPackageId || isAssigning}
+                                >
+                                  {isAssigning && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Assign Package
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        </PermissionGate>
 
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="icon">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                                             This will permanently delete {person.name} and cannot be undone.
-                               {person.personAssignments && person.personAssignments.length > 0 && (
-                                 <span className="block mt-2 font-semibold text-destructive">
-                                   Warning: This person has {person.personAssignments.length} assigned packages.
-                                 </span>
-                               )}
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeletePerson(person.id)}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => setEditingPerson(person)}
                             >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Edit Person</DialogTitle>
+                              <DialogDescription>
+                                Make changes to the person's information.
+                              </DialogDescription>
+                            </DialogHeader>
+                            {editingPerson && (
+                              <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="edit-name" className="text-right">
+                                    Name
+                                  </Label>
+                                  <Input
+                                    id="edit-name"
+                                    value={editingPerson.name}
+                                    onChange={(e) =>
+                                      setEditingPerson({
+                                        ...editingPerson,
+                                        name: e.target.value,
+                                      })
+                                    }
+                                    className="col-span-3"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="edit-email" className="text-right">
+                                    Email
+                                  </Label>
+                                  <Input
+                                    id="edit-email"
+                                    value={editingPerson.email || ""}
+                                    onChange={(e) =>
+                                      setEditingPerson({
+                                        ...editingPerson,
+                                        email: e.target.value,
+                                      })
+                                    }
+                                    className="col-span-3"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="edit-department" className="text-right">
+                                    Department
+                                  </Label>
+                                  <Input
+                                    id="edit-department"
+                                    value={editingPerson.department || ""}
+                                    onChange={(e) =>
+                                      setEditingPerson({
+                                        ...editingPerson,
+                                        department: e.target.value,
+                                      })
+                                    }
+                                    className="col-span-3"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="edit-position" className="text-right">
+                                    Position
+                                  </Label>
+                                  <Input
+                                    id="edit-position"
+                                    value={editingPerson.position || ""}
+                                    onChange={(e) =>
+                                      setEditingPerson({
+                                        ...editingPerson,
+                                        position: e.target.value,
+                                      })
+                                    }
+                                    className="col-span-3"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="edit-pcReference" className="text-right">
+                                    PC Reference
+                                  </Label>
+                                  <Input
+                                    id="edit-pcReference"
+                                    value={editingPerson.pcReference || ""}
+                                    onChange={(e) =>
+                                      setEditingPerson({
+                                        ...editingPerson,
+                                        pcReference: e.target.value,
+                                      })
+                                    }
+                                    className="col-span-3"
+                                    placeholder="Serial number or asset tag"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                              </DialogClose>
+                              <DialogClose asChild>
+                                <Button onClick={handleUpdatePerson}>Save Changes</Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                                               This will permanently delete {person.name} and cannot be undone.
+                                {person.personAssignments && person.personAssignments.length > 0 && (
+                                  <span className="block mt-2 font-semibold text-destructive">
+                                    Warning: This person has {person.personAssignments.length} assigned packages.
+                                  </span>
+                                )}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeletePerson(person.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
