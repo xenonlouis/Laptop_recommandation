@@ -163,7 +163,7 @@ export default function SurveyResponsesPage() {
   // -------------------------------------
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requiredRole="ADMIN">
       {loading ? (
         <div className="container mx-auto p-6 flex items-center justify-center h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin mr-2" />
